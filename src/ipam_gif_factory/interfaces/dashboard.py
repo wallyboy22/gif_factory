@@ -1186,17 +1186,50 @@ def _can(mode, permission):
     return hierarchy.get(mode, 0) >= levels.get(permission, 0)
 
 
+def _sync_from_url():
+    params = st.query_params
+    tab = params.get("tab")
+    if tab:
+        tab_map = {"geral": "Geral", "produto": "Produto", "territorio": "Territorio"}
+        mapped = tab_map.get(tab.lower())
+        if mapped:
+            st.session_state["_active_tab"] = mapped
+
+    ds = params.get("ds")
+    prod = params.get("prod")
+    terr = params.get("terr")
+
+    if ds and prod and terr:
+        st.session_state["geral_view"] = {"active": True, "key": (ds, prod, terr)}
+    elif ds and prod:
+        st.session_state["selected_product"] = (ds, prod)
+    elif terr:
+        st.session_state["selected_territory"] = terr
 
 
+def _sync_to_url():
+    st.query_params.clear()
 
+    tab = st.session_state.get("_active_tab", "Geral")
+    st.query_params["tab"] = tab.lower()
 
+    geral_view = st.session_state.get("geral_view", {})
+    if geral_view.get("active"):
+        ds, prod, terr = geral_view["key"]
+        st.query_params["ds"] = ds
+        st.query_params["prod"] = prod
+        st.query_params["terr"] = terr
+        return
 
+    selected_product = st.session_state.get("selected_product")
+    if selected_product:
+        st.query_params["ds"] = selected_product[0]
+        st.query_params["prod"] = selected_product[1]
+        return
 
-
-
-
-
-
+    selected_territory = st.session_state.get("selected_territory")
+    if selected_territory:
+        st.query_params["terr"] = selected_territory
 
 
 _IPAM_CSS = """
@@ -1223,18 +1256,24 @@ _IPAM_CSS = """
     font-size: 0.85rem; font-weight: 500; margin: 0;
 }
 
-/* Pill tabs - light bg, dark text, selected = light green */
-.stTabs [data-baseweb="tab-list"] {
-    background: #f4ede5; border-radius: 30px; padding: 4px; gap: 0; border: none;
+/* Pill tabs via radio - light bg, dark text, selected = light green */
+div[data-testid="stRadio"] > div[role="radiogroup"] > div {
+    display: flex; flex-direction: row; flex-wrap: wrap;
+    background: #f4ede5; border-radius: 30px; padding: 4px; gap: 0;
 }
-.stTabs [data-baseweb="tab"] {
+div[data-testid="stRadio"] label {
     border-radius: 30px; padding: 8px 24px; font-weight: 500 !important;
     font-size: 0.9rem !important; color: #353935 !important;
+    background: transparent !important; margin: 0;
 }
-.stTabs [aria-selected="true"] {
+div[data-testid="stRadio"] label[aria-checked="true"] {
     background: #c8e6c9 !important; color: #1b5e20 !important;
 }
-.stTabs [data-baseweb="tab-highlight"] { display: none; }
+div[data-testid="stRadio"] label:hover {
+    background: #e8f5e9 !important;
+}
+div[data-testid="stRadio"] div[data-testid="StyledRadio"] { display: none !important; }
+div[data-testid="stRadio"] { min-height: unset; padding-bottom: 0; margin-bottom: 0; }
 
 /* Buttons - light background, dark text, subtle border */
 .stButton > button {
@@ -1536,11 +1575,6 @@ div[data-testid="stJson"] {
     color: #353935 !important;
 }
 
-/* Tabs hover - unselected tabs */
-.stTabs [data-baseweb="tab"]:not([aria-selected="true"]):hover {
-    background: #e8f5e9 !important;
-}
-
 /* Enforce dark text on EVERYTHING - Streamlit defaults use light colors in many places */
 .stApp, .stMain, .main, .block-container, div, section, article, aside, header, footer {
     color: #353935 !important;
@@ -1614,24 +1648,28 @@ def run_dashboard():
     except Exception:
         pass
 
+    _sync_from_url()
+
     _render_header()
 
     tabs = ["Geral", "Produto", "Territorio"]
 
-    tab_objects = st.tabs(tabs)
+    tab = st.radio("", tabs, horizontal=True, key="_active_tab", label_visibility="collapsed")
 
-    with tab_objects[0]:
+    if tab == "Geral":
         _clear_index_cache()
         st.session_state["_index_entries"] = _load_index(output_dir, config)
         _render_geral(output_dir, config)
 
-    with tab_objects[1]:
+    elif tab == "Produto":
         st.session_state["_index_entries"] = _filter_visible(_load_index(output_dir, config))
         _render_catalog_product(output_dir, config)
 
-    with tab_objects[2]:
+    elif tab == "Territorio":
         st.session_state["_index_entries"] = _filter_visible(_load_index(output_dir, config))
         _render_catalog_territory(output_dir, config)
+
+    _sync_to_url()
 
     ipam_b64 = base64.b64encode(open(LOGO_PATH, "rb").read()).decode() if LOGO_PATH.exists() else None
     footer_logo = f'<div style="margin-bottom:4px;"><img src="data:image/png;base64,{ipam_b64}" height="32"></div>' if ipam_b64 else ""

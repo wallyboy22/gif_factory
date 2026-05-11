@@ -1,0 +1,58 @@
+DOWNLOADS
+PARTE 1 - Ícone Externo
+
+Onde atualizar: https://brasil.mapbiomas.org/downloads/  
+
+Imagem: 
+thumbnail do mapa de idade da área de borda 
+
+
+
+Título: MapBiomas Degradação 
+
+Texto: Mapas dos vetores de degradação da vegetação nativa do Brasil 
+
+
+PARTE 2 - página de download
+
+Onde atualizar: https://brasil.mapbiomas.org/dados-do-modulo-mapbiomas-degradacao/ 
+
+Título: DADOS DO MÓDULO MAPBIOMAS DEGRADAÇÃO
+
+Texto: O módulo de Degradação do MapBiomas disponibiliza dados sobre os vetores de degradação da vegetação nativa do Brasil no período de 1986 a 2023. Os vetores incluem: frequência do fogo, tempo desde o último fogo, corte seletivo, distúrbio de dossel, número de fragmentos, tamanho dos fragmentos, área de borda, idade da borda, morfologia dos fragmentos e idade da vegetação secundária.
+
+Como acessar os dados: 
+
+Plataforma MapBiomas: https://plataforma.brasil.mapbiomas.org/degradation/degradation_edge_size
+Os dados estão disponíveis para download por meio da ferramenta “Criar análise”. Consulte as orientações para baixar mapas e estatísticas na plataforma.
+
+Assets de mapas no Google Earth Engine: acesso direto aos assets dos mapas.
+Frequência do fogo: projects/mapbiomas-public/assets/brazil/lulc/collection10_1/mapbiomas_brazil_collection10_1_degradation_fire_frequency_v1
+
+Tempo desde o último fogo: projects/mapbiomas-public/assets/brazil/lulc/collection10_1/mapbiomas_brazil_collection10_1_degradation_fire_age_v1
+
+Corte seletivo:
+Distúrbio de dossel:
+
+Número de fragmentos: projects/mapbiomas-public/assets/brazil/lulc/collection10_1/mapbiomas_brazil_collection10_1_degradation_patch_id_v1
+
+Tamanho do fragmento: projects/mapbiomas-public/assets/brazil/lulc/collection10_1/mapbiomas_brazil_collection10_1_degradation_patch_size_v1
+
+Área de borda: projects/mapbiomas-public/assets/brazil/lulc/collection10_1/mapbiomas_brazil_collection10_1_degradation_edge_area_v1
+
+Idade da borda: projects/mapbiomas-public/assets/brazil/lulc/collection10_1/mapbiomas_brazil_collection10_1_degradation_edge_age_v1
+
+Morfologia do fragmento: projects/mapbiomas-public/assets/brazil/lulc/collection10_1/mapbiomas_brazil_collection10_1_degradation_landscape_morphology_v1
+
+Idade da vegetação secundária: projects/mapbiomas-public/assets/brazil/lulc/collection10_1/mapbiomas_brazil_collection10_1_degradation_secondary_vegetation_age_v1
+
+Material de destaque (factsheet): https://brasil.mapbiomas.org/destaques/ 
+Destaques e visão geral do módulo
+
+
+Em caso de dúvidas, sugestões ou feedbacks para aprimoramento do módulo e dos dados, entre em contato pelo e-mail: contato@mapbiomas.org  
+
+Os dados do MapBiomas são públicos, abertos e gratuitos, sob licença CC-BY-SA, mediante citação da fonte. Utilize o seguinte formato de referência:
+“Módulo de degradação da vegetação nativa do Brasil (1986–2023), acessado em [DATA], [LINK]”. 
+
+

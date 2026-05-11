@@ -1,0 +1,56 @@
+[
+    {
+        "classe": "Formação Florestal",
+        "nivel": 2,
+        "pixel_id": 3,
+        "hexacode": "#1f8d49"
+    },
+    {
+        "classe": "Formação Savânica",
+        "nivel": 2,
+        "pixel_id": 4,
+        "hexacode": "#7dc975"
+    },
+    {
+        "classe": "Mangue",
+        "nivel": 2,
+        "pixel_id": 5,
+        "hexacode": "#04381d"
+    },
+    {
+        "classe": "Floresta Alagável",
+        "nivel": 2,
+        "pixel_id": 6,
+        "hexacode": "#007785"
+    },
+    {
+        "classe": "Restinga Arbórea",
+        "nivel": 2,
+        "pixel_id": 49,
+        "hexacode": "#02d659"
+    },
+    {
+        "classe": "Campo Alagado e Área Pantanosa",
+        "nivel": 2,
+        "pixel_id": 11,
+        "hexacode": "#519799"
+    },
+    {
+        "classe": "Formação Campestre",
+        "nivel": 2,
+        "pixel_id": 12,
+        "hexacode": "#d6bc74"
+    },
+    {
+        "classe": "Apicum",
+        "nivel": 2,
+        "pixel_id": 32,
+        "hexacode": "#fc8114"
+    },
+    {
+        "classe": "Restinga Herbácea",
+        "nivel": 2,
+        "pixel_id": 50,
+        "hexacode": "#ad5100"
+    }
+]
