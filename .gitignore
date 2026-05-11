@@ -26,6 +26,7 @@ config/visibility.json
 
 # Jupyter notebooks (not needed for deployment)
 notebooks/
+*.ipynb
 
 # Environment
 .env
