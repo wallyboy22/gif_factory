@@ -796,6 +796,19 @@ def _territory_thumbnail_html(territory_id, config, output_dir):
     if cached:
         return cached
 
+    gcs_base = _gcs_base(config) if config else None
+    if gcs_base:
+        thumb_url = f"{gcs_base}/territories/{territory_id}.png"
+        try:
+            with urllib.request.urlopen(thumb_url, timeout=15) as resp:
+                data = resp.read()
+            b64 = base64.b64encode(data).decode()
+            html = f'<img src="data:image/png;base64,{b64}" style="width:100%;border-radius:8px;">'
+            st.session_state[key] = html
+            return html
+        except Exception:
+            pass
+
     thumb_dir = Path(output_dir) / "territories"
     thumb_path = thumb_dir / f"{territory_id}.png"
 
