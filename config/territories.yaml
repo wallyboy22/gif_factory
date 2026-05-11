@@ -1,0 +1,176 @@
+territories:
+  countries:
+    paraguay:
+      name: "Paraguai"
+      name_en: "Paraguay"
+      source: "FAO/GAUL/2015/level0"
+      filter: "ADM0_NAME == 'Paraguay'"
+      bbox: [-62.0, -27.5, -54.0, -19.0]
+    brasil:
+      name: "Brasil"
+      name_en: "Brazil"
+      source: "FAO/GAUL/2015/level0"
+      filter: "ADM0_NAME == 'Brazil'"
+      bbox: [-74.0, -34.0, -34.0, 5.0]
+    brasil_biomes:
+      name: "Brasil - Biomas"
+      name_en: "Brazil - Biomes"
+      source: "FAO/GAUL/2015/level0"
+      filter: "ADM0_NAME == 'Brazil'"
+      bbox: [-74.0, -34.0, -34.0, 5.0]
+      overlay_source: "projects/mapbiomas-workspace/AUXILIAR/biomas_IBGE_250mil"
+
+  biomes:
+    biomas:
+      name: "Biomas"
+      name_en: "All Biomes"
+      source: "projects/mapbiomas-workspace/AUXILIAR/biomas_IBGE_250mil"
+      bbox: [-74.0, -34.0, -34.0, 5.0]
+    amazonia:
+      name: "Amazônia"
+      source: "projects/mapbiomas-workspace/AUXILIAR/biomas_IBGE_250mil"
+      filter: "Bioma == 'Amazônia'"
+      bbox: [-74.0, -18.0, -44.0, 5.0]
+    caatinga:
+      name: "Caatinga"
+      source: "projects/mapbiomas-workspace/AUXILIAR/biomas_IBGE_250mil"
+      filter: "Bioma == 'Caatinga'"
+      bbox: [-48.0, -18.0, -36.0, -3.0]
+    cerrado:
+      name: "Cerrado"
+      source: "projects/mapbiomas-workspace/AUXILIAR/biomas_IBGE_250mil"
+      filter: "Bioma == 'Cerrado'"
+      bbox: [-56.0, -24.0, -40.0, -2.0]
+    mata_atlantica:
+      name: "Mata Atlântica"
+      source: "users/wallacesilva/mata_atlantica_"
+      bbox: [-56.0, -30.0, -32.0, -2.0]
+    pampa:
+      name: "Pampa"
+      source: "projects/mapbiomas-workspace/AUXILIAR/biomas_IBGE_250mil"
+      filter: "Bioma == 'Pampa'"
+      bbox: [-58.0, -34.0, -50.0, -28.0]
+    pantanal:
+      name: "Pantanal"
+      source: "projects/mapbiomas-workspace/AUXILIAR/biomas_IBGE_250mil"
+      filter: "Bioma == 'Pantanal'"
+      bbox: [-58.0, -22.0, -55.0, -17.0]
+
+  states:
+    df:
+      name: "Distrito Federal"
+      name_en: "Federal District"
+      source: "projects/mapbiomas-workspace/AUXILIAR/estados-2017"
+      filter: "NM_ESTADO == 'DISTRITO FEDERAL'"
+      bbox: [-48.2, -16.1, -47.3, -15.5]
+    acre:
+      name: "Acre"
+      source: "projects/mapbiomas-workspace/AUXILIAR/estados-2017"
+      filter: "NM_ESTADO == 'ACRE'"
+    alagoas:
+      name: "Alagoas"
+      source: "projects/mapbiomas-workspace/AUXILIAR/estados-2017"
+      filter: "NM_ESTADO == 'ALAGOAS'"
+    amapa:
+      name: "Amapá"
+      source: "projects/mapbiomas-workspace/AUXILIAR/estados-2017"
+      filter: "NM_ESTADO == 'AMAPÁ'"
+    amazonas:
+      name: "Amazonas"
+      source: "projects/mapbiomas-workspace/AUXILIAR/estados-2017"
+      filter: "NM_ESTADO == 'AMAZONAS'"
+    bahia:
+      name: "Bahia"
+      source: "projects/mapbiomas-workspace/AUXILIAR/estados-2017"
+      filter: "NM_ESTADO == 'BAHIA'"
+    ceara:
+      name: "Ceará"
+      source: "projects/mapbiomas-workspace/AUXILIAR/estados-2017"
+      filter: "NM_ESTADO == 'CEARÁ'"
+    espirito_santo:
+      name: "Espírito Santo"
+      source: "projects/mapbiomas-workspace/AUXILIAR/estados-2017"
+      filter: "NM_ESTADO == 'ESPÍRITO SANTO'"
+    goias:
+      name: "Goiás"
+      source: "projects/mapbiomas-workspace/AUXILIAR/estados-2017"
+      filter: "NM_ESTADO == 'GOIÁS'"
+    maranhao:
+      name: "Maranhão"
+      source: "projects/mapbiomas-workspace/AUXILIAR/estados-2017"
+      filter: "NM_ESTADO == 'MARANHÃO'"
+    mato_grosso:
+      name: "Mato Grosso"
+      source: "projects/mapbiomas-workspace/AUXILIAR/estados-2017"
+      filter: "NM_ESTADO == 'MATO GROSSO'"
+    mato_grosso_sul:
+      name: "Mato Grosso do Sul"
+      source: "projects/mapbiomas-workspace/AUXILIAR/estados-2017"
+      filter: "NM_ESTADO == 'MATO GROSSO DO SUL'"
+    minas_gerais:
+      name: "Minas Gerais"
+      source: "projects/mapbiomas-workspace/AUXILIAR/estados-2017"
+      filter: "NM_ESTADO == 'MINAS GERAIS'"
+    para:
+      name: "Pará"
+      source: "projects/mapbiomas-workspace/AUXILIAR/estados-2017"
+      filter: "NM_ESTADO == 'PARÁ'"
+    paraiba:
+      name: "Paraíba"
+      source: "projects/mapbiomas-workspace/AUXILIAR/estados-2017"
+      filter: "NM_ESTADO == 'PARAÍBA'"
+    parana:
+      name: "Paraná"
+      source: "projects/mapbiomas-workspace/AUXILIAR/estados-2017"
+      filter: "NM_ESTADO == 'PARANÁ'"
+    pernambuco:
+      name: "Pernambuco"
+      source: "projects/mapbiomas-workspace/AUXILIAR/estados-2017"
+      filter: "NM_ESTADO == 'PERNAMBUCO'"
+    piaui:
+      name: "Piauí"
+      source: "projects/mapbiomas-workspace/AUXILIAR/estados-2017"
+      filter: "NM_ESTADO == 'PIAUÍ'"
+    rio_de_janeiro:
+      name: "Rio de Janeiro"
+      source: "projects/mapbiomas-workspace/AUXILIAR/estados-2017"
+      filter: "NM_ESTADO == 'RIO DE JANEIRO'"
+    rio_grande_norte:
+      name: "Rio Grande do Norte"
+      source: "projects/mapbiomas-workspace/AUXILIAR/estados-2017"
+      filter: "NM_ESTADO == 'RIO GRANDE DO NORTE'"
+    rio_grande_sul:
+      name: "Rio Grande do Sul"
+      source: "projects/mapbiomas-workspace/AUXILIAR/estados-2017"
+      filter: "NM_ESTADO == 'RIO GRANDE DO SUL'"
+    rondonia:
+      name: "Rondônia"
+      source: "projects/mapbiomas-workspace/AUXILIAR/estados-2017"
+      filter: "NM_ESTADO == 'RONDÔNIA'"
+    roraima:
+      name: "Roraima"
+      source: "projects/mapbiomas-workspace/AUXILIAR/estados-2017"
+      filter: "NM_ESTADO == 'RORAIMA'"
+    santa_catarina:
+      name: "Santa Catarina"
+      source: "projects/mapbiomas-workspace/AUXILIAR/estados-2017"
+      filter: "NM_ESTADO == 'SANTA CATARINA'"
+    sao_paulo:
+      name: "São Paulo"
+      source: "projects/mapbiomas-workspace/AUXILIAR/estados-2017"
+      filter: "NM_ESTADO == 'SÃO PAULO'"
+    sergipe:
+      name: "Sergipe"
+      source: "projects/mapbiomas-workspace/AUXILIAR/estados-2017"
+      filter: "NM_ESTADO == 'SERGIPE'"
+    tocantins:
+      name: "Tocantins"
+      source: "projects/mapbiomas-workspace/AUXILIAR/estados-2017"
+      filter: "NM_ESTADO == 'TOCANTINS'"
+
+  custom_regions:
+    matopiba_cerrado:
+      name: "MATOPIBA no Cerrado"
+      name_en: "MATOPIBA in Cerrado"
+      source: "users/dh-conciani/vectors/matopiba_lapig_cerrado"
+      bbox: [-50.0, -16.0, -41.0, -2.0]

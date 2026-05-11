@@ -1,0 +1,38 @@
+runtime:
+  mode: "local"
+
+paths:
+  google_drive:
+    output_root: "/content/drive/MyDrive/IPAM FRAMES AND GIFS/"
+    create_if_missing: true
+
+  google_cloud_storage:
+    bucket: "mapbiomas-fire"
+    hub_root: "gif-factory"
+    project_id: "mapbiomas-fire-485203"
+
+  local:
+    cache_dir: "./cache/"
+    output_dir: "./output/"
+    logs_dir: "./logs/"
+
+  earth_engine:
+    project_id: "ee-ipam"
+    timeout_seconds: 300
+    retry_attempts: 3
+
+processing:
+  image_download:
+    vertical_dimension: 2500
+    timeout: 60
+
+  gif_creation:
+    frame_duration: 300
+    loop_count: 1000
+    quality: 95
+
+  frame_processing:
+    font_size: 48
+    font_color: [255, 255, 255]
+    outline_color: [0, 0, 0]
+    background: "white"

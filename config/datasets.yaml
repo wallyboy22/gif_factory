@@ -1,0 +1,347 @@
+datasets:
+  brasil_fire_col3:
+    description: "MapBiomas Fire Collection 3 - Brasil"
+    category: "fire"
+    source: "MapBiomas"
+    collection: 3
+    visualization: "fire"
+    products:
+      annual_burned:
+        name: "Annual Burned Area"
+        asset: "projects/mapbiomas-public/assets/brazil/fire/collection3/mapbiomas_fire_collection3_annual_burned_v1"
+        bands: ["annual_burned"]
+        temporal_range: [1985, 2023]
+        visualization: "fire"
+      annual_burned_coverage:
+        name: "Annual Burned Coverage"
+        asset: "projects/mapbiomas-public/assets/brazil/fire/collection3/mapbiomas_fire_collection3_annual_burned_coverage_v1"
+        bands: ["annual_burned_coverage"]
+        temporal_range: [1985, 2023]
+        visualization: "lulc"
+      monthly_burned:
+        name: "Monthly Burned Area"
+        asset: "projects/mapbiomas-public/assets/brazil/fire/collection3/mapbiomas_fire_collection3_monthly_burned_v1"
+        bands: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"]
+        temporal_range: [1985, 2023]
+        visualization: "monthly"
+      fire_frequency:
+        name: "Fire Frequency"
+        asset: "projects/mapbiomas-public/assets/brazil/fire/collection3/mapbiomas_fire_collection3_fire_frequency_v1"
+        bands: ["frequency"]
+        temporal_range: [1985, 2023]
+        visualization: "frequency"
+        bands_slice: [0, 39]
+      accumulated_burned:
+        name: "Accumulated Burned Area"
+        asset: "projects/mapbiomas-public/assets/brazil/fire/collection3/mapbiomas_fire_collection3_accumulated_burned_v1"
+        bands: ["accumulated"]
+        bands_slice: [0, 39]
+        temporal_range: [1985, 2023]
+        visualization: "fire"
+      accumulated_burned_coverage:
+        name: "Accumulated Burned Coverage"
+        asset: "projects/mapbiomas-public/assets/brazil/fire/collection3/mapbiomas_fire_collection3_accumulated_burned_coverage_v1"
+        bands: ["coverage"]
+        temporal_range: [1985, 2023]
+        visualization: "lulc"
+      year_last_fire:
+        name: "Year of Last Fire"
+        asset: "projects/mapbiomas-public/assets/brazil/fire/collection3/mapbiomas_fire_collection3_year_last_fire_v1"
+        bands: ["year"]
+        visualization: "year_last_fire"
+      scar_size_range:
+        name: "Scar Size Range"
+        asset: "projects/mapbiomas-public/assets/brazil/fire/collection3/mapbiomas_fire_collection3_annual_burned_scar_size_range_v1"
+        bands: ["size_range"]
+        visualization: "scar_size_range"
+      time_after_fire:
+        name: "Time After Fire"
+        asset: "projects/mapbiomas-workspace/FOGO_COL3/2-Subprodutos/mapbiomas-fire-collection3-time-after-fire-v1"
+        bands: ["years"]
+        visualization: "fire_age"
+      time_before_fire:
+        name: "Time Before Fire"
+        asset: "projects/mapbiomas-workspace/FOGO_COL3/2-Subprodutos/mapbiomas-fire-collection3-time-before-fire-v1"
+        bands: ["years"]
+        visualization: "fire_age"
+      year_next_fire:
+        name: "Year of Next Fire"
+        asset: "projects/mapbiomas-workspace/FOGO_COL3/2-Subprodutos/mapbiomas-fire-collection3-year-next-fire-v1"
+        bands: ["year"]
+        visualization: "year_next_fire"
+
+  paraguay_fire_col1:
+    description: "MapBiomas Fire Collection 1 - Paraguay"
+    category: "fire"
+    source: "MapBiomas"
+    collection: 1
+    products:
+      annual_burned:
+        name: "Annual Burned Area"
+        asset: "projects/mapbiomas-paraguay/assets/FIRE/COLLECTION1/FINAL_PRODUCTS/mapbiomas_paraguay_fire_collection1_annual_burned_v1"
+        bands: ["annual_burned"]
+        temporal_range: [1998, 2023]
+        visualization: "fire"
+      annual_burned_coverage:
+        name: "Annual Burned Coverage"
+        asset: "projects/mapbiomas-public/assets/paraguay/fire/collection1/mapbiomas_paraguay_fire_collection1_annual_burned_coverage_v1"
+        bands: ["coverage"]
+        temporal_range: [1998, 2023]
+        visualization: "lulc"
+      monthly_burned:
+        name: "Monthly Burned Area"
+        asset: "projects/mapbiomas-paraguay/assets/FIRE/COLLECTION1/FINAL_PRODUCTS/mapbiomas_paraguay_fire_collection1_monthly_burned_v1"
+        bands: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"]
+        temporal_range: [1998, 2023]
+        visualization: "monthly"
+      fire_frequency:
+        name: "Fire Frequency"
+        asset: "projects/mapbiomas-paraguay/assets/FIRE/COLLECTION1/FINAL_PRODUCTS/mapbiomas_paraguay_fire_collection1_frequency_burned_v1"
+        bands: ["frequency"]
+        temporal_range: [1998, 2023]
+        visualization: "frequency_paraguay"
+      accumulated_burned:
+        name: "Accumulated Burned Area"
+        asset: "projects/mapbiomas-paraguay/assets/FIRE/COLLECTION1/FINAL_PRODUCTS/mapbiomas_paraguay_fire_collection1_accumulated_burned_v1"
+        bands: ["accumulated"]
+        temporal_range: [1998, 2023]
+        visualization: "fire"
+      accumulated_burned_coverage:
+        name: "Accumulated Burned Coverage"
+        asset: "projects/mapbiomas-paraguay/assets/FIRE/COLLECTION1/FINAL_PRODUCTS/mapbiomas_paraguay_fire_collection1_accumulated_burned_coverage_v1"
+        bands: ["coverage"]
+        temporal_range: [1998, 2023]
+        visualization: "lulc"
+
+  brasil_lulc_col9:
+    description: "MapBiomas Land Use and Cover Collection 9 - Brasil"
+    category: "land_cover"
+    source: "MapBiomas"
+    collection: 9
+    products:
+      integration:
+        name: "Land Use and Cover Classification"
+        asset: "projects/mapbiomas-public/assets/brazil/lulc/collection9/mapbiomas_collection90_integration_v1"
+        bands: ["classification"]
+        temporal_range: [1985, 2023]
+        visualization: "lulc"
+      deforestation_secondary:
+        name: "Deforestation and Secondary Vegetation"
+        asset: "projects/mapbiomas-public/assets/brazil/lulc/collection9/mapbiomas_collection90_deforestation_secondary_vegetation_v1"
+        bands: ["deforestation"]
+        visualization: "def_seco"
+      irrigated_agriculture:
+        name: "Irrigated Agriculture"
+        asset: "projects/mapbiomas-public/assets/brazil/lulc/collection9/mapbiomas_collection90_irrigated_agriculture_v1"
+        bands: ["irrigated"]
+        visualization: "lulc"
+      mined_substance:
+        name: "Mining Areas"
+        asset: "projects/mapbiomas-public/assets/brazil/lulc/collection9/mapbiomas_collection90_mined_substance_v1"
+        bands: ["mining"]
+        visualization: "lulc"
+      pasture_quality:
+        name: "Pasture Quality"
+        asset: "projects/mapbiomas-public/assets/brazil/lulc/collection9/mapbiomas_collection90_pasture_quality_v1"
+        bands: ["quality"]
+        visualization: "lulc"
+      secondary_vegetation_age:
+        name: "Secondary Vegetation Age"
+        asset: "projects/mapbiomas-public/assets/brazil/lulc/collection9/mapbiomas_collection90_secondary_vegetation_age_v1"
+        bands: ["age"]
+        visualization: "secondary_vegetation_age"
+      quality:
+        name: "Land Cover Quality"
+        asset: "projects/mapbiomas-public/assets/brazil/lulc/collection9/mapbiomas_collection90_quality_v1"
+        bands: ["quality"]
+        visualization: "lulc"
+
+  brasil_lulc_col10:
+    description: "MapBiomas Land Use and Cover Collection 10 - Brasil"
+    category: "land_cover"
+    source: "MapBiomas"
+    collection: 10
+    products:
+      integration:
+        name: "Land Use and Cover Classification v2"
+        asset: "projects/mapbiomas-public/assets/brazil/lulc/collection10/mapbiomas_brazil_collection10_integration_v2"
+        bands: ["classification"]
+        temporal_range: [1985, 2024]
+        visualization: "lulc"
+      deforestation_secondary:
+        name: "Deforestation and Secondary Vegetation v2"
+        asset: "projects/mapbiomas-public/assets/brazil/lulc/collection10/mapbiomas_brazil_collection10_deforestation_secondary_vegetation_v2"
+        bands: ["deforestation"]
+        visualization: "def_seco"
+      irrigated_agriculture:
+        name: "Irrigated Agriculture v2"
+        asset: "projects/mapbiomas-public/assets/brazil/lulc/collection10/mapbiomas_brazil_collection10_agriculture_irrigation_systems_v2"
+        bands: ["irrigated"]
+        visualization: "lulc"
+      mined_substance:
+        name: "Mining Areas v3"
+        asset: "projects/mapbiomas-public/assets/brazil/lulc/collection10/mapbiomas_brazil_collection10_mining_substances_v3"
+        bands: ["mining"]
+        visualization: "lulc"
+      pasture_quality:
+        name: "Pasture Vigor"
+        asset: "projects/mapbiomas-public/assets/brazil/lulc/collection10/mapbiomas_brazil_collection10_pasture_vigor_v1"
+        bands: ["vigor"]
+        visualization: "lulc"
+
+  brasil_soil:
+    description: "MapBiomas Soil Organic Carbon - Brasil"
+    category: "soil"
+    source: "MapBiomas"
+    products:
+      soc:
+        name: "Soil Organic Carbon (0-30 cm)"
+        asset: "projects/mapbiomas-workspace/SOLOS/PRODUTOS_BETA/soil_organic_carbon-0_30_cm_t_ha-beta_2_1"
+        bands: ["soc"]
+        asset_type: "image_collection"
+        mosaic: true
+        mask_value: -2
+        visualization: "soc"
+
+  brasil_degradation_col9:
+    description: "MapBiomas Degradation Indicators Collection 9 - Brasil"
+    category: "degradation"
+    source: "MapBiomas Degradation"
+    collection: 9
+    products:
+      edge_area:
+        name: "Edge Area (30-1000m)"
+        processor: "build_edge_area"
+        bands: ["edge_area"]
+        visualization: "edge_area"
+      fragment_size:
+        name: "Fragment Size (3-75ha)"
+        processor: "build_fragment_size"
+        bands: ["fragment_size"]
+        visualization: "patch_size"
+      distance_100ha:
+        name: "Isolation Distance (100ha)"
+        processor: "build_distance_100ha"
+        bands: ["distance_100ha"]
+        visualization: "distances"
+      distance_500ha:
+        name: "Isolation Distance (500ha)"
+        processor: "build_distance_500ha"
+        bands: ["distance_500ha"]
+        visualization: "distances"
+      distance_1000ha:
+        name: "Isolation Distance (1000ha)"
+        processor: "build_distance_1000ha"
+        bands: ["distance_1000ha"]
+        visualization: "distances"
+      secondary_vegetation_coverage:
+        name: "Secondary Vegetation Coverage"
+        processor: "build_secondary_vegetation_coverage"
+        bands: ["secondary_coverage"]
+        visualization: "lulc"
+      secondary_vegetation_age:
+        name: "Secondary Vegetation Age"
+        processor: "build_secondary_vegetation_age"
+        bands: ["secondary_age"]
+        visualization: "secondary_vegetation_age"
+      fire_frequency:
+        name: "Degradation Fire Frequency"
+        processor: "build_fire_frequency"
+        bands: ["fire_freq"]
+        visualization: "frequency"
+      fire_age:
+        name: "Degradation Fire Age"
+        processor: "build_fire_age"
+        bands: ["fire_age"]
+        visualization: "fire_age"
+      accumulated_burned_coverage:
+        name: "Degradation Accumulated Burned Coverage"
+        processor: "build_accumulated_burned_coverage"
+        bands: ["accum_burned"]
+        visualization: "lulc"
+
+  brasil_degradation_col10_1:
+    description: "Módulo de Degradação do MapBiomas · Coleção 10.1"
+    category: "degradation"
+    source: "MapBiomas Degradação"
+    collection: 10.1
+    products:
+      fire_frequency:
+        name: "Frequência do Fogo"
+        processor: "decode_fire_frequency_col101"
+        temporal_range: [1985, 2024]
+        visualization: "frequency_col101"
+      natural_coverage:
+        name: "Cobertura e Uso da Terra"
+        processor: "build_fire_frequency_coverage_col101"
+        temporal_range: [1985, 2024]
+        visualization: "secondary_vegetation_coverage"
+      burned_natural_coverage:
+        name: "Cobertura Vegetal em Áreas Queimadas"
+        processor: "build_burned_natural_coverage_col101"
+        temporal_range: [1985, 2024]
+        visualization: "secondary_vegetation_coverage"
+      burned_at_least_once:
+        name: "Queimado ao Menos uma Vez"
+        processor: "build_burned_at_least_once_col101"
+        temporal_range: [1985, 2024]
+        visualization: "burned_at_least_once"
+      primary_natural_coverage:
+        name: "Cobertura Natural Primária"
+        processor: "build_primary_natural_coverage_col101"
+        temporal_range: [1985, 2024]
+        visualization: "secondary_vegetation_coverage"
+      fire_age:
+        name: "Tempo desde o Último Fogo"
+        processor: "decode_fire_age_col101"
+        temporal_range: [1985, 2024]
+        visualization: "fire_age"
+      patch_id:
+        name: "Número de Fragmentos"
+        processor: "decode_patch_id_col101"
+        temporal_range: [1985, 2024]
+        visualization: "random"
+      patch_size:
+        name: "Tamanho do Fragmento"
+        processor: "decode_patch_size_col101"
+        temporal_range: [1985, 2024]
+        visualization: "patch_size"
+      edge_area:
+        name: "Área de Borda"
+        processor: "decode_edge_area_col101"
+        temporal_range: [1985, 2024]
+        visualization: "edge_area_col101"
+      edge_age:
+        name: "Idade da Borda"
+        processor: "decode_edge_age_col101"
+        temporal_range: [1985, 2024]
+        visualization: "edge_age_col101"
+      landscape_morphology:
+        name: "Morfologia dos Fragmentos"
+        processor: "decode_morphology_col101"
+        temporal_range: [1985, 2024]
+        visualization: "morphology"
+      secondary_vegetation_age:
+        name: "Idade da Vegetação Secundária"
+        processor: "decode_secondary_vegetation_age_col101"
+        temporal_range: [1985, 2024]
+        visualization: "secondary_vegetation_age"
+      secondary_vegetation_coverage:
+        name: "Cobertura da Vegetação Secundária"
+        processor: "build_secondary_vegetation_coverage_col101"
+        temporal_range: [1985, 2024]
+        visualization: "secondary_vegetation_coverage"
+
+categories:
+  fire:
+    label: "Fogo"
+    color: "#FF5722"
+  land_cover:
+    label: "Uso do Solo"
+    color: "#4CAF50"
+  degradation:
+    label: "Degradação"
+    color: "#795548"
+  soil:
+    label: "Solo"
+    color: "#8D6E63"
