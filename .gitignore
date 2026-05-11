@@ -38,3 +38,47 @@ notebooks/
 # Logs
 logs/
 *.log
+
+# Agent context (internal)
+.agents/
+
+# Scripts (processing only, not needed for viewer)
+scripts/
+
+# Tests
+tests/
+
+# Extra reference files (logos kept separately)
+references/*.pdf
+references/*.gif
+references/*.js
+references/*.txt
+references/*.md
+references/*.jpg
+references/ipam_fabrica_de_gifs_com_earth_engine.py
+references/legend_natural_classes_mapbiomas_degragation.json
+references/north-arrow-2.png
+references/word/
+
+# Extra interfaces (viewer only needs dashboard)
+src/ipam_gif_factory/interfaces/api.py
+src/ipam_gif_factory/interfaces/cli.py
+src/ipam_gif_factory/interfaces/colab_dashboard.py
+
+# Processing pipeline modules (not needed for viewer)
+src/ipam_gif_factory/core/gif_generator.py
+src/ipam_gif_factory/core/frame_processor.py
+src/ipam_gif_factory/core/ee_downloader.py
+src/ipam_gif_factory/core/ee_transforms.py
+src/ipam_gif_factory/core/pipeline.py
+src/ipam_gif_factory/core/state_manager.py
+src/ipam_gif_factory/utils/ee_utils.py
+
+# Root scripts
+main.py
+sync_to_hub.py
+test_checkpoint.py
+run_*.py
+
+# Config reference (not loaded by dashboard)
+config/visualization_reference.yaml
