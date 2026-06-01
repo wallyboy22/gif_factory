@@ -27,6 +27,7 @@ status.json
 # Colab notebooks (only allow factory notebooks)
 notebooks/*
 !notebooks/fabrica_*.ipynb
+gif_factory_hub_dashboard.ipynb
 
 # Environment
 .env
@@ -47,6 +48,8 @@ logs/
 scripts/process_*.py
 scripts/upload_*.py
 scripts/build_index.py
+scripts/__init__.py
+scripts/__pycache__/
 
 # Tests
 tests/
@@ -58,6 +61,9 @@ references/*.js
 references/*.txt
 references/*.md
 references/*.jpg
+references/*.py
+references/*.json
+references/*.docx
 references/logo_ipam_trinta_anos_curta.png
 references/logomarca_fundo_preto_logo_branca.png
 references/logomarca_horizontal.png
