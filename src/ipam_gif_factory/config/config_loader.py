@@ -1,6 +1,18 @@
 import os
 import yaml
+import warnings
 from typing import Any, Dict
+
+
+def _deep_merge(base: Dict, overlay: Dict) -> Dict:
+    """Mesclar overlay em base recursivamente."""
+    result = base.copy()
+    for key, value in overlay.items():
+        if key in result and isinstance(result[key], dict) and isinstance(value, dict):
+            result[key] = _deep_merge(result[key], value)
+        else:
+            result[key] = value
+    return result
 
 
 class ConfigLoader:
@@ -21,10 +33,23 @@ class ConfigLoader:
         with open(path, "r", encoding="utf-8") as f:
             return yaml.safe_load(f) or {}
 
+    def _load_yaml_with_includes(self, filename: str) -> Dict[str, Any]:
+        """Carregar YAML suportando includes de arquivos externos."""
+        data = self._load_yaml(filename)
+        includes = data.pop("includes", [])
+        for inc in includes:
+            inc_path = os.path.join(self.config_dir, inc)
+            if not os.path.exists(inc_path):
+                warnings.warn(f"Include not found, skipping: {inc}")
+                continue
+            inc_data = self._load_yaml(inc)
+            data = _deep_merge(data, inc_data)
+        return data
+
     def load_all(self):
         self._datasets = self._load_yaml("datasets.yaml")
-        self._territories = self._load_yaml("territories.yaml")
-        self._visualizations = self._load_yaml("visualization.yaml")
+        self._territories = self._load_yaml_with_includes("territories.yaml")
+        self._visualizations = self._load_yaml_with_includes("visualization.yaml")
         self._paths = self._load_yaml("paths.yaml")
         return self
 
@@ -41,13 +66,13 @@ class ConfigLoader:
     @property
     def territories(self) -> Dict[str, Any]:
         if not self._territories:
-            self._territories = self._load_yaml("territories.yaml")
+            self._territories = self._load_yaml_with_includes("territories.yaml")
         return self._territories.get("territories", self._territories)
 
     @property
     def visualizations(self) -> Dict[str, Any]:
         if not self._visualizations:
-            self._visualizations = self._load_yaml("visualization.yaml")
+            self._visualizations = self._load_yaml_with_includes("visualization.yaml")
         return self._visualizations.get("visualizations", self._visualizations)
 
     @property
