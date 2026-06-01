@@ -34,6 +34,13 @@ if IN_COLAB:
     ee.Initialize(project='ee-ipam')
 else:
     sys.path.insert(0, os.path.join(os.path.dirname(__file__)))
+    cwd = os.getcwd()
+    if not os.path.exists(os.path.join(cwd, 'src')):
+        parent = os.path.dirname(cwd)
+        while not os.path.exists(os.path.join(parent, 'src')) and parent != os.path.dirname(parent):
+            parent = os.path.dirname(parent)
+        if os.path.exists(os.path.join(parent, 'src')):
+            os.chdir(parent)
     import ee
     try:
         ee.Initialize(project='ee-ipam')
