@@ -1,0 +1,54 @@
+{
+    "items":  [
+                  {
+                      "territory":  "matopiba_cerrado",
+                      "dataset":  "brasil_degradation_col10_1",
+                      "product":  "canopy_disturbance_frequency"
+                  },
+                  {
+                      "territory":  "biomas",
+                      "dataset":  "brasil_degradation_col10_1",
+                      "product":  "canopy_disturbance_frequency"
+                  },
+                  {
+                      "territory":  "amazonia",
+                      "dataset":  "brasil_degradation_col10_1",
+                      "product":  "canopy_disturbance_frequency"
+                  },
+                  {
+                      "territory":  "caatinga",
+                      "dataset":  "brasil_degradation_col10_1",
+                      "product":  "canopy_disturbance_frequency"
+                  },
+                  {
+                      "territory":  "cerrado",
+                      "dataset":  "brasil_degradation_col10_1",
+                      "product":  "canopy_disturbance_frequency"
+                  },
+                  {
+                      "territory":  "mata_atlantica",
+                      "dataset":  "brasil_degradation_col10_1",
+                      "product":  "canopy_disturbance_frequency"
+                  },
+                  {
+                      "territory":  "pampa",
+                      "dataset":  "brasil_degradation_col10_1",
+                      "product":  "canopy_disturbance_frequency"
+                  },
+                  {
+                      "territory":  "pantanal",
+                      "dataset":  "brasil_degradation_col10_1",
+                      "product":  "canopy_disturbance_frequency"
+                  },
+                  {
+                      "territory":  "bap",
+                      "dataset":  "brasil_degradation_col10_1",
+                      "product":  "canopy_disturbance_frequency"
+                  },
+                  {
+                      "territory":  "bap_planalto",
+                      "dataset":  "brasil_degradation_col10_1",
+                      "product":  "canopy_disturbance_frequency"
+                  }
+              ]
+}
