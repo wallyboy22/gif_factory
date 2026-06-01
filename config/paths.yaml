@@ -13,7 +13,7 @@ paths:
 
   local:
     cache_dir: "./cache/"
-    output_dir: "./output/"
+    output_dir: "./outputs/v001/"
     logs_dir: "./logs/"
 
   earth_engine:
@@ -23,7 +23,7 @@ paths:
 
 processing:
   image_download:
-    vertical_dimension: 2500
+    vertical_dimension: 1560
     timeout: 60
 
   gif_creation:
