@@ -101,6 +101,7 @@ def build_territory_groups(territories_dict) -> Dict[str, List[str]]:
     groups = {
         'countries': [], 'biomes': [], 'ufs': [], 'custom_regions': [],
         'paraguay_departments': [], 'paraguay_regions': [], 'paraguay_full': [],
+        'brazil_all': [], 'paraguay_all': [],
     }
     for gname, group in territories_dict.items():
         if not isinstance(group, dict):
@@ -120,17 +121,14 @@ def build_territory_groups(territories_dict) -> Dict[str, List[str]]:
                 groups['paraguay_regions'] = sorted(group['regions'].keys())
             if 'full' in group:
                 groups['paraguay_full'] = sorted(group['full'].keys())
+    # Brazil: countries + biomes + ufs + custom_regions
+    groups['brazil_all'] = sorted(set(groups['countries'] + groups['biomes'] + groups['ufs'] + groups['custom_regions']))
+    # Paraguay: departments + regions + full + country
+    groups['paraguay_all'] = sorted(set(
+        groups['paraguay_departments'] + groups['paraguay_regions'] + groups['paraguay_full'] +
+        [t for t in groups['countries'] if t.startswith('paraguay') or t == 'paraguay']
+    ))
     return groups
-
-
-def build_dataset_categories(datasets_dict) -> Dict[str, List[str]]:
-    categories = {}
-    for ds_id, ds_data in datasets_dict.items():
-        cat = ds_data.get('category', 'other')
-        if cat not in categories:
-            categories[cat] = []
-        categories[cat].append(ds_id)
-    return categories
 
 
 def build_dataset_categories(datasets_dict) -> Dict[str, List[str]]:
