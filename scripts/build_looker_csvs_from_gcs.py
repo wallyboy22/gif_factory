@@ -214,7 +214,14 @@ def generate_csvs(dataset_id, metadata_dir):
     for d in ["raw", "pivot_territorios", "pivot_produtos"]:
         p = os.path.join(ROOT, d)
         if os.path.isdir(p):
-            shutil.rmtree(p)
+            try:
+                shutil.rmtree(p)
+            except PermissionError:
+                for f in Path(p).rglob("*"):
+                    try:
+                        f.unlink()
+                    except Exception:
+                        pass
 
     for suffix, data in [
         ("", rows),
