@@ -27,7 +27,10 @@ status.json
 # Colab notebooks (only allow factory notebooks)
 notebooks/*
 !notebooks/fabrica_*.ipynb
-gif_factory_hub_dashboard.ipynb
+
+# Legacy / archived files
+legacy/
+scripts/legacy/
 
 # Environment
 .env
@@ -44,15 +47,13 @@ logs/
 # Agent context (internal)
 .agents/
 
-# Scripts (allow templates, ignore old processing scripts)
-scripts/process_*.py
-scripts/upload_*.py
-scripts/build_index.py
+# Scripts (ignore legacy, templates are tracked automatically)
 scripts/__init__.py
 scripts/__pycache__/
 
 # Tests
 tests/
+!tests/test_checkpoint.py
 
 # Extra reference files (logos kept separately)
 references/*.pdf
