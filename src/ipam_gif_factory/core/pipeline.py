@@ -304,7 +304,7 @@ class Pipeline:
                 if not state.is_complete("frame_bottom_bars"):
                     print(f"  Adicionando legenda aos frames...")
                     t4b = time.perf_counter()
-                    FrameProcessor.batch_add_bottom_bars(frame_paths, bounds['lon_min'], bounds['lon_max'], bounds['lat_min'], bounds['lat_max'], palette=viz_params.get("palette", ["fdfdfd", "800000"]), vmin=viz_params.get("min", 0), vmax=viz_params.get("max", 1), font_size=50, discrete_labels=viz_params.get("discrete_labels"), cmap_type=viz_params.get("cmap_type", "sequential"), show_legend=True, show_scale=True)
+                    FrameProcessor.batch_add_bottom_bars(frame_paths, bounds['lon_min'], bounds['lon_max'], bounds['lat_min'], bounds['lat_max'], palette=viz_params.get("palette", ["fdfdfd", "800000"]), vmin=viz_params.get("min", 0), vmax=viz_params.get("max", 1), font_size=50, discrete_labels=viz_params.get("discrete_labels"), cmap_type=viz_params.get("cmap_type", "sequential"), show_legend=True, show_scale=not create_collage)
                     timings["frame_bottom_bars"] = round(time.perf_counter() - t4b, 1)
                     print(f"    legendas: {timings['frame_bottom_bars']}s")
                     state.mark_complete("frame_bottom_bars")
