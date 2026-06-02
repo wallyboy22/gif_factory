@@ -211,18 +211,23 @@ def generate_csvs(dataset_id, metadata_dir):
         return fn, out
 
     ROOT = LOCAL_CSV_ROOT
+    # Limpa CSVs anteriores
+    for csv_path in Path(ROOT).rglob("*.csv"):
+        try:
+            csv_path.unlink()
+        except Exception:
+            pass
     for d in ["raw", "pivot_territorios", "pivot_produtos"]:
-        p = os.path.join(ROOT, d)
-        if os.path.isdir(p):
-            try:
-                shutil.rmtree(p)
-            except PermissionError:
-                for f in Path(p).rglob("*"):
-                    try:
-                        f.unlink()
-                    except Exception:
-                        pass
+        Path(ROOT, d).mkdir(parents=True, exist_ok=True)
 
+    # --- ARQUIVOS RAIZ (3 flat files que o Looker Studio le) ---
+    write_csv(f"{ROOT}/gif_index.csv", FIELDS, rows)
+    flds_pt, data_pt = pivot_territorios(rows)
+    write_csv(f"{ROOT}/gif_index_pivot_territorios.csv", flds_pt, data_pt)
+    flds_pp, data_pp = pivot_produtos(rows)
+    write_csv(f"{ROOT}/gif_index_pivot_produtos.csv", flds_pp, data_pp)
+
+    # --- SUBPASTAS (versoes detalhadas) ---
     for suffix, data in [
         ("", rows),
         ("_biomes", [r for r in rows if r["tipo_territorio"] == "biome"]),
@@ -231,17 +236,12 @@ def generate_csvs(dataset_id, metadata_dir):
         ("_countries", [r for r in rows if r["tipo_territorio"] == "country"]),
         (f"_{dataset_id}", rows),
     ]:
-        write_csv(f"{ROOT}/raw/gif_index{suffix}.csv", FIELDS, data)
+        if suffix:
+            write_csv(f"{ROOT}/raw/gif_index{suffix}.csv", FIELDS, data)
         flds_pt, data_pt = pivot_territorios(data)
         write_csv(f"{ROOT}/pivot_territorios/gif_index{suffix}.csv", flds_pt, data_pt)
         flds_pp, data_pp = pivot_produtos(data)
         write_csv(f"{ROOT}/pivot_produtos/gif_index{suffix}.csv", flds_pp, data_pp)
-
-    # Cleanup flat files
-    for fn in os.listdir(ROOT):
-        fp = os.path.join(ROOT, fn)
-        if os.path.isfile(fp) and fn.endswith(".csv"):
-            os.remove(fp)
 
     return len(rows)
 
@@ -257,7 +257,7 @@ def upload_csvs_to_gcs():
     count = 0
     for fpath in csv_root.rglob("*.csv"):
         rel = fpath.relative_to(csv_root).as_posix()
-        remote = f"{GCS_ROOT}/{csv_root.name}/{rel}"
+        remote = f"{GCS_ROOT}/looker studio/{rel}"
         bucket.blob(remote).upload_from_filename(str(fpath))
         count += 1
 
@@ -304,7 +304,7 @@ def main():
     if not skip_upload and rows > 0:
         print("[4/4] Subindo CSVs para o GCS...")
         csv_count = upload_csvs_to_gcs()
-        print(f"  {csv_count} CSVs enviados para gs://{BUCKET_NAME}/{GCS_ROOT}/{LOCAL_CSV_ROOT}/")
+        print(f"  {csv_count} CSVs enviados para gs://{BUCKET_NAME}/{GCS_ROOT}/looker studio/")
     else:
         print("[4/4] Upload skipado (--no-upload)")
 
@@ -316,7 +316,7 @@ def main():
     print(f"{'=' * 60}")
     print(f"CSVs locais: {LOCAL_CSV_ROOT}/")
     if not skip_upload:
-        print(f"GCS: gs://{BUCKET_NAME}/{GCS_ROOT}/{LOCAL_CSV_ROOT}/")
+        print(f"GCS: gs://{BUCKET_NAME}/{GCS_ROOT}/looker studio/")
         print(f"Looker Studio: https://datastudio.google.com/u/0/reporting/179f6b47-8f6e-4f51-abd5-75b7ae018a2b/page/XDzxF")
 
 

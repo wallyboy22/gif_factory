@@ -1,5 +1,6 @@
 import os, csv, json, yaml, shutil
 from collections import OrderedDict
+from pathlib import Path
 
 # ── config ───────────────────────────────────────────
 DS_ID = os.environ.get("GIF_FACTORY_DS_ID", "brasil_degradation_col10_1")
@@ -138,30 +139,34 @@ def pivot_produtos(data, vc="link_direto"):
         out.append(row)
     return fn, out
 
-# ── generate 3-folder structure ─────────────────────
+# ── generate flat root + subfolder structure ──────────
 ROOT = "outputs/looker_studio"
+for csv_path in Path(ROOT).rglob("*.csv"):
+    try: csv_path.unlink()
+    except Exception: pass
 for d in ["raw", "pivot_territorios", "pivot_produtos"]:
-    p = os.path.join(ROOT, d)
-    if os.path.isdir(p):
-        shutil.rmtree(p)
+    Path(ROOT, d).mkdir(parents=True, exist_ok=True)
 
+# --- Root: 3 flat files (what Looker Studio reads) ---
+write_csv(f"{ROOT}/gif_index.csv", FIELDS, rows)
+flds_pt, data_pt = pivot_territorios(rows)
+write_csv(f"{ROOT}/gif_index_pivot_territorios.csv", flds_pt, data_pt)
+flds_pp, data_pp = pivot_produtos(rows)
+write_csv(f"{ROOT}/gif_index_pivot_produtos.csv", flds_pp, data_pp)
+
+# --- Subfolders: detailed versions ---
 for suffix, data in [
     ("", rows),
     ("_biomes", [r for r in rows if r["tipo_territorio"] == "biome"]),
     ("_custom_regions", [r for r in rows if r["tipo_territorio"] == "custom_region"]),
     (f"_{DS_ID}", rows),
 ]:
-    write_csv(f"{ROOT}/raw/gif_index{suffix}.csv", FIELDS, data)
-    flds_pt, data_pt = pivot_territorios(data)
-    write_csv(f"{ROOT}/pivot_territorios/gif_index{suffix}.csv", flds_pt, data_pt)
-    flds_pp, data_pp = pivot_produtos(data)
-    write_csv(f"{ROOT}/pivot_produtos/gif_index{suffix}.csv", flds_pp, data_pp)
-
-# cleanup flat files
-for fn in os.listdir(ROOT):
-    fp = os.path.join(ROOT, fn)
-    if os.path.isfile(fp) and fn.endswith(".csv"):
-        os.remove(fp)
+    if suffix:
+        write_csv(f"{ROOT}/raw/gif_index{suffix}.csv", FIELDS, data)
+    flds_pt2, data_pt2 = pivot_territorios(data)
+    write_csv(f"{ROOT}/pivot_territorios/gif_index{suffix}.csv", flds_pt2, data_pt2)
+    flds_pp2, data_pp2 = pivot_produtos(data)
+    write_csv(f"{ROOT}/pivot_produtos/gif_index{suffix}.csv", flds_pp2, data_pp2)
 
 # show result
 print("\nStructure:")
