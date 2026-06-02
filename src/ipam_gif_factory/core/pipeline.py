@@ -268,7 +268,7 @@ class Pipeline:
                         print(f"\n[3c/4] Adicionando titulo e legenda ao grid...")
                         t3c = time.perf_counter()
                         FrameProcessor.add_year_label(collage_path, title_line1, position="top_left", font_size=34, padding_top=130, bar_color=(255, 255, 255), text_color=(0, 0, 0), subtitle=title_line2, subtitle_size=30)
-                        FrameProcessor.add_bottom_bar(collage_path, bounds['lon_min'], bounds['lon_max'], bounds['lat_min'], bounds['lat_max'], palette=viz_params.get("palette", ["fdfdfd", "800000"]), vmin=viz_params.get("min", 0), vmax=viz_params.get("max", 1), font_size=60, discrete_labels=viz_params.get("discrete_labels"), cmap_type=viz_params.get("cmap_type", "sequential"), show_legend=True, show_scale=True)
+                        FrameProcessor.add_bottom_bar(collage_path, bounds['lon_min'], bounds['lon_max'], bounds['lat_min'], bounds['lat_max'], palette=viz_params.get("palette", ["fdfdfd", "800000"]), vmin=viz_params.get("min", 0), vmax=viz_params.get("max", 1), font_size=60, discrete_labels=viz_params.get("discrete_labels"), cmap_type=viz_params.get("cmap_type", "sequential"), show_legend=True, show_scale=False)
                         FrameProcessor.add_margin(collage_path, 30)
                         timings["collage_labels"] = round(time.perf_counter() - t3c, 1)
                         print(f"    titulo/legenda: {timings['collage_labels']}s")
