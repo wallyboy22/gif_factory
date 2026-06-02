@@ -26,16 +26,16 @@ Arquivo JSON com array de objetos, cada um com 3 campos:
 
 | Arquivo | Entradas | Escopo |
 |---------|----------|--------|
-| `batch_v001.json` | 150 | 10 territórios x 15 produtos (degradation_col10_1) |
-| `batch_canopy.json` | 10 | 10 territórios x canopy_disturbance_frequency |
-| `batch_patch_size.json` | 10 | 10 territórios x patch_size |
+| `config/batches/v001.json` | 150 | 10 territórios x 15 produtos (degradation_col10_1) |
+| `config/batches/canopy.json` | 10 | 10 territórios x canopy_disturbance_frequency |
+| `config/batches/patch_size.json` | 10 | 10 territórios x patch_size |
 
 ## Como Executar um Batch
 
 ### Via CLI (PowerShell)
 
 ```powershell
-python -m src.ipam_gif_factory.interfaces.cli --generate --batch batch_v001.json --workers 6 --resume
+python -m src.ipam_gif_factory.interfaces.cli --generate --batch config/batches/v001.json --workers 6 --resume
 ```
 
 ### Via Python script

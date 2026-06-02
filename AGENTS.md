@@ -28,10 +28,10 @@ python -c "import ee; ee.Authenticate()"
 
 ```powershell
 # Gerar um GIF de teste rápido (DF, rápido, ~30s)
-python run_pipeline_df.py
+python scripts/run_pipeline_df.py
 
 # Gerar batch completo de degradação com resume
-python -m src.ipam_gif_factory.interfaces.cli --generate --batch batch_v001.json --workers 6 --resume
+python -m src.ipam_gif_factory.interfaces.cli --generate --batch config/batches/v001.json --workers 6 --resume
 
 # Listar datasets disponíveis
 python -m src.ipam_gif_factory.interfaces.cli --list-datasets
@@ -40,7 +40,7 @@ python -m src.ipam_gif_factory.interfaces.cli --list-datasets
 python -m src.ipam_gif_factory.interfaces.cli --list-territories
 
 # Gerar CSVs para Looker Studio
-python build_looker_csvs.py
+python scripts/build_looker_csvs.py
 
 # Upload para GCS
 python sync_to_hub.py
@@ -53,13 +53,14 @@ python sync_to_hub.py
 | `config/datasets.yaml` | Adicionar/editar datasets e produtos |
 | `config/visualization.yaml` | Ajustar paletas, ranges, legendas |
 | `config/visualization_col101.yaml` | Visualizações específicas Degradação Col 10.1 |
-| `config/territories.yaml` | Adicionar/editar territórios |
-| `config/paths.yaml` | Dimensões, durações, caminhos |
-| `config/visibility.json` | Toggles de visibilidade por produto |
+| `config/territories.yaml` | Adicionar/editar territórios (hub com includes) |
+| `config/territories_paraguay.yaml` | Paraguai: departamentos e regiões |
+| `config/batches/` | Batch definitions JSON |
 | `src/ipam_gif_factory/core/pipeline.py` | Orquestrador principal |
 | `src/ipam_gif_factory/core/ee_transforms.py` | Processors EE (novos cálculos) |
 | `src/ipam_gif_factory/core/frame_processor.py` | Labels, legendas, escala |
-| `batch_v001.json` | Batch de degradação (150 combos) |
+| `scripts/_template_batch.py` | Template para criar novos batches |
+| `notebooks/fabrica_fire_col5.ipynb` | Notebook interativo Colab/VS Code |
 
 ## Convenções
 
@@ -75,15 +76,15 @@ python sync_to_hub.py
 1. Adicionar entrada em `config/datasets.yaml` com asset e visualização
 2. Se precisar de EE processor: adicionar em `ee_transforms.py` e registrar
 3. Criar visualização em `config/visualization.yaml` (ou usar existente)
-4. Testar com `run_pipeline_df.py` (território DF, rápido)
+4. Testar com `scripts/run_pipeline_df.py` (território DF, rápido)
 5. Adicionar ao batch
 
 ## Como Adicionar um Novo Território
 
-1. Adicionar no YAML apropriado em `config/territories/`
-2. Especificar `feature_collection` (asset GEE FeatureCollection)
-3. Opcional: `filter` para subselecionar features
-4. Opcional: `overlay.feature_collection` para bordas
+1. Adicionar no YAML apropriado em `config/`
+2. Especificar `source` (asset GEE FeatureCollection)
+3. Opcional: `filter`, `filter_in` para subselecionar features
+4. Opcional: `overlay_source` para bordas
 
 ## Como Ajustar Visualização
 

@@ -1,3 +1,5 @@
-streamlit>=1.30
+earthengine-api
+pillow>=10.0
 PyYAML>=6.0
 google-cloud-storage>=2.0
+ipywidgets>=8.0

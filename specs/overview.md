@@ -70,8 +70,8 @@ FABRICA DE GIFS/
 | Interface | Público | Tecnologia | Status |
 |-----------|---------|------------|--------|
 | Looker Studio | Público | CSV → GCS | Parcial |
+| Colab Notebook | Colegas | Python + GEE + ipywidgets | Implementado |
 | HTML local | Desenvolvedor | HTML + JS (lê CSV GCS) | Planejado |
-| Colab Notebook | Colegas | Python + GEE | Planejado |
 
 ## Estado Atual (Jun 2026)
 
