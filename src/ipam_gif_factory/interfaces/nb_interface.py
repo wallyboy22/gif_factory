@@ -135,22 +135,24 @@ class GIFactoryUI(PipelineStepUI):
         category_tabs = widgets.Tab()
         category_names = sorted(self.ctx.dataset_categories.keys())
         category_children = []
-        for i, cat in enumerate(category_names):
+        for cat in category_names:
             grid = self._make_dataset_grid(cat)
             category_children.append(grid)
-            category_tabs.set_title(i, cat)
         category_tabs.children = category_children
+        for i, cat in enumerate(category_names):
+            category_tabs.set_title(i, cat)
 
         # Abas de territorio
         territory_tabs = widgets.Tab()
         territory_group_names = ['countries', 'biomes', 'states', 'custom_regions']
         territory_labels = ['Paises', 'Biomas', 'Estados', 'Regioes']
         territory_children = []
-        for i, gkey in enumerate(territory_group_names):
+        for gkey in territory_group_names:
             grid = self._make_territory_grid(gkey)
             territory_children.append(grid)
-            territory_tabs.set_title(i, territory_labels[i])
         territory_tabs.children = territory_children
+        for i, label in enumerate(territory_labels):
+            territory_tabs.set_title(i, label)
 
         # Config row
         self.edit_cb.observe(self._on_edit_change, names='value')
