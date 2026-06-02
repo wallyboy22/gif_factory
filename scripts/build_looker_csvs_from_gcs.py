@@ -232,47 +232,56 @@ def parse_metadata_dir(dataset_id, base_dir):
 
 
 def pivot_territorios(data):
-    """Pivot onde TERRITORIOS sao as COLUNAS (linhas = produtos)."""
-    gif_only = [r for r in data if r["tipo_arquivo"] == "GIF do periodo"]
-    prods = sorted(set(r["produto_id"] for r in gif_only))
-    terrs = sorted(set(r["territorio_id"] for r in gif_only))
+    """Pivot onde TERRITORIOS sao as COLUNAS (linhas = produtos, todos os tipos de arquivo)."""
+    prods = sorted(set(r["produto_id"] for r in data))
+    terrs = sorted(set(r["territorio_id"] for r in data))
     fn = ["produto_id", "nome_produto", "tipo_arquivo", "ano"] + terrs
     out = []
     for pid in prods:
-        sub = [r for r in gif_only if r["produto_id"] == pid]
+        sub = [r for r in data if r["produto_id"] == pid]
         if not sub: continue
-        row = OrderedDict()
-        row["produto_id"] = pid
-        row["nome_produto"] = sub[0]["nome_produto"]
-        row["tipo_arquivo"] = sub[0]["tipo_arquivo"]
-        row["ano"] = sub[0]["ano"]
-        for t in terrs:
-            match = [r for r in sub if r["territorio_id"] == t]
-            row[t] = match[0]["link_direto"] if match else ""
-        out.append(row)
+        # Agrupa por tipo_arquivo+ano
+        seen = set()
+        for r in sub:
+            key = (r["tipo_arquivo"], r["ano"])
+            if key in seen: continue
+            seen.add(key)
+            row = OrderedDict()
+            row["produto_id"] = pid
+            row["nome_produto"] = r["nome_produto"]
+            row["tipo_arquivo"] = r["tipo_arquivo"]
+            row["ano"] = r["ano"]
+            for t in terrs:
+                match = [x for x in sub if x["territorio_id"] == t and x["tipo_arquivo"] == r["tipo_arquivo"] and x["ano"] == r["ano"]]
+                row[t] = match[0]["link_direto"] if match else ""
+            out.append(row)
     return fn, out
 
 
 def pivot_produtos(data):
-    """Pivot onde PRODUTOS sao as COLUNAS (linhas = territorios)."""
-    gif_only = [r for r in data if r["tipo_arquivo"] == "GIF do periodo"]
-    terrs = sorted(set(r["territorio_id"] for r in gif_only))
-    prods = sorted(set(r["produto_id"] for r in gif_only))
+    """Pivot onde PRODUTOS sao as COLUNAS (linhas = territorios, todos os tipos de arquivo)."""
+    terrs = sorted(set(r["territorio_id"] for r in data))
+    prods = sorted(set(r["produto_id"] for r in data))
     fn = ["territorio_id", "nome_territorio", "tipo_territorio", "tipo_arquivo", "ano"] + prods
     out = []
     for tid in terrs:
-        sub = [r for r in gif_only if r["territorio_id"] == tid]
+        sub = [r for r in data if r["territorio_id"] == tid]
         if not sub: continue
-        row = OrderedDict()
-        row["territorio_id"] = tid
-        row["nome_territorio"] = sub[0]["nome_territorio"]
-        row["tipo_territorio"] = sub[0]["tipo_territorio"]
-        row["tipo_arquivo"] = sub[0]["tipo_arquivo"]
-        row["ano"] = sub[0]["ano"]
-        for p in prods:
-            match = [r for r in sub if r["produto_id"] == p]
-            row[p] = match[0]["link_direto"] if match else ""
-        out.append(row)
+        seen = set()
+        for r in sub:
+            key = (r["tipo_arquivo"], r["ano"])
+            if key in seen: continue
+            seen.add(key)
+            row = OrderedDict()
+            row["territorio_id"] = tid
+            row["nome_territorio"] = r["nome_territorio"]
+            row["tipo_territorio"] = r["tipo_territorio"]
+            row["tipo_arquivo"] = r["tipo_arquivo"]
+            row["ano"] = r["ano"]
+            for p in prods:
+                match = [x for x in sub if x["produto_id"] == p and x["tipo_arquivo"] == r["tipo_arquivo"] and x["ano"] == r["ano"]]
+                row[p] = match[0]["link_direto"] if match else ""
+            out.append(row)
     return fn, out
 
 
