@@ -34,14 +34,3 @@ territories:
       source: "projects/mapbiomas-workspace/AUXILIAR/biomas_IBGE_250mil"
       filter: "Bioma == 'Pantanal'"
       bbox: [-58.0, -22.0, -55.0, -17.0]
-    bap:
-      name: "BAP"
-      name_en: "BAP"
-      source: "projects/ee-arcplan/assets/bap_pantanal_planalto"
-      bbox: [-58.0, -22.0, -55.0, -17.0]
-    bap_planalto:
-      name: "BAP Planalto"
-      name_en: "BAP Planalto"
-      source: "projects/ee-arcplan/assets/bap_pantanal_planalto"
-      filter: "name_pt_br == 'Planalto'"
-      bbox: [-58.0, -22.0, -55.0, -17.0]

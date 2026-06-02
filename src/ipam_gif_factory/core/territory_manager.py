@@ -5,7 +5,7 @@ from ..config import ConfigLoader
 class TerritoryManager:
     """Gerenciar territórios geográficos a partir da configuração YAML."""
 
-    TYPES = ["countries", "biomes", "states", "custom_regions"]
+    TYPES = ["countries", "biomes", "ufs", "custom_regions", "paraguay"]
 
     def __init__(self, config: ConfigLoader):
         self.config = config
@@ -39,33 +39,57 @@ class TerritoryManager:
             "bbox": tinfo.get("bbox"),
         }
 
-    def get_territory(self, territory_id: str) -> Dict[str, Any]:
+    def _find_territory_entry(self, territory_id: str) -> Dict[str, Any]:
+        """Busca um territorio em todos os tipos, incluindo sub-grupos."""
         for ttype in self.TYPES:
-            territories = self._territories.get(ttype, {})
-            if territory_id in territories:
-                return self._format_territory(territory_id, territories[territory_id], ttype)
+            group = self._territories.get(ttype, {})
+            if territory_id in group and not isinstance(group.get(territory_id), dict):
+                continue
+            if territory_id in group and isinstance(group.get(territory_id), dict):
+                return {'entry': group[territory_id], 'type': ttype}
+            for sub_key, sub_group in group.items():
+                if isinstance(sub_group, dict) and territory_id in sub_group:
+                    return {'entry': sub_group[territory_id], 'type': ttype}
         raise KeyError(f"Território '{territory_id}' não encontrado")
+
+    def _find_in_group(self, group: dict, territory_id: str):
+        """Procura recursivamente um territorio em um grupo (incluindo sub-grupos)."""
+        if territory_id in group and isinstance(group.get(territory_id), dict):
+            return group[territory_id]
+        for sub_key, sub_group in group.items():
+            if isinstance(sub_group, dict) and territory_id in sub_group:
+                return sub_group[territory_id]
+        return None
+
+    def get_territory(self, territory_id: str) -> Dict[str, Any]:
+        found = self._find_territory_entry(territory_id)
+        return self._format_territory(territory_id, found['entry'], found['type'])
 
     def get_territory_info(self, territory_type: str, territory_id: str) -> Dict[str, Any]:
         territories = self._territories.get(territory_type, {})
-        if territory_id not in territories:
+        entry = self._find_in_group(territories, territory_id)
+        if entry is None:
             raise KeyError(f"Território '{territory_id}' não encontrado em '{territory_type}'")
-        return self._format_territory(territory_id, territories[territory_id], territory_type)
+        return self._format_territory(territory_id, entry, territory_type)
 
     def get_territory_name(self, territory_type: str, territory_id: str) -> str:
         return self.get_territory_info(territory_type, territory_id)["name"]
 
     def get_feature_collection(self, territory_id: str):
-        info = self.get_territory(territory_id)
+        found = self._find_territory_entry(territory_id)
+        info = found['entry']
         try:
             import ee
         except ImportError:
             return None
         fc = ee.FeatureCollection(info["source"])
-        if info["filter"]:
-            filter_info = self._parse_filter(info["filter"])
-            if filter_info:
-                fc = fc.filter(ee.Filter.equals(filter_info["field"], filter_info["value"]))
+        if info.get("filter"):
+            parsed = self._parse_filter(info["filter"])
+            if parsed:
+                fc = fc.filter(ee.Filter.equals(parsed["field"], parsed["value"]))
+        filter_in = info.get("filter_in")
+        if filter_in:
+            fc = fc.filter(ee.Filter.inList(filter_in["field"], filter_in["values"]))
         return fc
 
     def _parse_filter(self, expression: str) -> Optional[Dict[str, str]]:
@@ -89,14 +113,11 @@ class TerritoryManager:
         return ee.FeatureCollection(overlay_source)
 
     def get_raw_territory(self, territory_id: str) -> Dict[str, Any]:
-        for ttype in self.TYPES:
-            territories = self._territories.get(ttype, {})
-            if territory_id in territories:
-                info = territories[territory_id]
-                info["id"] = territory_id
-                info["type"] = ttype
-                return info
-        raise KeyError(f"Território '{territory_id}' não encontrado")
+        found = self._find_territory_entry(territory_id)
+        info = found['entry']
+        info["id"] = territory_id
+        info["type"] = found['type']
+        return info
 
     def get_bbox(self, territory_id: str) -> Optional[List[float]]:
         info = self.get_territory(territory_id)

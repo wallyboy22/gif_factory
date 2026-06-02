@@ -1,6 +1,7 @@
 datasets:
   brasil_fire_col3:
     description: "MapBiomas Fire Collection 3 - Brasil"
+    project: mapbiomas-brazil
     category: "fire"
     source: "MapBiomas"
     collection: 3
@@ -72,6 +73,7 @@ datasets:
 
   brasil_fire_col5:
     description: "MapBiomas Fire Collection 5 - Brasil"
+    project: mapbiomas-brazil
     category: "fire"
     source: "MapBiomas"
     collection: 5
@@ -216,6 +218,7 @@ datasets:
 
   paraguay_fire_col1:
     description: "MapBiomas Fire Collection 1 - Paraguay"
+    project: mapbiomas-paraguay
     category: "fire"
     source: "MapBiomas"
     collection: 1
@@ -259,6 +262,7 @@ datasets:
 
   brasil_lulc_col9:
     description: "MapBiomas Land Use and Cover Collection 9 - Brasil"
+    project: mapbiomas-brazil
     category: "land_cover"
     source: "MapBiomas"
     collection: 9
@@ -302,6 +306,7 @@ datasets:
 
   brasil_lulc_col10:
     description: "MapBiomas Land Use and Cover Collection 10 - Brasil"
+    project: mapbiomas-brazil
     category: "land_cover"
     source: "MapBiomas"
     collection: 10
@@ -335,6 +340,7 @@ datasets:
 
   brasil_soil:
     description: "MapBiomas Soil Organic Carbon - Brasil"
+    project: mapbiomas-brazil
     category: "soil"
     source: "MapBiomas"
     products:
@@ -349,6 +355,7 @@ datasets:
 
   brasil_degradation_col9:
     description: "MapBiomas Degradation Indicators Collection 9 - Brasil"
+    project: mapbiomas-brazil
     category: "degradation"
     source: "MapBiomas Degradation"
     collection: 9
@@ -406,6 +413,7 @@ datasets:
 
   brasil_degradation_col10_1:
     description: "Módulo de Degradação do MapBiomas · Coleção 10.1"
+    project: mapbiomas-brazil
     category: "degradation"
     source: "MapBiomas Degradação"
     collection: 10.1

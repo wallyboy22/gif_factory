@@ -21,10 +21,16 @@ class NotebookContext:
     config: any
     workers: int
     in_colab: bool
+    ee_project: str = "ee-ipam"
+    gcs_bucket: str = "mapbiomas-fire"
+    gcs_root: str = "gif-factory"
+    active_projects: List[str] = field(default_factory=list)
+    active_gts: List[str] = field(default_factory=list)
     gif_cache: Dict[Tuple[str, str], Set[str]] = field(default_factory=lambda: defaultdict(set))
     territory_groups: Dict[str, List[str]] = field(default_factory=dict)
     dataset_categories: Dict[str, List[str]] = field(default_factory=dict)
     all_territories: List[str] = field(default_factory=list)
+    project_hierarchy: Dict = field(default_factory=dict)
 
 
 def detect_colab() -> bool:
@@ -92,17 +98,28 @@ def flatten_territories(territories_dict) -> List[str]:
 
 
 def build_territory_groups(territories_dict) -> Dict[str, List[str]]:
-    groups = {'countries': [], 'biomes': [], 'states': [], 'custom_regions': []}
+    groups = {
+        'countries': [], 'biomes': [], 'ufs': [], 'custom_regions': [],
+        'paraguay_departments': [], 'paraguay_regions': [], 'paraguay_full': [],
+    }
     for gname, group in territories_dict.items():
-        if isinstance(group, dict):
-            if gname == 'countries':
-                groups['countries'] = sorted(group.keys())
-            elif gname == 'biomes':
-                groups['biomes'] = sorted(group.keys())
-            elif gname == 'states':
-                groups['states'] = sorted(group.keys())
-            elif gname == 'custom_regions':
-                groups['custom_regions'] = sorted(group.keys())
+        if not isinstance(group, dict):
+            continue
+        if gname == 'countries':
+            groups['countries'] = sorted(group.keys())
+        elif gname == 'biomes':
+            groups['biomes'] = sorted(group.keys())
+        elif gname == 'ufs':
+            groups['ufs'] = sorted(group.keys())
+        elif gname == 'custom_regions':
+            groups['custom_regions'] = sorted(group.keys())
+        elif gname == 'paraguay':
+            if 'departments' in group:
+                groups['paraguay_departments'] = sorted(group['departments'].keys())
+            if 'regions' in group:
+                groups['paraguay_regions'] = sorted(group['regions'].keys())
+            if 'full' in group:
+                groups['paraguay_full'] = sorted(group['full'].keys())
     return groups
 
 
@@ -116,7 +133,40 @@ def build_dataset_categories(datasets_dict) -> Dict[str, List[str]]:
     return categories
 
 
-def setup() -> NotebookContext:
+def build_dataset_categories(datasets_dict) -> Dict[str, List[str]]:
+    categories = {}
+    for ds_id, ds_data in datasets_dict.items():
+        cat = ds_data.get('category', 'other')
+        if cat not in categories:
+            categories[cat] = []
+        categories[cat].append(ds_id)
+    return categories
+
+
+def build_project_hierarchy(datasets_dict, active_projects=None, active_gts=None):
+    """Constroi arvore: projeto -> GT -> colecao -> [datasets]."""
+    hierarchy = {}
+    for ds_id, ds_data in datasets_dict.items():
+        project = ds_data.get('project', 'unknown')
+        gt = ds_data.get('category', 'other')
+        collection = str(ds_data.get('collection', '?'))
+        if active_projects and project not in active_projects:
+            continue
+        if active_gts and gt not in active_gts:
+            continue
+        if project not in hierarchy:
+            hierarchy[project] = {}
+        if gt not in hierarchy[project]:
+            hierarchy[project][gt] = {}
+        if collection not in hierarchy[project][gt]:
+            hierarchy[project][gt][collection] = []
+        hierarchy[project][gt][collection].append(ds_id)
+    return hierarchy
+
+
+
+def setup(ee_project="ee-ipam", gcs_bucket="mapbiomas-fire",
+          gcs_root="gif-factory", active_projects=None, active_gts=None) -> NotebookContext:
     """Inicializa ambiente, autentica, carrega config e cache.
        Retorna NotebookContext com todos os dados prontos."""
     from src.ipam_gif_factory.config import ConfigLoader
@@ -135,12 +185,19 @@ def setup() -> NotebookContext:
         config=config,
         workers=workers,
         in_colab=in_colab,
+        ee_project=ee_project,
+        gcs_bucket=gcs_bucket,
+        gcs_root=gcs_root,
+        active_projects=active_projects or [],
+        active_gts=active_gts or [],
     )
 
     build_gif_cache(ctx)
     ctx.all_territories = flatten_territories(config.territories)
     ctx.territory_groups = build_territory_groups(config.territories)
     ctx.dataset_categories = build_dataset_categories(config.datasets)
+    ctx.project_hierarchy = build_project_hierarchy(
+        config.datasets, ctx.active_projects, ctx.active_gts)
 
     total_gifs = sum(len(v) for v in ctx.gif_cache.values())
     print(f"Ambiente: {'Google Colab' if in_colab else 'VS Code'}")

@@ -144,8 +144,14 @@ class GIFactoryUI(PipelineStepUI):
 
         # Abas de territorio
         territory_tabs = widgets.Tab()
-        territory_group_names = ['countries', 'biomes', 'states', 'custom_regions']
-        territory_labels = ['Paises', 'Biomas', 'Estados', 'Regioes']
+        territory_group_names = [
+            'countries', 'biomes', 'ufs', 'custom_regions',
+            'paraguay_departments', 'paraguay_regions', 'paraguay_full',
+        ]
+        territory_labels = [
+            'Paises', 'Biomas', 'UFs', 'Regioes',
+            'PY-Deptos', 'PY-Regioes', 'PY-Completo',
+        ]
         territory_children = []
         for gkey in territory_group_names:
             grid = self._make_territory_grid(gkey)

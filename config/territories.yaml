@@ -6,3 +6,4 @@ includes:
   - territories_biomes.yaml
   - territories_states.yaml
   - territories_custom.yaml
+  - territories_paraguay.yaml
