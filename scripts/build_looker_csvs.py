@@ -2,17 +2,23 @@ import os, csv, json, yaml, shutil
 from collections import OrderedDict
 
 # ── config ───────────────────────────────────────────
-DS_ID = "brasil_degradation_col10_1"
+DS_ID = os.environ.get("GIF_FACTORY_DS_ID", "brasil_degradation_col10_1")
 GCS_BASE = "https://storage.googleapis.com/mapbiomas-fire/gif-factory"
 
 with open("config/territories_biomes.yaml", encoding="utf-8") as f:
     biome_ids = set(yaml.safe_load(f)["territories"]["biomes"].keys())
 with open("config/territories_custom.yaml", encoding="utf-8") as f:
     custom_ids = set(yaml.safe_load(f)["territories"]["custom_regions"].keys())
+with open("config/territories_states.yaml", encoding="utf-8") as f:
+    state_ids = set(yaml.safe_load(f)["territories"]["ufs"].keys())
+with open("config/territories_countries.yaml", encoding="utf-8") as f:
+    country_ids = set(yaml.safe_load(f)["territories"]["countries"].keys())
 
 def get_type(tid):
     if tid in biome_ids: return "biome"
     if tid in custom_ids: return "custom_region"
+    if tid in state_ids: return "state"
+    if tid in country_ids: return "country"
     return "unknown"
 
 # ── read all metadata ────────────────────────────────
