@@ -216,8 +216,10 @@ def parse_metadata_dir(dataset_id, base_dir):
                 ("ano", "colagem"),
             ]))
 
-            # Frames
+            # Frames (exclui collage e gif do loop de frames)
             for ffn in frames_fnames:
+                if 'collage' in ffn or ffn.endswith('.gif'):
+                    continue
                 year = extract_year(ffn)
                 frame_url = f"{GCS_BASE_URL}/{dataset_id}/{prod_id}/{terr_id}/{ffn}"
                 rows.append(OrderedDict([
@@ -235,7 +237,7 @@ def pivot_territorios(data):
     """Pivot onde TERRITORIOS sao as COLUNAS (linhas = produtos, todos os tipos de arquivo)."""
     prods = sorted(set(r["produto_id"] for r in data))
     terrs = sorted(set(r["territorio_id"] for r in data))
-    fn = ["produto_id", "nome_produto", "tipo_arquivo", "ano"] + terrs
+    fn = ["dataset", "colecao", "produto_id", "nome_produto", "tipo_arquivo", "ano"] + terrs
     out = []
     for pid in prods:
         sub = [r for r in data if r["produto_id"] == pid]
@@ -247,6 +249,8 @@ def pivot_territorios(data):
             if key in seen: continue
             seen.add(key)
             row = OrderedDict()
+            row["dataset"] = r["dataset"]
+            row["colecao"] = r["colecao"]
             row["produto_id"] = pid
             row["nome_produto"] = r["nome_produto"]
             row["tipo_arquivo"] = r["tipo_arquivo"]
@@ -262,7 +266,7 @@ def pivot_produtos(data):
     """Pivot onde PRODUTOS sao as COLUNAS (linhas = territorios, todos os tipos de arquivo)."""
     terrs = sorted(set(r["territorio_id"] for r in data))
     prods = sorted(set(r["produto_id"] for r in data))
-    fn = ["territorio_id", "nome_territorio", "tipo_territorio", "tipo_arquivo", "ano"] + prods
+    fn = ["dataset", "colecao", "territorio_id", "nome_territorio", "tipo_territorio", "tipo_arquivo", "ano"] + prods
     out = []
     for tid in terrs:
         sub = [r for r in data if r["territorio_id"] == tid]
@@ -273,6 +277,8 @@ def pivot_produtos(data):
             if key in seen: continue
             seen.add(key)
             row = OrderedDict()
+            row["dataset"] = r["dataset"]
+            row["colecao"] = r["colecao"]
             row["territorio_id"] = tid
             row["nome_territorio"] = r["nome_territorio"]
             row["tipo_territorio"] = r["tipo_territorio"]
