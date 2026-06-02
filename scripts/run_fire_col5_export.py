@@ -176,6 +176,11 @@ def upload_combo(dataset_id, product_id, territory_id):
                 print(f"  [GCS ERRO] {fpath.name}: {e}")
 
     if count > 0:
+        # Salva metadata no cache antes de deletar (para uso offline do CSV builder)
+        for f in local_dir.glob("metadata_*.json"):
+            cache_dir = Path(f"outputs/v001/.metadata_cache/{dataset_id}/{product_id}")
+            cache_dir.mkdir(parents=True, exist_ok=True)
+            shutil.copy(str(f), str(cache_dir / f"{territory_id}_{f.name}"))
         shutil.rmtree(str(local_dir), ignore_errors=True)
         mark_uploaded(dataset_id, product_id, territory_id)
         with upload_count_lock:
