@@ -17,6 +17,7 @@ Uso:
 """
 
 import os
+import re
 import sys
 import json
 import shutil
@@ -44,7 +45,6 @@ def get_gcs_client():
 
 
 def list_metadata_files(dataset_id):
-    """Lista todos os metadata_*.json no GCS para um dataset."""
     client = get_gcs_client()
     bucket = client.bucket(BUCKET_NAME)
     prefix = f"{GCS_ROOT}/{dataset_id}/"
@@ -53,7 +53,6 @@ def list_metadata_files(dataset_id):
 
 
 def download_metadata_files(blobs, dest_dir):
-    """Download dos metadata JSONs para um diretorio local."""
     bucket = get_gcs_client().bucket(BUCKET_NAME)
     count = 0
     for b in blobs:
@@ -65,10 +64,14 @@ def download_metadata_files(blobs, dest_dir):
     return count
 
 
+def extract_year(filename):
+    """Extrai o ultimo ano de 4 digitos do nome do arquivo (ex: 1985_2025 -> 2025)."""
+    years = re.findall(r'\d{4}', filename)
+    return years[-1] if years else "?"
+
+
 def load_dataset_metadata(dataset_ids=None):
-    """Baixa metadata de todos (ou alguns) datasets do GCS e retorna linhas CSV."""
     if dataset_ids is None:
-        # Descobre todos os datasets no GCS
         client = get_gcs_client()
         bucket = client.bucket(BUCKET_NAME)
         prefixes = set()
@@ -76,7 +79,8 @@ def load_dataset_metadata(dataset_ids=None):
             parts = b.name.split("/")
             if len(parts) >= 3 and parts[0] == GCS_ROOT:
                 prefixes.add(parts[1])
-        dataset_ids = sorted(p for p in prefixes if p and not p.startswith(".") and p not in ("looker studio", "outputs"))
+        dataset_ids = sorted(p for p in prefixes if p and not p.startswith(".")
+                            and p not in ("looker studio", "outputs"))
 
     all_rows = []
     temp_dirs = []
@@ -99,7 +103,6 @@ def load_dataset_metadata(dataset_ids=None):
 
 
 def parse_metadata_dir(dataset_id, base_dir):
-    """Le metadata JSONs de um diretorio e retorna linhas CSV."""
     # Territory type detection
     def load_ids(yaml_file, key):
         if not os.path.exists(yaml_file):
@@ -119,7 +122,6 @@ def parse_metadata_dir(dataset_id, base_dir):
         if tid in country_ids: return "country"
         return "unknown"
 
-    # Dataset collection from config
     collection = "?"
     try:
         with open("config/datasets.yaml", encoding="utf-8") as f:
@@ -154,7 +156,6 @@ def parse_metadata_dir(dataset_id, base_dir):
 
             prod_name = meta["product"]["name"]
             terr_name = meta["territory"]["name"]
-            trange = meta["product"].get("temporal_range", [1985, 2024])
             fcount = meta.get("output", {}).get("frames_count", 0)
             gen_at = meta.get("generated_at", "")
             fi = meta.get("files", {})
@@ -165,47 +166,100 @@ def parse_metadata_dir(dataset_id, base_dir):
             dim = ee.get("frame_dimensions", {})
             dim_str = f"{dim.get('width', 0)}x{dim.get('height', 0)}"
             tpx = ee.get("total_pixels_processed", 0)
-            gif_fn = f"{prod_id}_{terr_id}_0_3s.gif"
-            url = f"{GCS_BASE_URL}/{dataset_id}/{prod_id}/{terr_id}/{gif_fn}"
 
+            gif_fn = f"{prod_id}_{terr_id}_0_3s.gif"
+            collage_fn = f"{prod_id}_{terr_id}_collage.png"
+            gif_url = f"{GCS_BASE_URL}/{dataset_id}/{prod_id}/{terr_id}/{gif_fn}"
+            collage_url = f"{GCS_BASE_URL}/{dataset_id}/{prod_id}/{terr_id}/{collage_fn}"
+
+            frames_fnames = meta.get("output", {}).get("frames", [])
+
+            base_values = dict(
+                dataset=dataset_id,
+                colecao=collection,
+                produto_id=prod_id,
+                nome_produto=prod_name,
+                territorio_id=terr_id,
+                nome_territorio=terr_name,
+                tipo_territorio=get_type(terr_id),
+                data_geracao=gen_at[:10] if gen_at else "",
+                bandas=fcount,
+                gif_tamanho_mb=fi.get("gif_size_mb", ""),
+                frames_total_mb=fi.get("frames_total_mb", ""),
+                frames_count=fi.get("frames_count", fcount),
+                tempo_total_s=round(ttotal, 1) if ttotal else "",
+                tempo_download_s=round(phases.get("download", 0), 1) or "",
+                tempo_resize_s=round(phases.get("resize", 0), 1) or "",
+                tempo_colagem_s=round(phases.get("collage_build", 0), 1) or "",
+                tempo_gif_s=round(phases.get("gif_creation", 0), 1) or "",
+                ee_cu=ee.get("estimated_eecu", ""),
+                pixels_por_frame=ee.get("pixels_per_frame", ""),
+                total_pixels_m=round(tpx / 1_000_000, 1) if tpx else "",
+                dimensao_frame=dim_str,
+            )
+
+            # GIF
             rows.append(OrderedDict([
-                ("link_direto", url),
-                ("dataset", dataset_id),
-                ("colecao", collection),
-                ("produto_id", prod_id),
-                ("nome_produto", prod_name),
-                ("territorio_id", terr_id),
-                ("nome_territorio", terr_name),
-                ("tipo_territorio", get_type(terr_id)),
-                ("tipo_arquivo", "GIF animado"),
+                *base_values.items(),
+                ("link_direto", gif_url),
+                ("tipo_arquivo", "GIF do periodo"),
                 ("arquivo", gif_fn),
-                ("data_geracao", gen_at[:10] if gen_at else ""),
-                ("bandas", fcount),
-                ("ano_inicial", trange[0]),
-                ("ano_final", trange[1]),
-                ("gif_tamanho_mb", fi.get("gif_size_mb", "")),
-                ("frames_total_mb", fi.get("frames_total_mb", "")),
-                ("frames_count", fi.get("frames_count", fcount)),
-                ("tempo_total_s", round(ttotal, 1) if ttotal else ""),
-                ("tempo_download_s", round(phases.get("download", 0), 1) or ""),
-                ("tempo_resize_s", round(phases.get("resize", 0), 1) or ""),
-                ("tempo_colagem_s", round(phases.get("collage_build", 0), 1) or ""),
-                ("tempo_gif_s", round(phases.get("gif_creation", 0), 1) or ""),
-                ("ee_cu", ee.get("estimated_eecu", "")),
-                ("pixels_por_frame", ee.get("pixels_per_frame", "")),
-                ("total_pixels_m", round(tpx / 1_000_000, 1) if tpx else ""),
-                ("dimensao_frame", dim_str),
+                ("ano", "gif"),
             ]))
+
+            # Collage
+            rows.append(OrderedDict([
+                *base_values.items(),
+                ("link_direto", collage_url),
+                ("tipo_arquivo", "Colagem"),
+                ("arquivo", collage_fn),
+                ("ano", "colagem"),
+            ]))
+
+            # Frames
+            for ffn in frames_fnames:
+                year = extract_year(ffn)
+                frame_url = f"{GCS_BASE_URL}/{dataset_id}/{prod_id}/{terr_id}/{ffn}"
+                rows.append(OrderedDict([
+                    *base_values.items(),
+                    ("link_direto", frame_url),
+                    ("tipo_arquivo", f"Frame do ano {year}"),
+                    ("arquivo", ffn),
+                    ("ano", year),
+                ]))
+
     return rows
 
 
-def pivot_territorios(data, vc="link_direto"):
-    prods = sorted(set(r["produto_id"] for r in data))
-    terrs = sorted(set(r["territorio_id"] for r in data))
+def pivot_territorios(data):
+    """Pivot onde TERRITORIOS sao as COLUNAS (linhas = produtos)."""
+    gif_only = [r for r in data if r["tipo_arquivo"] == "GIF do periodo"]
+    prods = sorted(set(r["produto_id"] for r in gif_only))
+    terrs = sorted(set(r["territorio_id"] for r in gif_only))
+    fn = ["produto_id", "nome_produto"] + terrs
+    out = []
+    for pid in prods:
+        sub = [r for r in gif_only if r["produto_id"] == pid]
+        if not sub: continue
+        row = OrderedDict()
+        row["produto_id"] = pid
+        row["nome_produto"] = sub[0]["nome_produto"]
+        for t in terrs:
+            match = [r for r in sub if r["territorio_id"] == t]
+            row[t] = match[0]["link_direto"] if match else ""
+        out.append(row)
+    return fn, out
+
+
+def pivot_produtos(data):
+    """Pivot onde PRODUTOS sao as COLUNAS (linhas = territorios)."""
+    gif_only = [r for r in data if r["tipo_arquivo"] == "GIF do periodo"]
+    terrs = sorted(set(r["territorio_id"] for r in gif_only))
+    prods = sorted(set(r["produto_id"] for r in gif_only))
     fn = ["territorio_id", "nome_territorio", "tipo_territorio"] + prods
     out = []
     for tid in terrs:
-        sub = [r for r in data if r["territorio_id"] == tid]
+        sub = [r for r in gif_only if r["territorio_id"] == tid]
         if not sub: continue
         row = OrderedDict()
         row["territorio_id"] = tid
@@ -213,25 +267,7 @@ def pivot_territorios(data, vc="link_direto"):
         row["tipo_territorio"] = sub[0]["tipo_territorio"]
         for p in prods:
             match = [r for r in sub if r["produto_id"] == p]
-            row[p] = match[0][vc] if match else ""
-        out.append(row)
-    return fn, out
-
-
-def pivot_produtos(data, vc="link_direto"):
-    terrs = sorted(set(r["territorio_id"] for r in data))
-    prods = sorted(set(r["produto_id"] for r in data))
-    fn = ["produto_id", "nome_produto"] + terrs
-    out = []
-    for pid in prods:
-        sub = [r for r in data if r["produto_id"] == pid]
-        if not sub: continue
-        row = OrderedDict()
-        row["produto_id"] = pid
-        row["nome_produto"] = sub[0]["nome_produto"]
-        for t in terrs:
-            match = [r for r in sub if r["territorio_id"] == t]
-            row[t] = match[0][vc] if match else ""
+            row[p] = match[0]["link_direto"] if match else ""
         out.append(row)
     return fn, out
 
@@ -244,12 +280,24 @@ def write_csv(path, fieldnames, data):
         w.writerows(data)
 
 
+FIELDS = [
+    "link_direto", "dataset", "colecao",
+    "produto_id", "nome_produto",
+    "territorio_id", "nome_territorio", "tipo_territorio",
+    "tipo_arquivo", "arquivo", "ano",
+    "data_geracao", "bandas",
+    "gif_tamanho_mb", "frames_total_mb", "frames_count",
+    "tempo_total_s", "tempo_download_s", "tempo_resize_s",
+    "tempo_colagem_s", "tempo_gif_s",
+    "ee_cu", "pixels_por_frame", "total_pixels_m", "dimensao_frame",
+]
+
+
 def generate_all_csvs(all_rows, full_dataset_ids):
-    """Gera todos os CSVs: raiz combinada + subpastas por dataset."""
-    FIELDS = list(all_rows[0].keys()) if all_rows else []
+    if not all_rows:
+        return
 
     ROOT = LOCAL_CSV_ROOT
-    # Limpa CSVs anteriores
     for csv_path in Path(ROOT).rglob("*.csv"):
         try: csv_path.unlink()
         except Exception: pass
@@ -257,13 +305,12 @@ def generate_all_csvs(all_rows, full_dataset_ids):
         Path(ROOT, d).mkdir(parents=True, exist_ok=True)
 
     # --- RAIZ: 3 arquivos flat (TODOS os datasets combinados) ---
-    if all_rows:
-        write_csv(f"{ROOT}/gif_index.csv", FIELDS, all_rows)
-        flds_pt, data_pt = pivot_territorios(all_rows)
-        write_csv(f"{ROOT}/gif_index_pivot_territorios.csv", flds_pt, data_pt)
-        flds_pp, data_pp = pivot_produtos(all_rows)
-        write_csv(f"{ROOT}/gif_index_pivot_produtos.csv", flds_pp, data_pp)
-        print(f"  Raiz: 3 arquivos combinados ({len(all_rows)} linhas)")
+    write_csv(f"{ROOT}/gif_index.csv", FIELDS, all_rows)
+    flds_pt, data_pt = pivot_territorios(all_rows)
+    write_csv(f"{ROOT}/gif_index_pivot_territorios.csv", flds_pt, data_pt)
+    flds_pp, data_pp = pivot_produtos(all_rows)
+    write_csv(f"{ROOT}/gif_index_pivot_produtos.csv", flds_pp, data_pp)
+    print(f"  Raiz: 3 arquivos combinados ({len(all_rows)} linhas)")
 
     # --- SUBPASTAS: versoes por dataset / bioma / regiao ---
     for ds_id in full_dataset_ids:
@@ -286,7 +333,6 @@ def generate_all_csvs(all_rows, full_dataset_ids):
 
 
 def upload_csvs_to_gcs():
-    """Sobe todos os CSVs gerados para o GCS."""
     client = get_gcs_client()
     bucket = client.bucket(BUCKET_NAME)
     csv_root = Path(LOCAL_CSV_ROOT)
@@ -316,7 +362,7 @@ def main():
     print(f"LOOKER STUDIO CSV — FROM GCS")
     print(f"{'=' * 60}")
 
-    # Step 1: Download metadata
+    # 1. Download
     print("[1/3] Baixando metadata do GCS...")
     if args.all:
         all_rows, temp_dirs = load_dataset_metadata()
@@ -327,12 +373,17 @@ def main():
         print("  Nenhum metadata encontrado. Abortando.")
         return
 
-    # Step 2: Generate CSVs
-    print(f"\n[2/3] Gerando CSVs ({len(all_rows)} linhas)...")
+    gif_count = sum(1 for r in all_rows if r["tipo_arquivo"] == "GIF do periodo")
+    frame_count = sum(1 for r in all_rows if r["tipo_arquivo"].startswith("Frame"))
+    collage_count = sum(1 for r in all_rows if r["tipo_arquivo"] == "Colagem")
+    print(f"  {len(all_rows)} linhas ({gif_count} GIFs, {collage_count} Colagens, {frame_count} Frames)")
+
+    # 2. Generate CSVs
+    print(f"\n[2/3] Gerando CSVs...")
     dataset_ids = sorted(set(r["dataset"] for r in all_rows))
     generate_all_csvs(all_rows, dataset_ids)
 
-    # Step 3: Upload to GCS
+    # 3. Upload
     if not skip_upload:
         print(f"\n[3/3] Subindo CSVs para o GCS...")
         csv_count = upload_csvs_to_gcs()
@@ -340,7 +391,6 @@ def main():
     else:
         print(f"\n[3/3] Upload skipado (--no-upload)")
 
-    # Cleanup temp dirs
     for td in temp_dirs:
         shutil.rmtree(td, ignore_errors=True)
 
