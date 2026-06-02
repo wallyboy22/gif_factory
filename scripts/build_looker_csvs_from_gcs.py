@@ -236,7 +236,7 @@ def pivot_territorios(data):
     gif_only = [r for r in data if r["tipo_arquivo"] == "GIF do periodo"]
     prods = sorted(set(r["produto_id"] for r in gif_only))
     terrs = sorted(set(r["territorio_id"] for r in gif_only))
-    fn = ["produto_id", "nome_produto"] + terrs
+    fn = ["produto_id", "nome_produto", "tipo_arquivo", "ano"] + terrs
     out = []
     for pid in prods:
         sub = [r for r in gif_only if r["produto_id"] == pid]
@@ -244,6 +244,8 @@ def pivot_territorios(data):
         row = OrderedDict()
         row["produto_id"] = pid
         row["nome_produto"] = sub[0]["nome_produto"]
+        row["tipo_arquivo"] = sub[0]["tipo_arquivo"]
+        row["ano"] = sub[0]["ano"]
         for t in terrs:
             match = [r for r in sub if r["territorio_id"] == t]
             row[t] = match[0]["link_direto"] if match else ""
@@ -256,7 +258,7 @@ def pivot_produtos(data):
     gif_only = [r for r in data if r["tipo_arquivo"] == "GIF do periodo"]
     terrs = sorted(set(r["territorio_id"] for r in gif_only))
     prods = sorted(set(r["produto_id"] for r in gif_only))
-    fn = ["territorio_id", "nome_territorio", "tipo_territorio"] + prods
+    fn = ["territorio_id", "nome_territorio", "tipo_territorio", "tipo_arquivo", "ano"] + prods
     out = []
     for tid in terrs:
         sub = [r for r in gif_only if r["territorio_id"] == tid]
@@ -265,6 +267,8 @@ def pivot_produtos(data):
         row["territorio_id"] = tid
         row["nome_territorio"] = sub[0]["nome_territorio"]
         row["tipo_territorio"] = sub[0]["tipo_territorio"]
+        row["tipo_arquivo"] = sub[0]["tipo_arquivo"]
+        row["ano"] = sub[0]["ano"]
         for p in prods:
             match = [r for r in sub if r["produto_id"] == p]
             row[p] = match[0]["link_direto"] if match else ""
