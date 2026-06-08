@@ -128,7 +128,7 @@ def detect_workers():
     return max(1, min(cores - 1, 12))
 
 
-def process_one(config, territory, prod, resume, workers_count):
+def process_one(config, territory, prod, resume, workers_count, font_scale=1.0):
     """Executa um combo dataset+produto+territorio."""
     from src.ipam_gif_factory.core.pipeline import Pipeline
 
@@ -147,6 +147,7 @@ def process_one(config, territory, prod, resume, workers_count):
         vertical_dimension=VERTICAL_DIMENSION,
         cell_height=CELL_HEIGHT,
         resume=resume,
+        font_scale=font_scale,
     )
 
     with print_lock:
@@ -176,10 +177,13 @@ def main():
                         help="Workers paralelos (padrao: auto-detect)")
     parser.add_argument("--resume", action="store_true", default=None,
                         help="Retomar de onde parou")
+    parser.add_argument("--font-scale", type=float, default=1.0,
+                        help="Escala das fontes (padrao: 1.0)")
     args = parser.parse_args()
 
     workers = args.workers or WORKERS or detect_workers()
     resume = args.resume if args.resume is not None else RESUME
+    font_scale = args.font_scale
 
     config = ConfigLoader()
 
@@ -201,7 +205,7 @@ def main():
 
     with ThreadPoolExecutor(max_workers=workers) as executor:
         futures = [
-            executor.submit(process_one, config, t, p, resume, workers)
+            executor.submit(process_one, config, t, p, resume, workers, font_scale)
             for t, p in combos
         ]
         for _ in as_completed(futures):

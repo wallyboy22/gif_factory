@@ -54,7 +54,7 @@ results_lock = threading.Lock()
 results_list = []
 
 
-def process_one(config, territory, prod, resume):
+def process_one(config, territory, prod, resume, font_scale=1.0):
     pipeline = Pipeline(config)
 
     with print_lock:
@@ -70,6 +70,7 @@ def process_one(config, territory, prod, resume):
         vertical_dimension=1560,
         cell_height=300,
         resume=resume,
+        font_scale=font_scale,
     )
 
     with print_lock:
@@ -92,6 +93,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="GIFs de degradacao para biomas + Brasil")
     parser.add_argument("--workers", type=int, default=4, help="Workers paralelos (padrao: 4)")
     parser.add_argument("--resume", action="store_true", help="Retomar de onde parou")
+    parser.add_argument("--font-scale", type=float, default=1.0, help="Escala das fontes (padrao: 1.0)")
     args = parser.parse_args()
 
     config = ConfigLoader().load_all()
@@ -101,11 +103,12 @@ if __name__ == "__main__":
     print(f"Total de combinacoes: {total}")
     print(f"Workers: {args.workers}")
     print(f"Modo: {'resume' if args.resume else 'fresh'}")
+    print(f"Font scale: {args.font_scale}")
     print()
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=args.workers) as executor:
         futures = [
-            executor.submit(process_one, config, territory, prod, args.resume)
+            executor.submit(process_one, config, territory, prod, args.resume, args.font_scale)
             for territory, prod in combos
         ]
         concurrent.futures.wait(futures)

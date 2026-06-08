@@ -1,8 +1,13 @@
+import argparse
 import sys
 sys.path.insert(0, "src")
 
 from ipam_gif_factory.config import ConfigLoader
 from ipam_gif_factory.core.pipeline import Pipeline
+
+parser = argparse.ArgumentParser(description="GIFs de degradacao para MATOPIBA + Cerrado + DF")
+parser.add_argument("--font-scale", type=float, default=1.0, help="Escala das fontes (padrao: 1.0)")
+args = parser.parse_args()
 
 config = ConfigLoader().load_all()
 pipeline = Pipeline(config)
@@ -56,6 +61,7 @@ for territory, prods in territory_products.items():
             add_labels=True,
             vertical_dimension=1560,
             cell_height=300,
+            font_scale=args.font_scale,
         )
 
         status_sym = "OK" if result["status"] == "success" else "FALHA"

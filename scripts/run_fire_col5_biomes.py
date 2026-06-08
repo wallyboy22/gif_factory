@@ -103,7 +103,7 @@ def filter_products(tipo):
         return PRODUCTS_PERIODO
     return PRODUCTS
 
-def process_one(config, territory, prod, resume, upload):
+def process_one(config, territory, prod, resume, upload, font_scale=1.0):
     from pathlib import Path
     from scripts.upload_to_gcs import upload_combo
     from src.ipam_gif_factory.core.pipeline import Pipeline
@@ -122,6 +122,7 @@ def process_one(config, territory, prod, resume, upload):
         vertical_dimension=VERTICAL_DIMENSION,
         cell_height=CELL_HEIGHT,
         resume=resume,
+        font_scale=font_scale,
     )
 
     with print_lock:
@@ -157,12 +158,15 @@ def main():
                         help="Filtrar por tipo de analise (padrao: todos)")
     parser.add_argument("--no-upload", action="store_true",
                         help="Pular upload para GCS apos cada combo")
+    parser.add_argument("--font-scale", type=float, default=1.0,
+                        help="Escala das fontes (padrao: 1.0)")
     args = parser.parse_args()
 
     workers = args.workers or detect_workers()
     resume = args.resume
     active_products = filter_products(args.tipo)
     do_upload = not args.no_upload
+    font_scale = args.font_scale
 
     config = ConfigLoader()
 
@@ -183,7 +187,7 @@ def main():
 
     with ThreadPoolExecutor(max_workers=workers) as executor:
         futures = [
-            executor.submit(process_one, config, t, p, resume, do_upload)
+            executor.submit(process_one, config, t, p, resume, do_upload, font_scale)
             for t, p in combos
         ]
         for i, f in enumerate(as_completed(futures), 1):

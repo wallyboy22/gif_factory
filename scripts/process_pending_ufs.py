@@ -76,6 +76,7 @@ def main():
     parser.add_argument("--resume", action="store_true", help="Pular já processados localmente")
     parser.add_argument("--dry-run", action="store_true", help="Só mostrar o que seria processado")
     parser.add_argument("--upload", action="store_true", help="Subir para GCS após processar")
+    parser.add_argument("--font-scale", type=float, default=1.0, help="Escala das fontes (padrao: 1.0)")
     args = parser.parse_args()
 
     config = ConfigLoader().load_all()
@@ -143,6 +144,7 @@ def main():
         sys.executable, "-m", "src.ipam_gif_factory.interfaces.cli",
         "--generate", "--batch", batch_path,
         "--workers", str(args.workers),
+        "--font-scale", str(args.font_scale),
     ]
     if args.resume:
         cmd.append("--resume")

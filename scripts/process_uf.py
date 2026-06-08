@@ -35,6 +35,7 @@ def main():
     parser.add_argument("--prod", required=True, help="Product ID")
     parser.add_argument("--workers", type=int, default=4, help="Parallel workers (default: 4)")
     parser.add_argument("--resume", action="store_true", help="Pular itens já processados")
+    parser.add_argument("--font-scale", type=float, default=1.0, help="Escala das fontes (padrao: 1.0)")
     args = parser.parse_args()
 
     items = [
@@ -61,6 +62,7 @@ def main():
         sys.executable, "-m", "src.ipam_gif_factory.interfaces.cli",
         "--generate", "--batch", batch_path,
         "--workers", str(args.workers),
+        "--font-scale", str(args.font_scale),
     ]
     if args.resume:
         cmd.append("--resume")
