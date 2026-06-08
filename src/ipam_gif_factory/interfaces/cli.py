@@ -51,6 +51,7 @@ class CLI:
         parser.add_argument("--frames-only", action="store_true", help="Apenas baixar frames, sem colagem/GIF")
         parser.add_argument("--batch", type=str, help="Caminho para arquivo batch.json com lista de itens para processar em lote")
         parser.add_argument("--workers", type=int, default=1, help="Processos paralelos no modo batch (padrão: 1, sequencial)")
+        parser.add_argument("--no-upload", action="store_true", help="Pular upload para GCS apos cada combo")
 
         parsed = parser.parse_args(args)
 
@@ -78,6 +79,7 @@ class CLI:
                     parsed.cell_height,
                     parsed.resume,
                     parsed.workers,
+                    parsed.no_upload,
                 )
             return self._execute_pipeline(
                 parsed.dataset,
@@ -229,7 +231,7 @@ class CLI:
 
     def _execute_batch(self, batch_path: str, output_dir: Optional[str],
                        cell_height: int = 300, resume: bool = False,
-                       workers: int = 1):
+                       workers: int = 1, no_upload: bool = False):
         try:
             with open(batch_path, encoding="utf-8") as f:
                 batch = json.load(f)
@@ -243,10 +245,13 @@ class CLI:
             print("Batch vazio. Nada a processar.")
             return
 
+        do_upload = not no_upload
+
         print()
         print("=" * 52)
         print(f"  MapBiomas GIF Factory  -  {total} iten{'s' if total > 1 else ''}"  )
         print(f"  Workers: {workers}  |  Modo: {'resume' if resume else 'fresh'}")
+        print(f"  Upload: {'sim' if do_upload else 'nao'}")
         print(f"  Inicio: {datetime.now().strftime('%d/%m/%Y %H:%M')}")
         print("-" * 52)
 
@@ -278,15 +283,24 @@ class CLI:
             print(f"  +-> Dataset: {ds}  |  Territorio: {terr}")
 
             item_start = time.time()
-            self._execute_pipeline(
-                ds, prod, terr,
-                output_dir=output_dir,
-                viz_key=None,
-                max_bands=0,
-                band_names_filter=None,
-                cell_height=cell_height,
-                resume=resume,
-            )
+            try:
+                self._execute_pipeline(
+                    ds, prod, terr,
+                    output_dir=output_dir,
+                    viz_key=None,
+                    max_bands=0,
+                    band_names_filter=None,
+                    cell_height=cell_height,
+                    resume=resume,
+                )
+                if do_upload:
+                    from pathlib import Path
+                    from scripts.upload_to_gcs import upload_combo
+                    base = self.config.get_output_dir()
+                    upload_combo(ds, prod, terr, Path(base))
+            except SystemExit:
+                with lock:
+                    errors += 1
             item_elapsed = time.time() - item_start
             total_elapsed = time.time() - start_all
 

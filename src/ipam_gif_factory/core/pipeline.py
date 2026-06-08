@@ -155,6 +155,15 @@ class Pipeline:
                     (y, sorted(grp, key=lambda b: CHANNEL_ORDER.get(b.split('_')[0], 99)))
                     for y, grp in sorted(groups.items())
                 ]
+                if rgb_band_groups and viz_params.get("rgb_legend") is True:
+                    first_group_labels = [b.rsplit("_", 1)[0].upper() for b in rgb_band_groups[0][1]]
+                    channel_colors = ["#ff0000", "#00ff00", "#0000ff"]
+                    viz_params["rgb_legend"] = {
+                        "entries": [
+                            {"label": lbl, "color": clr}
+                            for lbl, clr in zip(first_group_labels, channel_colors)
+                        ]
+                    }
 
             self.downloader.vertical_dimension = vertical_dimension
             prefix = f"{product_id}_"
@@ -191,15 +200,32 @@ class Pipeline:
 
                 result["frames"] = frame_paths
 
+                expected = len(rgb_band_groups) if (is_rgb and rgb_band_groups) else len(band_names)
+                if len(frame_paths) != expected:
+                    return {**result, "status": "error",
+                            "error": f"Download incompleto: {len(frame_paths)}/{expected} frames"}
+
                 for fp in frame_paths:
                     if not os.path.exists(fp):
                         return {**result, "status": "error", "error": f"Frame faltando apos download: {fp}"}
+                    try:
+                        PILImage.open(fp).verify()
+                    except Exception as e:
+                        return {**result, "status": "error",
+                                "error": f"Frame corrompido: {fp} ({e})"}
 
                 state.mark_complete("download")
             else:
                 completed = state.get_completed()
                 print(f"\n[1/4] Download ja concluido (resume)")
                 frame_paths = self._load_existing_frames(output_dir, f"{product_id}_")
+                expected = len(rgb_band_groups) if (is_rgb and rgb_band_groups) else len(band_names)
+                if len(frame_paths) != expected:
+                    print(f"  [AVISO] Resume com {len(frame_paths)}/{expected} frames. Refazendo download...")
+                    state.clear_all()
+                    return self.run(dataset_id, product_id, territory_id, viz_key, output_dir,
+                                    create_collage, add_labels, vertical_dimension, max_bands,
+                                    band_names_filter, cell_height, resume=False)
                 result["frames"] = frame_paths
                 timings["download"] = 0
 
@@ -213,6 +239,37 @@ class Pipeline:
             else:
                 print(f"\n[2/4] Redimensionamento ja concluido (resume)")
                 timings["resize"] = 0
+
+            legend_overlay = None
+            legend_collage_overlay = None
+            if create_collage or add_labels:
+                if not state.is_complete("overlay_legend"):
+                    print(f"\n[2b/4] Renderizando legendas...")
+                    t_ol = time.perf_counter()
+                    frame_w = PILImage.open(frame_paths[0]).width
+                    legend_overlay = os.path.join(output_dir, f"{product_id}_{territory_id}_legend_frames.png")
+                    legend_collage_overlay = os.path.join(output_dir, f"{product_id}_{territory_id}_legend_collage.png")
+                    FrameProcessor.render_legend_overlay(
+                        width=frame_w, palette=viz_params.get("palette", ["fdfdfd", "800000"]),
+                        vmin=viz_params.get("min", 0), vmax=viz_params.get("max", 1),
+                        font_size=50, discrete_labels=viz_params.get("discrete_labels"),
+                        cmap_type=viz_params.get("cmap_type", "sequential"),
+                        label="", rgb_legend=viz_params.get("rgb_legend"),
+                        legend_order=viz_params.get("legend_order"),
+                        output_path=legend_overlay,
+                    )
+                    FrameProcessor.render_legend_overlay(
+                        width=frame_w, palette=viz_params.get("palette", ["fdfdfd", "800000"]),
+                        vmin=viz_params.get("min", 0), vmax=viz_params.get("max", 1),
+                        font_size=60, discrete_labels=viz_params.get("discrete_labels"),
+                        cmap_type=viz_params.get("cmap_type", "sequential"),
+                        label="", rgb_legend=viz_params.get("rgb_legend"),
+                        legend_order=viz_params.get("legend_order"),
+                        output_path=legend_collage_overlay,
+                    )
+                    timings["overlay_legend"] = round(time.perf_counter() - t_ol, 1)
+                    print(f"  ({timings['overlay_legend']}s)")
+                    state.mark_complete("overlay_legend")
 
             product_label = product_info.get("name", product_id)
             territory_name = territory_info["name"]
@@ -268,7 +325,8 @@ class Pipeline:
                         print(f"\n[3c/4] Adicionando titulo e legenda ao grid...")
                         t3c = time.perf_counter()
                         FrameProcessor.add_year_label(collage_path, title_line1, position="top_left", font_size=34, padding_top=130, bar_color=(255, 255, 255), text_color=(0, 0, 0), subtitle=title_line2, subtitle_size=30)
-                        FrameProcessor.add_bottom_bar(collage_path, bounds['lon_min'], bounds['lon_max'], bounds['lat_min'], bounds['lat_max'], palette=viz_params.get("palette", ["fdfdfd", "800000"]), vmin=viz_params.get("min", 0), vmax=viz_params.get("max", 1), font_size=60, discrete_labels=viz_params.get("discrete_labels"), cmap_type=viz_params.get("cmap_type", "sequential"), show_legend=True, show_scale=False)
+                        if legend_collage_overlay and os.path.exists(legend_collage_overlay):
+                            FrameProcessor.paste_overlay_below(collage_path, legend_collage_overlay)
                         FrameProcessor.add_margin(collage_path, 30)
                         timings["collage_labels"] = round(time.perf_counter() - t3c, 1)
                         print(f"    titulo/legenda: {timings['collage_labels']}s")
@@ -294,7 +352,7 @@ class Pipeline:
                 if not state.is_complete("frame_headers"):
                     print(f"\n[3d/4] Adicionando titulo aos frames...")
                     t4a = time.perf_counter()
-                    FrameProcessor.batch_add_frame_headers(frame_paths, title_line1, label_map, line1_size=36, line2_size=80, padding_top=220, gap=10, subtitle=title_line2, subtitle_size=22)
+                    FrameProcessor.batch_add_frame_headers(frame_paths, title_line1, label_map, line1_size=36, line2_size=80, padding_top=220, gap=10, subtitle=title_line2, subtitle_size=28)
                     timings["frame_headers"] = round(time.perf_counter() - t4a, 1)
                     print(f"    headers: {timings['frame_headers']}s")
                     state.mark_complete("frame_headers")
@@ -302,9 +360,12 @@ class Pipeline:
                     timings["frame_headers"] = 0
 
                 if not state.is_complete("frame_bottom_bars"):
-                    print(f"  Adicionando legenda aos frames...")
+                    print(f"  Colando legendas nos frames...")
                     t4b = time.perf_counter()
-                    FrameProcessor.batch_add_bottom_bars(frame_paths, bounds['lon_min'], bounds['lon_max'], bounds['lat_min'], bounds['lat_max'], palette=viz_params.get("palette", ["fdfdfd", "800000"]), vmin=viz_params.get("min", 0), vmax=viz_params.get("max", 1), font_size=50, discrete_labels=viz_params.get("discrete_labels"), cmap_type=viz_params.get("cmap_type", "sequential"), show_legend=True, show_scale=not create_collage)
+                    if not create_collage:
+                        FrameProcessor.batch_add_bottom_bars(frame_paths, bounds['lon_min'], bounds['lon_max'], bounds['lat_min'], bounds['lat_max'], palette=viz_params.get("palette", ["fdfdfd", "800000"]), vmin=viz_params.get("min", 0), vmax=viz_params.get("max", 1), font_size=50, discrete_labels=viz_params.get("discrete_labels"), cmap_type=viz_params.get("cmap_type", "sequential"), show_legend=False, show_scale=True)
+                    if legend_overlay and os.path.exists(legend_overlay):
+                        FrameProcessor.batch_paste_overlay_below(frame_paths, legend_overlay)
                     timings["frame_bottom_bars"] = round(time.perf_counter() - t4b, 1)
                     print(f"    legendas: {timings['frame_bottom_bars']}s")
                     state.mark_complete("frame_bottom_bars")

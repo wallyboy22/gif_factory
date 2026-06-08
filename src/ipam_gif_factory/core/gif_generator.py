@@ -26,17 +26,23 @@ class GIFGenerator:
         if sort_frames:
             image_paths = sorted(image_paths)
 
+        missing = [p for p in image_paths if not os.path.exists(p)]
+        if missing:
+            raise FileNotFoundError(
+                f"{len(missing)}/{len(image_paths)} frames ausentes para o GIF: "
+                f"{missing[0]}" + (f", ..." if len(missing) > 1 else "")
+            )
+
         images = []
         for path in image_paths:
-            if os.path.exists(path):
-                img = PILImage.open(path)
-                if img.mode == "RGBA":
-                    bg = PILImage.new("RGB", img.size, (255, 255, 255))
-                    bg.paste(img, mask=img.split()[3])
-                    img = bg
-                elif img.mode != "RGB":
-                    img = img.convert("RGB")
-                images.append(img)
+            img = PILImage.open(path)
+            if img.mode == "RGBA":
+                bg = PILImage.new("RGB", img.size, (255, 255, 255))
+                bg.paste(img, mask=img.split()[3])
+                img = bg
+            elif img.mode != "RGB":
+                img = img.convert("RGB")
+            images.append(img)
 
         if not images:
             raise ValueError("Nenhuma imagem pôde ser carregada")
@@ -44,7 +50,10 @@ class GIFGenerator:
         common_size = self._get_common_size(images)
         resized = [img.resize(common_size, PILImage.Resampling.LANCZOS) for img in images]
 
-        resized_rgb = [img.convert("P", palette=PILImage.Palette.ADAPTIVE) for img in resized]
+        first = resized[0].convert("P", palette=PILImage.Palette.ADAPTIVE)
+        resized_rgb = [first]
+        for img in resized[1:]:
+            resized_rgb.append(img.quantize(method=0, palette=first))
 
         ensure_dir(output_dir)
         output_path = os.path.join(output_dir, clean_filename(filename))
@@ -81,17 +90,23 @@ class GIFGenerator:
         if not image_paths:
             raise ValueError("Nenhuma imagem fornecida para a colagem")
 
+        missing = [p for p in image_paths if not os.path.exists(p)]
+        if missing:
+            raise FileNotFoundError(
+                f"{len(missing)}/{len(image_paths)} frames ausentes para a colagem: "
+                f"{missing[0]}" + (f", ..." if len(missing) > 1 else "")
+            )
+
         images = []
         for p in image_paths:
-            if os.path.exists(p):
-                img = PILImage.open(p)
-                if img.mode == "RGBA":
-                    bg = PILImage.new("RGB", img.size, (255, 255, 255))
-                    bg.paste(img, mask=img.split()[3])
-                    img = bg
-                elif img.mode != "RGB":
-                    img = img.convert("RGB")
-                images.append(img)
+            img = PILImage.open(p)
+            if img.mode == "RGBA":
+                bg = PILImage.new("RGB", img.size, (255, 255, 255))
+                bg.paste(img, mask=img.split()[3])
+                img = bg
+            elif img.mode != "RGB":
+                img = img.convert("RGB")
+            images.append(img)
         if not images:
             raise ValueError("Nenhuma imagem pôde ser carregada")
 

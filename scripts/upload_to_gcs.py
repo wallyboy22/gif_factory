@@ -64,7 +64,7 @@ def _local_items(output_dir: Path) -> list:
     return sorted(set(items))
 
 
-def _upload_combo(ds: str, prod: str, terr: str, output_dir: Path, dry_run: bool) -> int:
+def upload_combo(ds: str, prod: str, terr: str, output_dir: Path, dry_run: bool = False) -> int:
     local_dir = output_dir / ds / prod / terr
     if not local_dir.exists():
         return 0
@@ -141,7 +141,7 @@ def main():
     for ds, prod, terr in combos:
         label = f"{ds}/{prod}/{terr}"
         print(f"  [{label}]")
-        n = _upload_combo(ds, prod, terr, output_dir, args.dry_run)
+        n = upload_combo(ds, prod, terr, output_dir, args.dry_run)
         total += n
 
     print(f"\n{'─' * 52}")

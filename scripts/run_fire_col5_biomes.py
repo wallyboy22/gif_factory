@@ -10,6 +10,7 @@ Uso:
 
 import sys
 import os
+import subprocess
 import argparse
 import threading
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -56,6 +57,23 @@ PRODUCTS = [
     "nbr_min",
 ]
 
+PRODUCTS_ANUAL = [
+    "annual_burned", "monthly_burned", "scar_size_range",
+    "annual_burned_coverage_nivel0", "annual_burned_coverage_nivel1",
+    "annual_burned_coverage_nivel1_1", "annual_burned_coverage_nivel2",
+    "annual_burned_coverage_nivel3", "annual_burned_coverage_nivel4",
+    "severity", "nbr_min",
+]
+
+PRODUCTS_PERIODO = [
+    "accumulated_burned",
+    "accumulated_burned_coverage_nivel0", "accumulated_burned_coverage_nivel1",
+    "accumulated_burned_coverage_nivel1_1", "accumulated_burned_coverage_nivel2",
+    "accumulated_burned_coverage_nivel3", "accumulated_burned_coverage_nivel4",
+    "fire_frequency", "year_last_fire", "time_after_fire",
+    "fire_return_interval", "mean_fire_return_interval",
+]
+
 TERRITORIES = [
     "biomas",
     "amazonia",
@@ -76,10 +94,18 @@ results_lock = threading.Lock()
 results_list = []
 
 def detect_workers():
-    cores = os.cpu_count() or 4
-    return max(1, min(cores - 1, 12))
+    return 12
 
-def process_one(config, territory, prod, resume):
+def filter_products(tipo):
+    if tipo == "anual":
+        return PRODUCTS_ANUAL
+    if tipo == "periodo":
+        return PRODUCTS_PERIODO
+    return PRODUCTS
+
+def process_one(config, territory, prod, resume, upload):
+    from pathlib import Path
+    from scripts.upload_to_gcs import upload_combo
     from src.ipam_gif_factory.core.pipeline import Pipeline
 
     pipeline = Pipeline(config)
@@ -103,6 +129,10 @@ def process_one(config, territory, prod, resume):
             print(f"  [OK] {prod} / {territory}")
             if result.get("collage_path"):
                 print(f"  Colagem: {result['collage_path']}")
+            if upload:
+                output_dir = Path(config.get_output_dir())
+                n = upload_combo(DATASET_ID, prod, territory, output_dir)
+                print(f"  Upload GCS: {n} arquivo(s)")
         else:
             print(f"  [FALHA] {prod} / {territory}")
             if result.get("error"):
@@ -120,53 +150,64 @@ def main():
         description="Batch Fire Col5 — Biomas (7 territórios × 23 produtos)"
     )
     parser.add_argument("--workers", type=int, default=None,
-                        help="Workers paralelos (padrao: auto-detect)")
+                        help="Workers paralelos (padrao: 12)")
     parser.add_argument("--resume", action="store_true",
                         help="Retomar de onde parou")
+    parser.add_argument("--tipo", choices=["anual", "periodo", "todos"], default="todos",
+                        help="Filtrar por tipo de analise (padrao: todos)")
+    parser.add_argument("--no-upload", action="store_true",
+                        help="Pular upload para GCS apos cada combo")
     args = parser.parse_args()
 
     workers = args.workers or detect_workers()
     resume = args.resume
+    active_products = filter_products(args.tipo)
+    do_upload = not args.no_upload
 
     config = ConfigLoader()
 
-    combos = [(t, p) for t in TERRITORIES for p in PRODUCTS]
+    combos = [(t, p) for t in TERRITORIES for p in active_products]
     total = len(combos)
 
     print(f"\n{'=' * 60}")
     print(f"FÁBRICA DE GIFS — FIRE COLLECTION 5 — BIOMAS")
     print(f"{'=' * 60}")
-    print(f"Produtos: {len(PRODUCTS)}")
+    print(f"Tipo: {args.tipo}")
+    print(f"Produtos: {len(active_products)}")
     print(f"Territórios: {len(TERRITORIES)}")
     print(f"Total: {total} combinações")
     print(f"Workers: {workers}")
     print(f"Resume: {resume}")
-    print(f"Ambiente: VS Code")
+    print(f"Upload: {'sim' if do_upload else 'nao'}")
     print(f"{'=' * 60}\n")
 
     with ThreadPoolExecutor(max_workers=workers) as executor:
         futures = [
-            executor.submit(process_one, config, t, p, resume)
+            executor.submit(process_one, config, t, p, resume, do_upload)
             for t, p in combos
         ]
         for i, f in enumerate(as_completed(futures), 1):
             if i % 10 == 0 or i == total:
                 print(f"\n--- Progresso: {i}/{total} ---")
 
-    ok = sum(1 for r in results_list if r["status"] == "success")
-    fail = sum(1 for r in results_list if r["status"] == "error")
+    ok_count = sum(1 for r in results_list if r["status"] == "success")
+    fail_count = sum(1 for r in results_list if r["status"] == "error")
 
     print(f"\n{'=' * 60}")
     print(f"RESUMO FINAL")
     print(f"{'=' * 60}")
-    print(f"Total: {total} | OK: {ok} | Falha: {fail}")
+    print(f"Total: {total} | OK: {ok_count} | Falha: {fail_count}")
     print(f"{'=' * 60}")
 
-    if ok > 0:
+    if ok_count > 0:
         output_base = config.get_output_dir()
         print(f"\nOutput: {output_base}{DATASET_ID}/")
-        print("\nPróximos passos:")
-        print("  python scripts/sync_fire_col5.py  # upload + index + Looker CSVs")
+        root = os.path.dirname(os.path.dirname(__file__))
+        print("Reconstruindo indice...")
+        subprocess.run([sys.executable, "scripts/build_index.py", "--upload"],
+                       cwd=root, check=True)
+        print("\nProximos passos:")
+        print("  python scripts/sync_fire_col5.py  # atualizar planilhas Looker")
 
 
 if __name__ == "__main__":

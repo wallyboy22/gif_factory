@@ -1,4 +1,5 @@
 import os
+import time
 import requests
 import ee
 from typing import Any, Dict, List, Optional, Tuple
@@ -57,25 +58,33 @@ class EEDownloader:
         downloaded = []
 
         for band_name in band_names:
-            try:
-                url = self._get_thumb_url(image, band_name, viz_params, region_fc, overlay_fc)
-                filename = f"{prefix}{band_name}.png"
-                filepath = os.path.join(output_dir, filename)
+            filename = f"{prefix}{band_name}.png"
+            filepath = os.path.join(output_dir, filename)
+            max_attempts = 3
 
-                response = requests.get(url, stream=True, timeout=120)
-                response.raise_for_status()
+            for attempt in range(1, max_attempts + 1):
+                try:
+                    url = self._get_thumb_url(image, band_name, viz_params, region_fc, overlay_fc)
 
-                with open(filepath, "wb") as f:
-                    for chunk in response.iter_content(chunk_size=8192):
-                        if chunk:
-                            f.write(chunk)
+                    response = requests.get(url, stream=True, timeout=120)
+                    response.raise_for_status()
 
-                downloaded.append(filepath)
-                print(f"  [OK] {filename}")
+                    with open(filepath, "wb") as f:
+                        for chunk in response.iter_content(chunk_size=8192):
+                            if chunk:
+                                f.write(chunk)
 
-            except Exception as e:
-                print(f"  [ERRO] {band_name}: {e}")
-                continue
+                    downloaded.append(filepath)
+                    print(f"  [OK] {filename}")
+                    break
+
+                except Exception as e:
+                    if attempt < max_attempts:
+                        wait = 2 ** attempt
+                        print(f"  [RETRY {attempt}/{max_attempts}] {band_name}: {e} (esperando {wait}s)")
+                        time.sleep(wait)
+                    else:
+                        print(f"  [FALHA] {band_name} apos {max_attempts} tentativas: {e}")
 
         return downloaded
 
@@ -150,38 +159,48 @@ class EEDownloader:
         ensure_dir(output_dir)
         downloaded = []
         for year_label, band_list in band_groups:
-            try:
-                vis = {
-                    "min": viz_params.get("min", 0),
-                    "max": viz_params.get("max", 1),
-                    "bands": band_list,
-                }
-                visualized = (
-                    image.select(band_list)
-                    .unmask()
-                    .visualize(**vis)
-                    .updateMask(ee.Image().paint(region_fc, 0).eq(0))
-                    .blend(ee.Image().paint(region_fc, "vazio", 1))
-                )
-                if overlay_fc is not None:
-                    boundaries = ee.Image().byte().paint(featureCollection=overlay_fc, color=1, width=1)
-                    visualized = visualized.where(boundaries, 0)
+            filename = f"{prefix}{year_label}.png"
+            filepath = os.path.join(output_dir, filename)
+            max_attempts = 3
 
-                url = visualized.getThumbURL({
-                    "dimensions": str(self.vertical_dimension),
-                    "region": region_fc.geometry().bounds(),
-                })
-                filename = f"{prefix}{year_label}.png"
-                filepath = os.path.join(output_dir, filename)
-                response = requests.get(url, stream=True, timeout=120)
-                response.raise_for_status()
-                with open(filepath, "wb") as f:
-                    for chunk in response.iter_content(chunk_size=8192):
-                        if chunk:
-                            f.write(chunk)
-                downloaded.append(filepath)
-                print(f"  [OK] {filename}")
-            except Exception as e:
-                print(f"  [ERRO] {year_label}: {e}")
-                continue
+            for attempt in range(1, max_attempts + 1):
+                try:
+                    vis = {
+                        "min": viz_params.get("min", 0),
+                        "max": viz_params.get("max", 1),
+                        "bands": band_list,
+                    }
+                    visualized = (
+                        image.select(band_list)
+                        .unmask()
+                        .visualize(**vis)
+                        .updateMask(ee.Image().paint(region_fc, 0).eq(0))
+                        .blend(ee.Image().paint(region_fc, "vazio", 1))
+                    )
+                    if overlay_fc is not None:
+                        boundaries = ee.Image().byte().paint(featureCollection=overlay_fc, color=1, width=1)
+                        visualized = visualized.where(boundaries, 0)
+
+                    url = visualized.getThumbURL({
+                        "dimensions": str(self.vertical_dimension),
+                        "region": region_fc.geometry().bounds(),
+                    })
+                    response = requests.get(url, stream=True, timeout=120)
+                    response.raise_for_status()
+                    with open(filepath, "wb") as f:
+                        for chunk in response.iter_content(chunk_size=8192):
+                            if chunk:
+                                f.write(chunk)
+                    downloaded.append(filepath)
+                    print(f"  [OK] {filename}")
+                    break
+
+                except Exception as e:
+                    if attempt < max_attempts:
+                        wait = 2 ** attempt
+                        print(f"  [RETRY {attempt}/{max_attempts}] {year_label}: {e} (esperando {wait}s)")
+                        time.sleep(wait)
+                    else:
+                        print(f"  [FALHA] {year_label} apos {max_attempts} tentativas: {e}")
+
         return downloaded
