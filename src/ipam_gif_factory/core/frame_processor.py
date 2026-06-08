@@ -1,5 +1,7 @@
 import math
 import os
+import subprocess
+import sys
 from typing import Any, Dict, List, Optional, Tuple
 from PIL import Image as PILImage, ImageDraw, ImageFont
 
@@ -18,13 +20,27 @@ def _find_font() -> Optional[str]:
         "C:\\Windows\\Fonts\\Arial.ttf",
         "C:\\Windows\\Fonts\\segoeui.ttf",
         "C:\\Windows\\Fonts\\Calibri.ttf",
-        "C:\\Windows\\Fonts\\DejaVuSans.ttf",
         "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+        "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf",
+        "/usr/share/fonts/truetype/noto/NotoSans-Regular.ttf",
         "/usr/share/fonts/TTF/DejaVuSans.ttf",
     ]
     for p in candidates:
         if os.path.exists(p):
             return p
+
+    import subprocess, sys
+    try:
+        result = subprocess.run(
+            ["fc-match", "-f", "%{file}", "sans"],
+            capture_output=True, text=True, timeout=5,
+        )
+        fp = result.stdout.strip()
+        if fp and os.path.exists(fp):
+            return fp
+    except Exception:
+        pass
+
     return None
 
 
@@ -39,10 +55,11 @@ def _ensure_rgb(image: PILImage.Image) -> PILImage.Image:
 
 
 def _render_rgb_legend(draw: ImageDraw.Draw, width: int, y: int, margin: int,
-                       entries: List[Dict[str, str]], vmin: float, vmax: float):
+                       entries: List[Dict[str, str]], vmin: float, vmax: float,
+                       font_size: int = 42):
     box_size = 28
-    font_title = FrameProcessor._make_font(42)
-    font_detail = FrameProcessor._make_font(36)
+    font_title = FrameProcessor._make_font(font_size)
+    font_detail = FrameProcessor._make_font(font_size - 6)
 
     line1_h = draw.textbbox((0, 0), "Ag", font=font_title)[3] + 6
     line2_h = draw.textbbox((0, 0), "Ag", font=font_detail)[3] + 6
@@ -533,7 +550,7 @@ class FrameProcessor:
         if show_legend:
             if rgb_legend and rgb_legend.get("entries"):
                 _render_rgb_legend(draw, width, ly, margin, rgb_legend["entries"],
-                                   vmin, vmax)
+                                   vmin, vmax, font_size=font_size)
             elif n == 0:
                 bx = margin
                 by = ly + 5
@@ -791,7 +808,7 @@ class FrameProcessor:
         y += label_h
 
         if rgb_legend and rgb_legend.get("entries"):
-            _render_rgb_legend(draw, width, y - label_h + 5, margin, entries_rgb, vmin, vmax)
+            _render_rgb_legend(draw, width, y - label_h + 5, margin, entries_rgb, vmin, vmax, font_size=font_size)
         elif is_discrete:
             col_w = (width - 2 * margin) // cols
             for idx, (color, lbl) in enumerate(entries):
