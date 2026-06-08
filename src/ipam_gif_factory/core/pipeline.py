@@ -52,7 +52,9 @@ class Pipeline:
         band_names_filter: Optional[List[str]] = None,
         cell_height: int = 300,
         resume: bool = False,
+        font_scale: float = 1.0,
     ) -> Dict[str, Any]:
+        fs = lambda n: int(n * font_scale)
         result = {
             "dataset": dataset_id,
             "product": product_id,
@@ -252,7 +254,7 @@ class Pipeline:
                     FrameProcessor.render_legend_overlay(
                         width=frame_w, palette=viz_params.get("palette", ["fdfdfd", "800000"]),
                         vmin=viz_params.get("min", 0), vmax=viz_params.get("max", 1),
-                        font_size=50, discrete_labels=viz_params.get("discrete_labels"),
+                        font_size=fs(50), discrete_labels=viz_params.get("discrete_labels"),
                         cmap_type=viz_params.get("cmap_type", "sequential"),
                         label="", rgb_legend=viz_params.get("rgb_legend"),
                         legend_order=viz_params.get("legend_order"),
@@ -261,7 +263,7 @@ class Pipeline:
                     FrameProcessor.render_legend_overlay(
                         width=frame_w, palette=viz_params.get("palette", ["fdfdfd", "800000"]),
                         vmin=viz_params.get("min", 0), vmax=viz_params.get("max", 1),
-                        font_size=60, discrete_labels=viz_params.get("discrete_labels"),
+                        font_size=fs(60), discrete_labels=viz_params.get("discrete_labels"),
                         cmap_type=viz_params.get("cmap_type", "sequential"),
                         label="", rgb_legend=viz_params.get("rgb_legend"),
                         legend_order=viz_params.get("legend_order"),
@@ -274,8 +276,8 @@ class Pipeline:
             product_label = product_info.get("name", product_id)
             territory_name = territory_info["name"]
             dataset_desc = product_info.get("dataset_description", dataset_id)
-            title_line1 = f"{product_label} \u00b7 {territory_name}"
-            title_line2 = dataset_desc
+            title_line1 = product_label
+            title_line2 = f"{dataset_desc} \u00b7 {territory_name}"
 
             label_map = {}
             for fp in frame_paths:
@@ -294,7 +296,7 @@ class Pipeline:
                     if not state.is_complete("collage_scale_north"):
                         print(f"\n[3a/4] Adicionando escala e norte aos frames...")
                         t3a = time.perf_counter()
-                        FrameProcessor.batch_add_bottom_bars(frame_paths, bounds['lon_min'], bounds['lon_max'], bounds['lat_min'], bounds['lat_max'], palette=viz_params.get("palette", ["fdfdfd", "800000"]), vmin=viz_params.get("min", 0), vmax=viz_params.get("max", 1), font_size=50, discrete_labels=viz_params.get("discrete_labels"), cmap_type=viz_params.get("cmap_type", "sequential"), show_legend=False, show_scale=True)
+                        FrameProcessor.batch_add_bottom_bars(frame_paths, bounds['lon_min'], bounds['lon_max'], bounds['lat_min'], bounds['lat_max'], palette=viz_params.get("palette", ["fdfdfd", "800000"]), vmin=viz_params.get("min", 0), vmax=viz_params.get("max", 1), font_size=fs(50), discrete_labels=viz_params.get("discrete_labels"), cmap_type=viz_params.get("cmap_type", "sequential"), show_legend=False, show_scale=True)
                         timings["collage_scale_north"] = round(time.perf_counter() - t3a, 1)
                         print(f"    escala/norte: {timings['collage_scale_north']}s")
                         state.mark_complete("collage_scale_north")
@@ -324,7 +326,7 @@ class Pipeline:
                     if not state.is_complete("collage_labels"):
                         print(f"\n[3c/4] Adicionando titulo e legenda ao grid...")
                         t3c = time.perf_counter()
-                        FrameProcessor.add_year_label(collage_path, title_line1, position="top_left", font_size=34, padding_top=130, bar_color=(255, 255, 255), text_color=(0, 0, 0), subtitle=title_line2, subtitle_size=30)
+                        FrameProcessor.add_year_label(collage_path, title_line1, position="top_left", font_size=fs(34), padding_top=130, bar_color=(255, 255, 255), text_color=(0, 0, 0), subtitle=title_line2, subtitle_size=fs(30))
                         if legend_collage_overlay and os.path.exists(legend_collage_overlay):
                             FrameProcessor.paste_overlay_below(collage_path, legend_collage_overlay)
                         FrameProcessor.add_margin(collage_path, 30)
@@ -352,7 +354,7 @@ class Pipeline:
                 if not state.is_complete("frame_headers"):
                     print(f"\n[3d/4] Adicionando titulo aos frames...")
                     t4a = time.perf_counter()
-                    FrameProcessor.batch_add_frame_headers(frame_paths, title_line1, label_map, line1_size=36, line2_size=80, padding_top=220, gap=10, subtitle=title_line2, subtitle_size=28)
+                    FrameProcessor.batch_add_frame_headers(frame_paths, title_line1, label_map, line1_size=fs(36), line2_size=fs(80), padding_top=220, gap=10, subtitle=title_line2, subtitle_size=fs(28))
                     timings["frame_headers"] = round(time.perf_counter() - t4a, 1)
                     print(f"    headers: {timings['frame_headers']}s")
                     state.mark_complete("frame_headers")
@@ -363,7 +365,7 @@ class Pipeline:
                     print(f"  Colando legendas nos frames...")
                     t4b = time.perf_counter()
                     if not create_collage:
-                        FrameProcessor.batch_add_bottom_bars(frame_paths, bounds['lon_min'], bounds['lon_max'], bounds['lat_min'], bounds['lat_max'], palette=viz_params.get("palette", ["fdfdfd", "800000"]), vmin=viz_params.get("min", 0), vmax=viz_params.get("max", 1), font_size=50, discrete_labels=viz_params.get("discrete_labels"), cmap_type=viz_params.get("cmap_type", "sequential"), show_legend=False, show_scale=True)
+                        FrameProcessor.batch_add_bottom_bars(frame_paths, bounds['lon_min'], bounds['lon_max'], bounds['lat_min'], bounds['lat_max'], palette=viz_params.get("palette", ["fdfdfd", "800000"]), vmin=viz_params.get("min", 0), vmax=viz_params.get("max", 1), font_size=fs(50), discrete_labels=viz_params.get("discrete_labels"), cmap_type=viz_params.get("cmap_type", "sequential"), show_legend=False, show_scale=True)
                     if legend_overlay and os.path.exists(legend_overlay):
                         FrameProcessor.batch_paste_overlay_below(frame_paths, legend_overlay)
                     timings["frame_bottom_bars"] = round(time.perf_counter() - t4b, 1)
@@ -680,13 +682,14 @@ class Pipeline:
     def run_batch(self, combinations: List[Tuple[str, str, str, Optional[str]]],
                   output_dir: Optional[str] = None,
                   cell_height: int = 300,
-                  resume: bool = False) -> List[Dict[str, Any]]:
+                  resume: bool = False,
+                  font_scale: float = 1.0) -> List[Dict[str, Any]]:
         results = []
         for combo in combinations:
             dataset_id, product_id, territory_id = combo[:3]
             viz_key = combo[3] if len(combo) > 3 else None
             result = self.run(dataset_id, product_id, territory_id, viz_key, output_dir,
-                            cell_height=cell_height, resume=resume)
+                            cell_height=cell_height, resume=resume, font_scale=font_scale)
             results.append(result)
         return results
 

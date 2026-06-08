@@ -72,7 +72,7 @@ datasets:
         visualization: "year_next_fire"
 
   brasil_fire_col5:
-    description: "MapBiomas Fire Collection 5 - Brasil"
+    description: "MapBiomas Fogo Brasil - Coleção 5"
     project: mapbiomas-brazil
     category: "fire"
     source: "MapBiomas"

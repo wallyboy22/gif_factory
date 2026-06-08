@@ -52,6 +52,7 @@ class CLI:
         parser.add_argument("--batch", type=str, help="Caminho para arquivo batch.json com lista de itens para processar em lote")
         parser.add_argument("--workers", type=int, default=1, help="Processos paralelos no modo batch (padrão: 1, sequencial)")
         parser.add_argument("--no-upload", action="store_true", help="Pular upload para GCS apos cada combo")
+        parser.add_argument("--font-scale", type=float, default=1.0, help="Escala das fontes (padrão: 1.0)")
 
         parsed = parser.parse_args(args)
 
@@ -80,6 +81,7 @@ class CLI:
                     parsed.resume,
                     parsed.workers,
                     parsed.no_upload,
+                    font_scale=parsed.font_scale,
                 )
             return self._execute_pipeline(
                 parsed.dataset,
@@ -92,6 +94,7 @@ class CLI:
                 cell_height=parsed.cell_height,
                 resume=parsed.resume,
                 frames_only=parsed.frames_only,
+                font_scale=parsed.font_scale,
             )
 
         parser.print_help()
@@ -200,7 +203,7 @@ class CLI:
                           output_dir: Optional[str], viz_key: Optional[str],
                           max_bands: int = 0, band_names_filter: Optional[List[str]] = None,
                           cell_height: int = 300, resume: bool = False,
-                          frames_only: bool = False):
+                          frames_only: bool = False, font_scale: float = 1.0):
         if not dataset_id or not product_id:
             print("Erro: --dataset e --product são obrigatórios")
             return
@@ -219,6 +222,7 @@ class CLI:
             band_names_filter=band_names_filter,
             cell_height=cell_height,
             resume=resume,
+            font_scale=font_scale,
         )
 
         if result["status"] == "error":
@@ -231,7 +235,8 @@ class CLI:
 
     def _execute_batch(self, batch_path: str, output_dir: Optional[str],
                        cell_height: int = 300, resume: bool = False,
-                       workers: int = 1, no_upload: bool = False):
+                       workers: int = 1, no_upload: bool = False,
+                       font_scale: float = 1.0):
         try:
             with open(batch_path, encoding="utf-8") as f:
                 batch = json.load(f)
@@ -292,6 +297,7 @@ class CLI:
                     band_names_filter=None,
                     cell_height=cell_height,
                     resume=resume,
+                    font_scale=font_scale,
                 )
                 if do_upload:
                     from pathlib import Path
