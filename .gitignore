@@ -26,6 +26,7 @@ status.json
 # Colab notebooks (only allow factory notebooks)
 notebooks/*
 !notebooks/fabrica_*.ipynb
+!notebooks/Colab_*.ipynb
 
 # Legacy / archived files
 legacy/

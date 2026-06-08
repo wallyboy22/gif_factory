@@ -1,0 +1,114 @@
+╔══════════════════════════════════════════════════════════════╗
+║         FÁBRICA DE GIFS — MAPBIOMAS DEGRADAÇÃO COL 10.1     ║
+║                 GUIA DE COMANDOS                             ║
+╚══════════════════════════════════════════════════════════════╝
+
+Dataset: brasil_degradation_col10_1
+Produtos: 15  |  Territórios: 10 (batch completo)
+
+-----------------------------------------------------------------
+  1. BIOMAS + BRASIL (8 territórios, 13 produtos)
+-----------------------------------------------------------------
+  Gera GIFs para Amazônia, Caatinga, Cerrado, Mata Atlântica,
+  Pampa, Pantanal + mosaico "Biomas" + Brasil.
+
+  Produtos: fire_frequency, natural_coverage, burned_natural_coverage,
+  burned_at_least_once, primary_natural_coverage, fire_age, patch_id,
+  patch_size, edge_area, edge_age, landscape_morphology,
+  secondary_vegetation_age, secondary_vegetation_coverage
+
+  Comando:
+      python scripts/run_degradacao_biomas.py --workers 6 --resume
+
+-----------------------------------------------------------------
+  2. BATCH COMPLETO (10 territórios, 15 produtos)
+-----------------------------------------------------------------
+  Usa o batch JSON pré-definido. Inclui MATOPIBA, BAP, BAP Planalto,
+  canopy_disturbance_frequency e logging.
+
+  Territórios: amazonia, caatinga, cerrado, mata_atlantica, pampa,
+  pantanal, biomas, matopiba_cerrado, bap, bap_planalto
+
+  Comando:
+      python -m src.ipam_gif_factory.interfaces.cli --generate `
+      --batch config/batches/v001.json --workers 6 --resume
+
+  Ou via PowerShell:
+      .\scripts\run_all_v001.ps1
+
+-----------------------------------------------------------------
+  3. MATOPIBA + CERRADO + DF (alvos específicos)
+-----------------------------------------------------------------
+  Gera GIFs para MATOPIBA no Cerrado, Cerrado e DF.
+
+  Comando:
+      python scripts/run_matopiba_degradacao.py
+
+-----------------------------------------------------------------
+  4. ESTADOS / UFs — UM PRODUTO POR VEZ (27 estados)
+-----------------------------------------------------------------
+  Processa um produto específico em todas as 27 UFs.
+
+  Comando:
+      python scripts/process_uf.py --ds brasil_degradation_col10_1 `
+      --prod <produto_id> --workers 8 --resume
+
+  Exemplo:
+      python scripts/process_uf.py --ds brasil_degradation_col10_1 `
+      --prod secondary_vegetation_coverage --workers 8 --resume
+
+  Produtos disponíveis:
+      fire_frequency, natural_coverage, burned_natural_coverage,
+      burned_at_least_once, primary_natural_coverage, fire_age,
+      patch_id, patch_size, patch_size_fragments, patch_size_massifs,
+      edge_area, edge_age, landscape_morphology,
+      secondary_vegetation_age, secondary_vegetation_coverage,
+      canopy_disturbance_frequency, logging
+
+-----------------------------------------------------------------
+  5. UFs — SOMENTE PENDENTES NO GCS
+-----------------------------------------------------------------
+  Compara o que existe localmente com o que já está no GCS
+  e processa apenas o que falta.
+
+  Comando:
+      python scripts/process_pending_ufs.py `
+      --dataset brasil_degradation_col10_1 --workers 8
+
+-----------------------------------------------------------------
+  6. SINCORNIZAR DADOS (upload GCS + índices)
+-----------------------------------------------------------------
+  Sobe para o GCS o que ainda não foi enviado e reconstrói
+  os índices.
+
+  Comandos (em sequência):
+      python scripts/upload_to_gcs.py --pending
+      python scripts/build_index.py --upload
+      python scripts/build_looker_csvs_from_gcs.py `
+          --dataset brasil_degradation_col10_1
+
+  Tudo em uma linha:
+      python scripts/upload_to_gcs.py --pending; `
+      if ($?) { python scripts/build_index.py --upload }; `
+      if ($?) { python scripts/build_looker_csvs_from_gcs.py `
+          --dataset brasil_degradation_col10_1 }
+
+-----------------------------------------------------------------
+  RESUMO — COMANDOS MAIS COMUNS
+-----------------------------------------------------------------
+
+  Biomas + Brasil:
+    python scripts/run_degradacao_biomas.py --workers 6 --resume
+
+  Batch completo (com regiões custom):
+    python -m src.ipam_gif_factory.interfaces.cli --generate `
+      --batch config/batches/v001.json --workers 6 --resume
+
+  Um produto nas 27 UFs:
+    python scripts/process_uf.py --ds brasil_degradation_col10_1 `
+      --prod <id> --workers 8 --resume
+
+  Sincronizar tudo:
+    python scripts/upload_to_gcs.py --pending; `
+    if ($?) { python scripts/build_looker_csvs_from_gcs.py `
+        --dataset brasil_degradation_col10_1 }

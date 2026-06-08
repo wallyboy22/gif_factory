@@ -1,13 +1,11 @@
 """
-Batch Fire Collection 5: Brasil + Biomas + Estados (35 territórios × 23 produtos).
+Batch Fire Collection 5: Estados (28 UFs × 23 produtos).
 Gera GIFs completos (todos os anos) com colagem, labels, escala e norte.
 
 Uso:
-    python run_fire_col5_batch.py                          # fresco, auto-detect workers
-    python run_fire_col5_batch.py --workers 6 --resume     # retomando com 6 workers
-    python run_fire_col5_batch.py --workers 8              # 8 workers, sem resume
-
-Auto-detecta ambiente: VS Code (local) ou Google Colab.
+    python run_fire_col5_ufs.py                          # fresco, auto-detect workers
+    python run_fire_col5_ufs.py --workers 6 --resume     # retomando com 6 workers
+    python run_fire_col5_ufs.py --workers 8              # 8 workers, sem resume
 """
 
 import sys
@@ -15,10 +13,6 @@ import os
 import argparse
 import threading
 from concurrent.futures import ThreadPoolExecutor, as_completed
-
-# ============================================================
-# SETUP
-# ============================================================
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 cwd = os.getcwd()
@@ -34,14 +28,9 @@ try:
 except Exception:
     pass
 
-# ============================================================
-# CONFIGURAÇÃO
-# ============================================================
-
 DATASET_ID = "brasil_fire_col5"
 
 PRODUCTS = [
-    # Base (7)
     "annual_burned",
     "monthly_burned",
     "scar_size_range",
@@ -49,21 +38,18 @@ PRODUCTS = [
     "fire_frequency",
     "year_last_fire",
     "time_after_fire",
-    # Coverage annual (6)
     "annual_burned_coverage_nivel0",
     "annual_burned_coverage_nivel1",
     "annual_burned_coverage_nivel1_1",
     "annual_burned_coverage_nivel2",
     "annual_burned_coverage_nivel3",
     "annual_burned_coverage_nivel4",
-    # Coverage accumulated (6)
     "accumulated_burned_coverage_nivel0",
     "accumulated_burned_coverage_nivel1",
     "accumulated_burned_coverage_nivel1_1",
     "accumulated_burned_coverage_nivel2",
     "accumulated_burned_coverage_nivel3",
     "accumulated_burned_coverage_nivel4",
-    # Novos (4)
     "severity",
     "fire_return_interval",
     "mean_fire_return_interval",
@@ -71,17 +57,6 @@ PRODUCTS = [
 ]
 
 TERRITORIES = [
-    # País
-    "brasil",
-    # Biomas (7)
-    "biomas",
-    "amazonia",
-    "caatinga",
-    "cerrado",
-    "mata_atlantica",
-    "pampa",
-    "pantanal",
-    # Estados (27)
     "df",
     "acre",
     "alagoas",
@@ -116,19 +91,13 @@ ADD_LABELS = True
 VERTICAL_DIMENSION = 1560
 CELL_HEIGHT = 300
 
-# ============================================================
-# PIPELINE
-# ============================================================
-
 print_lock = threading.Lock()
 results_lock = threading.Lock()
 results_list = []
 
-
 def detect_workers():
     cores = os.cpu_count() or 4
     return max(1, min(cores - 1, 12))
-
 
 def process_one(config, territory, prod, resume):
     from src.ipam_gif_factory.core.pipeline import Pipeline
@@ -164,12 +133,11 @@ def process_one(config, territory, prod, resume):
 
     return result
 
-
 def main():
     from src.ipam_gif_factory.config import ConfigLoader
 
     parser = argparse.ArgumentParser(
-        description="Batch Fire Col5 — 35 territórios × 23 produtos"
+        description="Batch Fire Col5 — Estados (28 UFs × 23 produtos)"
     )
     parser.add_argument("--workers", type=int, default=None,
                         help="Workers paralelos (padrao: auto-detect)")
@@ -186,7 +154,7 @@ def main():
     total = len(combos)
 
     print(f"\n{'=' * 60}")
-    print(f"FÁBRICA DE GIFS — FIRE COLLECTION 5")
+    print(f"FÁBRICA DE GIFS — FIRE COLLECTION 5 — ESTADOS")
     print(f"{'=' * 60}")
     print(f"Produtos: {len(PRODUCTS)}")
     print(f"Territórios: {len(TERRITORIES)}")
