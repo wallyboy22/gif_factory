@@ -41,7 +41,7 @@ config.datasets           # Dict de datasets carregados
 config.territories        # Dict de territórios
 config.get_output_dir()   # output/ ou outputs/v001/
 config.get_processing_config("gif_creation")  # {frame_duration, loop_count, quality}
-config.ee_project_id      # "ee-ipam"
+config.ee_project_id      # "mapbiomas-fire-485203"
 ```
 
 ## Include e Merge
@@ -65,7 +65,7 @@ gcs:
   bucket: mapbiomas-fire
   root: gif-factory
 ee:
-  project: ee-ipam
+  project: mapbiomas-fire-485203
   mode: local                # local | colab | service_account
 ```
 

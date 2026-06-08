@@ -17,7 +17,7 @@ paths:
     logs_dir: "./logs/"
 
   earth_engine:
-    project_id: "ee-ipam"
+    project_id: "mapbiomas-fire-485203"
     timeout_seconds: 300
     retry_attempts: 3
 

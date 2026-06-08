@@ -21,7 +21,7 @@ class NotebookContext:
     config: any
     workers: int
     in_colab: bool
-    ee_project: str = "ee-ipam"
+    ee_project: str = "mapbiomas-fire-485203"
     gcs_bucket: str = "mapbiomas-fire"
     gcs_root: str = "gif-factory"
     active_projects: List[str] = field(default_factory=list)
@@ -62,10 +62,10 @@ def authenticate_gee(in_colab: bool):
     import ee
     if in_colab:
         ee.Authenticate()
-        ee.Initialize(project='ee-ipam')
+        ee.Initialize(project='mapbiomas-fire-485203')
     else:
         try:
-            ee.Initialize(project='ee-ipam')
+            ee.Initialize(project='mapbiomas-fire-485203')
         except Exception:
             pass
 
@@ -163,7 +163,7 @@ def build_project_hierarchy(datasets_dict, active_projects=None, active_gts=None
 
 
 
-def setup(ee_project="ee-ipam", gcs_bucket="mapbiomas-fire",
+def setup(ee_project="mapbiomas-fire-485203", gcs_bucket="mapbiomas-fire",
           gcs_root="gif-factory", active_projects=None, active_gts=None) -> NotebookContext:
     """Inicializa ambiente, autentica, carrega config e cache.
        Retorna NotebookContext com todos os dados prontos."""

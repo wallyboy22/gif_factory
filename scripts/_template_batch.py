@@ -35,7 +35,7 @@ if IN_COLAB:
     !pip install -q earthengine-api pillow pyyaml 2>/dev/null
     import ee
     ee.Authenticate()
-    ee.Initialize(project='ee-ipam')
+    ee.Initialize(project='mapbiomas-fire-485203')
 else:
     sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
     cwd = os.getcwd()
@@ -47,7 +47,7 @@ else:
             os.chdir(parent)
     import ee
     try:
-        ee.Initialize(project='ee-ipam')
+        ee.Initialize(project='mapbiomas-fire-485203')
     except Exception:
         pass
 

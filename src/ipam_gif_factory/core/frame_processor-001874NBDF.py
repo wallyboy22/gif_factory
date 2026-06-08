@@ -1,5 +1,6 @@
 import math
 import os
+import tempfile
 from typing import Any, Dict, List, Optional, Tuple
 from PIL import Image as PILImage, ImageDraw, ImageFont
 
@@ -299,7 +300,6 @@ class FrameProcessor:
         font_size: int = 50,
         discrete_labels: Optional[List[str]] = None,
         cmap_type: str = "sequential",
-        legend_order: Optional[List[int]] = None,
     ) -> None:
         image = _ensure_rgb(PILImage.open(image_path))
         width = image.width
@@ -315,19 +315,23 @@ class FrameProcessor:
             box_size = 28
             row_h = 40
             entries = []
-            indices = legend_order if legend_order else range(n)
-            for i in indices:
-                if not discrete_labels or i >= len(discrete_labels) or not discrete_labels[i]:
-                    continue
-                raw = discrete_labels[i]
-                lbl = f"{i:02d} {raw}"
+            for i in range(n):
+                if discrete_labels and i < len(discrete_labels):
+                    lbl = discrete_labels[i]
+                    if not lbl:
+                        continue
+                elif n == 2 and vmin == 0 and vmax == 1:
+                    lbl = ["Não queimado", "Queimado"][i]
+                else:
+                    val = vmin + (vmax - vmin) * i / (n - 1) if n > 1 else vmin
+                    lbl = str(int(val))
                 lbl = FrameProcessor._truncate_label(lbl)
                 entries.append((colors[i], lbl))
             n_entries = len(entries)
 
-            tfont = FrameProcessor._make_font(font_size - 14)
+            tfont = FrameProcessor._make_font(font_size - 8)
             cols, rows, tfont, _ = FrameProcessor._layout_discrete(
-                width, entries, tfont, box_size, 14, margin, max_cols=3)
+                width, entries, tfont, box_size, 8, margin, max_cols=3)
             content_h = rows * row_h
         else:
             box_size = 50
@@ -417,7 +421,6 @@ class FrameProcessor:
         show_legend: bool = True,
         show_scale: bool = True,
         rgb_legend: Optional[Dict[str, Any]] = None,
-        legend_order: Optional[List[int]] = None,
     ) -> None:
         image = _ensure_rgb(PILImage.open(image_path))
         width = image.width
@@ -450,19 +453,23 @@ class FrameProcessor:
             box_size = 28
             row_h = 50
             entries = []
-            indices = legend_order if legend_order else range(n)
-            for i in indices:
-                if not discrete_labels or i >= len(discrete_labels) or not discrete_labels[i]:
-                    continue
-                raw = discrete_labels[i]
-                lbl = f"{i:02d} {raw}"
+            for i in range(n):
+                if discrete_labels and i < len(discrete_labels):
+                    lbl = discrete_labels[i]
+                    if not lbl:
+                        continue
+                elif n == 2 and vmin == 0 and vmax == 1:
+                    lbl = ["Não queimado", "Queimado"][i]
+                else:
+                    val = vmin + (vmax - vmin) * i / (n - 1) if n > 1 else vmin
+                    lbl = str(int(val))
                 lbl = FrameProcessor._truncate_label(lbl)
                 entries.append((colors[i], lbl))
             n_entries = len(entries)
 
             tfont = FrameProcessor._make_font(font_size - 14)
             cols, rows, tfont, tfs = FrameProcessor._layout_discrete(
-                width, entries, tfont, box_size, 14, margin, max_cols=3)
+                width, entries, tfont, box_size, 8, margin, max_cols=3)
             legend_content_h = rows * row_h
         else:
             box_size = 50
@@ -550,10 +557,7 @@ class FrameProcessor:
                     by = ly + row * row_h
                     draw.rectangle([bx, by, bx + box_size, by + box_size], fill=color)
                     draw.rectangle([bx, by, bx + box_size, by + box_size], outline=(100, 100, 100), width=2)
-                    txt_bbox = draw.textbbox((0, 0), lbl, font=tfont)
-                    txt_h = txt_bbox[3] - txt_bbox[1]
-                    txt_y = by + (box_size - txt_h) // 2
-                    draw.text((bx + box_size + 10, txt_y), lbl, font=tfont, fill=(0, 0, 0))
+                    draw.text((bx + box_size + 8, by + 2), lbl, font=tfont, fill=(0, 0, 0))
             else:
                 bar_x = margin
                 bar_w = width - 2 * margin
@@ -599,11 +603,10 @@ class FrameProcessor:
         show_legend: bool = True,
         show_scale: bool = True,
         rgb_legend: Optional[Dict[str, Any]] = None,
-        legend_order: Optional[List[int]] = None,
     ) -> None:
         for path in image_paths:
             try:
-                FrameProcessor.add_bottom_bar(path, lon_min, lon_max, lat_min, lat_max, palette, vmin, vmax, font_size, discrete_labels=discrete_labels, cmap_type=cmap_type, show_legend=show_legend, show_scale=show_scale, rgb_legend=rgb_legend, legend_order=legend_order)
+                FrameProcessor.add_bottom_bar(path, lon_min, lon_max, lat_min, lat_max, palette, vmin, vmax, font_size, discrete_labels=discrete_labels, cmap_type=cmap_type, show_legend=show_legend, show_scale=show_scale, rgb_legend=rgb_legend)
             except Exception as e:
                 print(f"Erro ao adicionar barra inferior em {path}: {e}")
 
@@ -742,9 +745,9 @@ class FrameProcessor:
         cmap_type: str = "sequential",
         label: str = "",
         rgb_legend: Optional[Dict[str, Any]] = None,
-        legend_order: Optional[List[int]] = None,
         output_path: Optional[str] = None,
     ) -> str:
+        """Render legend as standalone PNG overlay, returns path."""
         colors = [_parse_color(c) for c in palette]
         n = len(colors)
         is_discrete = (n <= 2) or (cmap_type == "categorical")
@@ -757,19 +760,23 @@ class FrameProcessor:
             entries_rgb = rgb_legend["entries"]
         elif is_discrete:
             box_size = 28
-            row_h = 46
+            row_h = 40
             entries = []
-            indices = legend_order if legend_order else range(n)
-            for i in indices:
-                if not discrete_labels or i >= len(discrete_labels) or not discrete_labels[i]:
-                    continue
-                raw = discrete_labels[i]
-                lbl = f"{i:02d} {raw}"
+            for i in range(n):
+                if discrete_labels and i < len(discrete_labels):
+                    lbl = discrete_labels[i]
+                    if not lbl:
+                        continue
+                elif n == 2 and vmin == 0 and vmax == 1:
+                    lbl = ["Não queimado", "Queimado"][i]
+                else:
+                    val = vmin + (vmax - vmin) * i / (n - 1) if n > 1 else vmin
+                    lbl = str(int(val))
                 lbl = FrameProcessor._truncate_label(lbl)
                 entries.append((colors[i], lbl))
             tfont = FrameProcessor._make_font(font_size - 14)
             cols, rows, tfont, _ = FrameProcessor._layout_discrete(
-                width, entries, tfont, box_size, 14, margin, max_cols=3)
+                width, entries, tfont, box_size, 8, margin, max_cols=4)
             content_h = rows * row_h
         else:
             box_size = 50
@@ -786,6 +793,7 @@ class FrameProcessor:
             lfont = ImageFont.load_default()
 
         y = margin
+
         if label:
             draw.text((20, y), label, font=lfont, fill=(0, 0, 0))
         y += label_h
@@ -801,10 +809,7 @@ class FrameProcessor:
                 by = y + row * row_h
                 draw.rectangle([bx, by, bx + box_size, by + box_size], fill=color)
                 draw.rectangle([bx, by, bx + box_size, by + box_size], outline=(100, 100, 100), width=2)
-                txt_bbox = draw.textbbox((0, 0), lbl, font=tfont)
-                txt_h = txt_bbox[3] - txt_bbox[1]
-                txt_y = by + (box_size - txt_h) // 2
-                draw.text((bx + box_size + 10, txt_y), lbl, font=tfont, fill=(0, 0, 0))
+                draw.text((bx + box_size + 10, by + 2), lbl, font=tfont, fill=(0, 0, 0))
         else:
             bar_x, bar_y = margin, y
             bar_w = width - 2 * margin
@@ -813,6 +818,7 @@ class FrameProcessor:
                 x1 = int(bar_x + (i + 1) * bar_w / (n - 1))
                 draw.rectangle([x0, bar_y, x1, bar_y + box_size], fill=colors[i])
             draw.rectangle([int(bar_x + (n - 1) * bar_w / (n - 1)), bar_y, int(bar_x + bar_w), bar_y + box_size], fill=colors[-1])
+
             num_ticks = min(n, 6)
             for i in range(num_ticks):
                 val = vmin + (vmax - vmin) * i / (num_ticks - 1) if num_ticks > 1 else vmin
@@ -833,24 +839,29 @@ class FrameProcessor:
             img.save(output_path)
             return output_path
         else:
+            import tempfile
             tmp = tempfile.NamedTemporaryFile(suffix=".png", delete=False).name
             img.save(tmp)
             return tmp
 
     @staticmethod
     def paste_overlay_below(image_path: str, overlay_path: str) -> None:
+        """Paste overlay PNG below an image, save in-place."""
         image = _ensure_rgb(PILImage.open(image_path))
         overlay = PILImage.open(overlay_path)
+
         new_h = image.height + overlay.height
         result = PILImage.new("RGB", (image.width, new_h), (255, 255, 255))
         result.paste(image, (0, 0))
         result.paste(overlay, (0, image.height))
+
         image.close()
         overlay.close()
         result.save(image_path)
 
     @staticmethod
     def batch_paste_overlay_below(image_paths: List[str], overlay_path: str) -> None:
+        """Paste overlay below all images in batch."""
         for path in image_paths:
             try:
                 FrameProcessor.paste_overlay_below(path, overlay_path)

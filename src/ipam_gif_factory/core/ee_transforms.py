@@ -317,12 +317,15 @@ def decode_logging_col101() -> ee.Image:
 
 def decode_monthly_burned_col5() -> ee.Image:
     asset = "projects/mapbiomas-public/assets/brazil/fire/collection5/mapbiomas_fire_collection5_monthly_burned_v1"
-    return ee.Image(asset).divide(100).int().unmask(0).int8()
+    return ee.Image(asset).unmask(0).int8()
 
 
 FIRE_COL5_SEVERITY = "projects/mapbiomas-workspace/FOGO/COLLECTIONS/COL05/1_Subproducts/mapbiomas_fire_collection5_severity_class_v1"
 FIRE_COL5_INTERVAL = "projects/mapbiomas-workspace/FOGO/COLLECTIONS/COL05/1_Subproducts/mapbiomas_fire_collection5_interval_since_fire_v1"
 FIRE_COL5_NBR_MOSAIC = "projects/mapbiomas-workspace/FOGO/1_mosaics/landsat-view"
+ANNUAL_BURNED_COVERAGE = "projects/mapbiomas-public/assets/brazil/fire/collection5/mapbiomas_fire_collection5_annual_burned_coverage_v1"
+ACCUM_BURNED_COVERAGE = "projects/mapbiomas-public/assets/brazil/fire/collection5/mapbiomas_fire_collection5_accumulated_burned_coverage_v1"
+
 
 
 def build_severity_col5() -> ee.Image:
@@ -352,18 +355,19 @@ def decode_return_interval_discrete() -> ee.Image:
 
 def decode_mean_return_interval_discrete() -> ee.Image:
     img = ee.Image(FIRE_COL5_INTERVAL).slice(0, 41)
-    bands = ee.List(img.bandNames())
-    n = bands.length()
+    n = int(img.bandNames().length().getInfo())
 
-    def make_cummean(band_idx):
-        idx = ee.Number(band_idx)
-        year = idx.add(1985)
-        selected = img.select(bands.slice(0, idx.add(1)))
-        mean = selected.reduce(ee.Reducer.mean())
-        return mean.rename(ee.String("mean_").cat(year.format('%d')))
+    def make_cummean(i):
+        selected = img.select(list(range(i + 1)))
+        mean = selected.selfMask().reduce(ee.Reducer.mean())
+        return mean.rename(f"1985_{1985 + i}")
 
-    cummeans = ee.List.sequence(0, n.subtract(1)).map(make_cummean)
-    result = ee.ImageCollection.fromImages(cummeans).toBands()
+    cummeans = [make_cummean(i) for i in range(n)]
+    result = ee.ImageCollection(cummeans).toBands()
+    clean_names = result.bandNames().map(
+        lambda n: ee.String(n).split('_').slice(1).join('_')
+    )
+    result = result.rename(clean_names)
 
     return (
         result.multiply(0)
@@ -388,20 +392,16 @@ def build_nbr_min_mosaic() -> ee.Image:
     col = ee.ImageCollection(FIRE_COL5_NBR_MOSAIC)
     col = col.filter(ee.Filter.eq('version', 'QMNBR_byte-annual_landsat'))
 
-    def year_to_image(year):
-        y = ee.Number(year)
-        img = col.filterDate(
-            ee.Date.fromYMD(y, 1, 1),
-            ee.Date.fromYMD(y, 12, 31)
-        ).first()
-        return img.select(['swir1', 'nir', 'red'], [
-            ee.String('swir1_').cat(y.format('%d')),
-            ee.String('nir_').cat(y.format('%d')),
-            ee.String('red_').cat(y.format('%d')),
-        ]).byte()
+    images = []
+    clean_names = []
+    for y in range(1985, 2026):
+        img = col.filterDate(f"{y}-01-01", f"{y}-12-31").first()
+        names = [f'swir1_{y}', f'nir_{y}', f'red_{y}']
+        img = img.select(['swir1', 'nir', 'red'], names).byte()
+        images.append(img)
+        clean_names.extend(names)
 
-    years = ee.List.sequence(1985, 2025)
-    return ee.ImageCollection.fromImages(years.map(year_to_image)).toBands()
+    return ee.ImageCollection(images).toBands().rename(clean_names)
 
 
 def only_coverage(class_list: List[int], image: ee.Image, landcover: ee.Image) -> ee.Image:
@@ -409,6 +409,132 @@ def only_coverage(class_list: List[int], image: ee.Image, landcover: ee.Image) -
     for cls in class_list:
         container = container.where(landcover.eq(cls).selfMask(), image)
     return ee.Image(container).selfMask()
+
+
+
+def _make_eq_chain(img, codes):
+    c = img.eq(codes[0])
+    for cd in codes[1:]:
+        c = c.Or(img.eq(cd))
+    return c
+
+
+def _decode_coverage_nivel0(asset):
+    img = ee.Image(asset).unmask(0).int8()
+    natural = _make_eq_chain(img, [1,3,4,5,6,10,11,12,13,26,29,32,33,49,50])
+    antropico = _make_eq_chain(img, [9,14,15,18,19,20,21,22,23,24,25,30,31,35,36,39,40,41,46,47,48,62,75])
+    nao_obs = _make_eq_chain(img, [0,27])
+    result = img.multiply(0)
+    result = result.where(natural, 1)
+    result = result.where(antropico, 14)
+    result = result.where(nao_obs, 27)
+    return result.unmask(27).int8()
+
+
+def _decode_coverage_nivel1(asset):
+    img = ee.Image(asset).unmask(0).int8()
+    floresta = _make_eq_chain(img, [1,3,4,5,6,49])
+    veg_herb = _make_eq_chain(img, [10,11,12,29,32,50])
+    agropec = _make_eq_chain(img, [9,14,15,18,19,20,21,35,36,39,40,41,46,47,48,62])
+    nao_veg = _make_eq_chain(img, [22,23,24,25,30,75])
+    agua = _make_eq_chain(img, [26,31,33])
+    nao_obs = _make_eq_chain(img, [0,27])
+    result = img.multiply(0)
+    result = result.where(floresta, 1)
+    result = result.where(veg_herb, 10)
+    result = result.where(agropec, 14)
+    result = result.where(nao_veg, 22)
+    result = result.where(agua, 26)
+    result = result.where(nao_obs, 27)
+    return result.unmask(27).int8()
+
+
+def _decode_coverage_nivel1_1(asset):
+    img = ee.Image(asset).unmask(0).int8()
+    form_florestal = _make_eq_chain(img, [1,3,5,6])
+    form_savanica = _make_eq_chain(img, [4,49])
+    form_campestre = _make_eq_chain(img, [10,12,32,50])
+    c_alagado = _make_eq_chain(img, [11])
+    pastagem = _make_eq_chain(img, [14,15])
+    agricultura = _make_eq_chain(img, [18,19,20,35,36,39,40,41,46,47,48,62])
+    silvicultura = _make_eq_chain(img, [9])
+    mosaico = _make_eq_chain(img, [21])
+    nao_obs = _make_eq_chain(img, [0,27])
+    result = img.multiply(0)
+    result = result.where(form_florestal, 3)
+    result = result.where(form_savanica, 4)
+    result = result.where(form_campestre, 12)
+    result = result.where(c_alagado, 11)
+    result = result.where(pastagem, 15)
+    result = result.where(agricultura, 18)
+    result = result.where(silvicultura, 9)
+    result = result.where(mosaico, 21)
+    result = result.where(nao_obs, 27)
+    return result.unmask(27).int8()
+
+
+def _decode_coverage_nivel2(asset):
+    img = ee.Image(asset).unmask(0).int8()
+    agricultura = _make_eq_chain(img, [19,20,39,40,41,62])
+    lavoura_perene = _make_eq_chain(img, [46,47,35,48])
+    outras_form = _make_eq_chain(img, [13])
+    agua = _make_eq_chain(img, [26,33,31])
+    nao_obs = _make_eq_chain(img, [0,27])
+    result = img.multiply(0)
+    result = result.where(agricultura, 18)
+    result = result.where(lavoura_perene, 36)
+    result = result.where(outras_form, 10)
+    result = result.where(agua, 26)
+    result = result.where(nao_obs, 27)
+    return result.unmask(27).int8()
+
+
+def _decode_coverage_nivel3(asset):
+    img = ee.Image(asset).unmask(0).int8()
+    lavoura_temp = _make_eq_chain(img, [20,39,40,62,41])
+    lavoura_perene = _make_eq_chain(img, [46,47,35,48])
+    outras_form = _make_eq_chain(img, [13])
+    agua = _make_eq_chain(img, [26,33,31])
+    nao_obs = _make_eq_chain(img, [0,27])
+    result = img.multiply(0)
+    result = result.where(lavoura_temp, 19)
+    result = result.where(lavoura_perene, 36)
+    result = result.where(outras_form, 10)
+    result = result.where(agua, 26)
+    result = result.where(nao_obs, 27)
+    return result.unmask(27).int8()
+
+
+def decode_annual_burned_coverage_nivel0():
+    return _decode_coverage_nivel0(ANNUAL_BURNED_COVERAGE)
+
+def decode_annual_burned_coverage_nivel1():
+    return _decode_coverage_nivel1(ANNUAL_BURNED_COVERAGE)
+
+def decode_annual_burned_coverage_nivel1_1():
+    return _decode_coverage_nivel1_1(ANNUAL_BURNED_COVERAGE)
+
+def decode_annual_burned_coverage_nivel2():
+    return _decode_coverage_nivel2(ANNUAL_BURNED_COVERAGE)
+
+def decode_annual_burned_coverage_nivel3():
+    return _decode_coverage_nivel3(ANNUAL_BURNED_COVERAGE)
+
+
+def decode_accumulated_burned_coverage_nivel0():
+    return _decode_coverage_nivel0(ACCUM_BURNED_COVERAGE)
+
+def decode_accumulated_burned_coverage_nivel1():
+    return _decode_coverage_nivel1(ACCUM_BURNED_COVERAGE)
+
+def decode_accumulated_burned_coverage_nivel1_1():
+    return _decode_coverage_nivel1_1(ACCUM_BURNED_COVERAGE)
+
+def decode_accumulated_burned_coverage_nivel2():
+    return _decode_coverage_nivel2(ACCUM_BURNED_COVERAGE)
+
+def decode_accumulated_burned_coverage_nivel3():
+    return _decode_coverage_nivel3(ACCUM_BURNED_COVERAGE)
 
 
 PROCESSOR_REGISTRY = {
@@ -440,6 +566,17 @@ PROCESSOR_REGISTRY = {
     "decode_patch_size_massifs_col101": decode_patch_size_massifs_col101,
     "decode_canopy_disturbance_col101": decode_canopy_disturbance_col101,
     "decode_logging_col101": decode_logging_col101,
+    "decode_annual_burned_coverage_nivel0": decode_annual_burned_coverage_nivel0,
+    "decode_annual_burned_coverage_nivel1": decode_annual_burned_coverage_nivel1,
+    "decode_annual_burned_coverage_nivel1_1": decode_annual_burned_coverage_nivel1_1,
+    "decode_annual_burned_coverage_nivel2": decode_annual_burned_coverage_nivel2,
+    "decode_annual_burned_coverage_nivel3": decode_annual_burned_coverage_nivel3,
+    "decode_accumulated_burned_coverage_nivel0": decode_accumulated_burned_coverage_nivel0,
+    "decode_accumulated_burned_coverage_nivel1": decode_accumulated_burned_coverage_nivel1,
+    "decode_accumulated_burned_coverage_nivel1_1": decode_accumulated_burned_coverage_nivel1_1,
+    "decode_accumulated_burned_coverage_nivel2": decode_accumulated_burned_coverage_nivel2,
+    "decode_accumulated_burned_coverage_nivel3": decode_accumulated_burned_coverage_nivel3,
+
     "decode_monthly_burned_col5": decode_monthly_burned_col5,
     "build_severity_col5": build_severity_col5,
     "decode_return_interval_discrete": decode_return_interval_discrete,

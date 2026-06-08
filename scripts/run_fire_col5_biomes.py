@@ -25,7 +25,7 @@ if not os.path.exists(os.path.join(cwd, 'src')):
         os.chdir(parent)
 import ee
 try:
-    ee.Initialize(project='ee-ipam')
+    ee.Initialize(project='mapbiomas-fire-485203')
 except Exception:
     pass
 
