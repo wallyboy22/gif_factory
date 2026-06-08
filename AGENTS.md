@@ -118,3 +118,7 @@ Ver pasta `specs/`:
 - `looker.md` — Looker Studio
 - `html-interface.md` — Interface local
 - `colab.md` — Notebook colaborativo
+
+## Backlog / Próximos Passos
+
+- **GeoPDF/GeoTIFF pós-processamento** — Script independente que lê os PNGs + metadados já gerados pelo pipeline, atribui CRS (EPSG:4326) e geotransform a partir dos bounds do território (`config/territories.yaml`), e salva como GeoTIFF (via `rasterio` ou GDAL). Eventualmente GeoPDF para uso em campo (Avenza Maps). Zero acoplamento com o pipeline principal.
