@@ -444,8 +444,8 @@ visualizations:
     prefix_labels: false
     discrete_labels:
     - Não observado
-    - Incremento
     - Acumulado
+    - Incremento
   fire_col5_time_after_fire:
     name: Tempo desde a última ocorrência do fogo
     min: 0
