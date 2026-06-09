@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
 """
-upload_to_gcs.py - Sobe arquivos de mídia locais (GIF, collage, frames) para o GCS.
+upload_to_gcs.py - Sobe arquivos de mídia locais (GIF, collage, frames, metadata) para o GCS.
 
 Uso:
-    python scripts/upload_to_gcs.py --pending                    # tudo que falta no GCS
-    python scripts/upload_to_gcs.py --batch batch.json           # itens de um batch
-    python scripts/upload_to_gcs.py --ds X --prod Y --terr Z    # combo específico
-    python scripts/upload_to_gcs.py --pending --dry-run          # só mostrar
+    python scripts/upload_to_gcs.py --pending                                # tudo que falta no GCS
+    python scripts/upload_to_gcs.py --batch batch.json                       # itens de um batch
+    python scripts/upload_to_gcs.py --ds X --prod Y --terr Z                # combo específico
+    python scripts/upload_to_gcs.py --pending --dry-run                      # só mostrar
+    python scripts/upload_to_gcs.py --reupload-missing-metadata              # sobe metadados faltantes
+    python scripts/upload_to_gcs.py --reupload-missing-metadata --dry-run    # preview
 """
 import argparse
 import json
@@ -64,6 +66,21 @@ def _local_items(output_dir: Path) -> list:
     return sorted(set(items))
 
 
+def _list_local_metadata(output_dir: Path) -> list:
+    """Lista todos os metadata_*.json locais: (ds, prod, terr, Path)."""
+    items = []
+    for meta_path in output_dir.rglob("metadata_*.json"):
+        try:
+            rel = meta_path.relative_to(output_dir)
+        except ValueError:
+            continue
+        parts = rel.parts
+        if len(parts) >= 4:
+            ds, prod, terr = parts[0], parts[1], parts[2]
+            items.append((ds, prod, terr, meta_path))
+    return sorted(items)
+
+
 def upload_combo(ds: str, prod: str, terr: str, output_dir: Path, dry_run: bool = False) -> int:
     local_dir = output_dir / ds / prod / terr
     if not local_dir.exists():
@@ -73,7 +90,7 @@ def upload_combo(ds: str, prod: str, terr: str, output_dir: Path, dry_run: bool 
     enviados = 0
     for fpath in sorted(local_dir.iterdir()):
         name = fpath.name
-        if name.startswith(".state") or name.startswith("metadata_"):
+        if name.startswith(".state"):
             continue
         if not fpath.is_file():
             continue
@@ -93,6 +110,8 @@ def main():
     parser.add_argument("--terr", help="Territory ID")
     parser.add_argument("--batch", type=str, help="Batch JSON file")
     parser.add_argument("--pending", action="store_true", help="Upload tudo que existe local mas não no GCS")
+    parser.add_argument("--reupload-missing-metadata", action="store_true",
+                        help="Sobe metadata_*.json locais que ainda não existem no GCS")
     parser.add_argument("--dry-run", action="store_true", help="Simular sem enviar")
     args = parser.parse_args()
 
@@ -127,6 +146,30 @@ def main():
         todos = _local_items(output_dir)
         combos = [c for c in todos if c not in existentes]
         print(f"  Locais: {len(todos)}  |  No GCS: {len(existentes)}  |  Pendentes: {len(combos)}")
+
+    elif args.reupload_missing_metadata:
+        bucket = _get_bucket()
+        metas = _list_local_metadata(output_dir)
+        pendentes = []
+        for ds, prod, terr, local_path in metas:
+            blob_path = f"{GCS_HUB_ROOT}/{ds}/{prod}/{terr}/{local_path.name}"
+            exists = bucket.blob(blob_path).exists()
+            if not exists:
+                pendentes.append((ds, prod, terr, local_path))
+        print(f"  Metadados locais: {len(metas)}  |  Faltando no GCS: {len(pendentes)}")
+        if not pendentes:
+            print("  Todos os metadados já estão no GCS.")
+            return
+        enviados = 0
+        for ds, prod, terr, local_path in pendentes:
+            blob_path = f"{GCS_HUB_ROOT}/{ds}/{prod}/{terr}/{local_path.name}"
+            if args.dry_run:
+                print(f"     [DRY-RUN] {blob_path}")
+            else:
+                bucket.blob(blob_path).upload_from_filename(str(local_path))
+                enviados += 1
+        print(f"\n  ✅ {enviados} metadata(s) reenviado(s)")
+        return
 
     else:
         parser.print_help()
