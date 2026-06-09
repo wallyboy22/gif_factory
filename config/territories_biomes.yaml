@@ -3,21 +3,21 @@ territories:
     biomas:
       name: "Biomas"
       name_en: "All Biomes"
-      source: "projects/mapbiomas-workspace/AUXILIAR/biomas_IBGE_250mil"
+      source: "projects/ee-ipam/assets/IBGE/limite_biomas_IBGE_2026"
       bbox: [-74.0, -34.0, -34.0, 5.0]
     amazonia:
       name: "Amazônia"
-      source: "projects/mapbiomas-workspace/AUXILIAR/biomas_IBGE_250mil"
+      source: "projects/ee-ipam/assets/IBGE/limite_biomas_IBGE_2026"
       filter: "Bioma == 'Amazônia'"
       bbox: [-74.0, -18.0, -44.0, 5.0]
     caatinga:
       name: "Caatinga"
-      source: "projects/mapbiomas-workspace/AUXILIAR/biomas_IBGE_250mil"
+      source: "projects/ee-ipam/assets/IBGE/limite_biomas_IBGE_2026"
       filter: "Bioma == 'Caatinga'"
       bbox: [-48.0, -18.0, -36.0, -3.0]
     cerrado:
       name: "Cerrado"
-      source: "projects/mapbiomas-workspace/AUXILIAR/biomas_IBGE_250mil"
+      source: "projects/ee-ipam/assets/IBGE/limite_biomas_IBGE_2026"
       filter: "Bioma == 'Cerrado'"
       bbox: [-56.0, -24.0, -40.0, -2.0]
     mata_atlantica:
@@ -26,11 +26,11 @@ territories:
       bbox: [-56.0, -30.0, -32.0, -2.0]
     pampa:
       name: "Pampa"
-      source: "projects/mapbiomas-workspace/AUXILIAR/biomas_IBGE_250mil"
+      source: "projects/ee-ipam/assets/IBGE/limite_biomas_IBGE_2026"
       filter: "Bioma == 'Pampa'"
       bbox: [-58.0, -34.0, -50.0, -28.0]
     pantanal:
       name: "Pantanal"
-      source: "projects/mapbiomas-workspace/AUXILIAR/biomas_IBGE_250mil"
+      source: "projects/ee-ipam/assets/IBGE/limite_biomas_IBGE_2026"
       filter: "Bioma == 'Pantanal'"
       bbox: [-58.0, -22.0, -55.0, -17.0]

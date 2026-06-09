@@ -39,6 +39,7 @@ PRODUCTS = [
     "fire_frequency",
     "year_last_fire",
     "time_after_fire",
+    "unprecedented_fire",
     "annual_burned_coverage_nivel0",
     "annual_burned_coverage_nivel1",
     "annual_burned_coverage_nivel1_1",
@@ -70,7 +71,7 @@ PRODUCTS_PERIODO = [
     "accumulated_burned_coverage_nivel0", "accumulated_burned_coverage_nivel1",
     "accumulated_burned_coverage_nivel1_1", "accumulated_burned_coverage_nivel2",
     "accumulated_burned_coverage_nivel3", "accumulated_burned_coverage_nivel4",
-    "fire_frequency", "year_last_fire", "time_after_fire",
+    "fire_frequency", "year_last_fire", "time_after_fire", "unprecedented_fire",
     "fire_return_interval", "mean_fire_return_interval",
 ]
 

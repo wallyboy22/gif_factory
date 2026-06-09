@@ -50,10 +50,28 @@ class GIFGenerator:
         common_size = self._get_common_size(images)
         resized = [img.resize(common_size, PILImage.Resampling.LANCZOS) for img in images]
 
-        first = resized[0].convert("P", palette=PILImage.Palette.ADAPTIVE)
-        resized_rgb = [first]
-        for img in resized[1:]:
-            resized_rgb.append(img.quantize(method=0, palette=first))
+        unique_colors = set()
+        for img in resized:
+            for pixel in img.getdata():
+                unique_colors.add(pixel)
+        unique_colors.discard(None)
+
+        if len(unique_colors) <= 256:
+            palette_pixels = []
+            for color in unique_colors:
+                palette_pixels.extend(color)
+            palette_pixels += [0] * (768 - len(palette_pixels))
+            palette_img = PILImage.new("P", (1, 1))
+            palette_img.putpalette(palette_pixels)
+            first = resized[0].quantize(palette=palette_img, dither=PILImage.Dither.NONE)
+            resized_rgb = [first]
+            for img in resized[1:]:
+                resized_rgb.append(img.quantize(palette=palette_img, dither=PILImage.Dither.NONE))
+        else:
+            first = resized[0].convert("P", palette=PILImage.Palette.ADAPTIVE)
+            resized_rgb = [first]
+            for img in resized[1:]:
+                resized_rgb.append(img.quantize(method=0, palette=first))
 
         ensure_dir(output_dir)
         output_path = os.path.join(output_dir, clean_filename(filename))

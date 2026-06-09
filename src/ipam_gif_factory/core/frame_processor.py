@@ -317,6 +317,7 @@ class FrameProcessor:
         discrete_labels: Optional[List[str]] = None,
         cmap_type: str = "sequential",
         legend_order: Optional[List[int]] = None,
+        prefix_labels: bool = True,
     ) -> None:
         image = _ensure_rgb(PILImage.open(image_path))
         width = image.width
@@ -337,7 +338,7 @@ class FrameProcessor:
                 if not discrete_labels or i >= len(discrete_labels) or not discrete_labels[i]:
                     continue
                 raw = discrete_labels[i]
-                lbl = f"{i:02d} {raw}"
+                lbl = f"{i} - {raw}" if prefix_labels else raw
                 lbl = FrameProcessor._truncate_label(lbl)
                 entries.append((colors[i], lbl))
             n_entries = len(entries)
@@ -435,6 +436,7 @@ class FrameProcessor:
         show_scale: bool = True,
         rgb_legend: Optional[Dict[str, Any]] = None,
         legend_order: Optional[List[int]] = None,
+        prefix_labels: bool = True,
     ) -> None:
         image = _ensure_rgb(PILImage.open(image_path))
         width = image.width
@@ -472,7 +474,7 @@ class FrameProcessor:
                 if not discrete_labels or i >= len(discrete_labels) or not discrete_labels[i]:
                     continue
                 raw = discrete_labels[i]
-                lbl = f"{i:02d} {raw}"
+                lbl = f"{i} - {raw}" if prefix_labels else raw
                 lbl = FrameProcessor._truncate_label(lbl)
                 entries.append((colors[i], lbl))
             n_entries = len(entries)
@@ -617,10 +619,11 @@ class FrameProcessor:
         show_scale: bool = True,
         rgb_legend: Optional[Dict[str, Any]] = None,
         legend_order: Optional[List[int]] = None,
+        prefix_labels: bool = True,
     ) -> None:
         for path in image_paths:
             try:
-                FrameProcessor.add_bottom_bar(path, lon_min, lon_max, lat_min, lat_max, palette, vmin, vmax, font_size, discrete_labels=discrete_labels, cmap_type=cmap_type, show_legend=show_legend, show_scale=show_scale, rgb_legend=rgb_legend, legend_order=legend_order)
+                FrameProcessor.add_bottom_bar(path, lon_min, lon_max, lat_min, lat_max, palette, vmin, vmax, font_size, discrete_labels=discrete_labels, cmap_type=cmap_type, show_legend=show_legend, show_scale=show_scale, rgb_legend=rgb_legend, legend_order=legend_order, prefix_labels=prefix_labels)
             except Exception as e:
                 print(f"Erro ao adicionar barra inferior em {path}: {e}")
 
@@ -760,6 +763,7 @@ class FrameProcessor:
         label: str = "",
         rgb_legend: Optional[Dict[str, Any]] = None,
         legend_order: Optional[List[int]] = None,
+        prefix_labels: bool = True,
         output_path: Optional[str] = None,
     ) -> str:
         colors = [_parse_color(c) for c in palette]
@@ -781,7 +785,7 @@ class FrameProcessor:
                 if not discrete_labels or i >= len(discrete_labels) or not discrete_labels[i]:
                     continue
                 raw = discrete_labels[i]
-                lbl = f"{i:02d} {raw}"
+                lbl = f"{i} - {raw}" if prefix_labels else raw
                 lbl = FrameProcessor._truncate_label(lbl)
                 entries.append((colors[i], lbl))
             tfont = FrameProcessor._make_font(font_size - 14)

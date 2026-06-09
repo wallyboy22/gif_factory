@@ -320,6 +320,12 @@ def decode_monthly_burned_col5() -> ee.Image:
     return ee.Image(asset).unmask(0).int8()
 
 
+def decode_unprecedented_fire() -> ee.Image:
+    asset = "projects/mapbiomas-public/assets/brazil/fire/collection5/mapbiomas_fire_collection5_time_after_fire_v1"
+    img = ee.Image(asset)
+    return img.eq(0).add(1).unmask(0).int8().slice(0, -1)
+
+
 FIRE_COL5_SEVERITY = "projects/mapbiomas-workspace/FOGO/COLLECTIONS/COL05/1_Subproducts/mapbiomas_fire_collection5_severity_class_v1"
 FIRE_COL5_INTERVAL = "projects/mapbiomas-workspace/FOGO/COLLECTIONS/COL05/1_Subproducts/mapbiomas_fire_collection5_interval_since_fire_v1"
 FIRE_COL5_NBR_MOSAIC = "projects/mapbiomas-workspace/FOGO/1_mosaics/landsat-view"
@@ -578,6 +584,7 @@ PROCESSOR_REGISTRY = {
     "decode_accumulated_burned_coverage_nivel3": decode_accumulated_burned_coverage_nivel3,
 
     "decode_monthly_burned_col5": decode_monthly_burned_col5,
+    "decode_unprecedented_fire": decode_unprecedented_fire,
     "build_severity_col5": build_severity_col5,
     "decode_return_interval_discrete": decode_return_interval_discrete,
     "decode_mean_return_interval_discrete": decode_mean_return_interval_discrete,

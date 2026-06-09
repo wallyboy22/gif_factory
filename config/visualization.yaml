@@ -431,6 +431,21 @@ visualizations:
     - '750000'
     label: Ano
     cmap_type: sequential
+  unprecedented_fire:
+    name: Área queimada inédita
+    min: 0
+    max: 2
+    palette:
+    - ffffff
+    - fecc5c
+    - '800000'
+    label: Fogo inédito
+    cmap_type: categorical
+    prefix_labels: false
+    discrete_labels:
+    - Não observado
+    - Incremento
+    - Acumulado
   fire_col5_time_after_fire:
     name: Tempo desde a última ocorrência do fogo
     min: 0

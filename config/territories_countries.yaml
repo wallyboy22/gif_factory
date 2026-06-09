@@ -18,4 +18,4 @@ territories:
       source: "FAO/GAUL/2015/level0"
       filter: "ADM0_NAME == 'Brazil'"
       bbox: [-74.0, -34.0, -34.0, 5.0]
-      overlay_source: "projects/mapbiomas-workspace/AUXILIAR/biomas_IBGE_250mil"
+      overlay_source: "projects/ee-ipam/assets/IBGE/limite_biomas_IBGE_2026"

@@ -62,7 +62,7 @@ UPLOAD_STATE_FILE = "outputs/v001/.upload_state.json"
 
 PRODUCTS = [
     "annual_burned", "monthly_burned", "scar_size_range",
-    "accumulated_burned", "fire_frequency", "year_last_fire", "time_after_fire",
+    "accumulated_burned", "fire_frequency", "year_last_fire", "time_after_fire", "unprecedented_fire",
     "annual_burned_coverage_nivel0", "annual_burned_coverage_nivel1",
     "annual_burned_coverage_nivel1_1", "annual_burned_coverage_nivel2",
     "annual_burned_coverage_nivel3", "annual_burned_coverage_nivel4",

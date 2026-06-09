@@ -117,6 +117,11 @@ datasets:
         asset: "projects/mapbiomas-public/assets/brazil/fire/collection5/mapbiomas_fire_collection5_time_after_fire_v1"
         temporal_range: [1985, 2025]
         visualization: "fire_col5_time_after_fire"
+      unprecedented_fire:
+        name: "Área queimada inédita"
+        processor: "decode_unprecedented_fire"
+        temporal_range: [1985, 2024]
+        visualization: "unprecedented_fire"
       annual_burned_coverage_nivel0:
         name: "Área queimada por classe de cobertura e uso da terra - Anual - Nível 0 (Natural/Antrópico)"
         asset: "projects/mapbiomas-public/assets/brazil/fire/collection5/mapbiomas_fire_collection5_annual_burned_coverage_v1"

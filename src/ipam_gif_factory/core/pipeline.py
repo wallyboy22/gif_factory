@@ -258,6 +258,7 @@ class Pipeline:
                         cmap_type=viz_params.get("cmap_type", "sequential"),
                         label="", rgb_legend=viz_params.get("rgb_legend"),
                         legend_order=viz_params.get("legend_order"),
+                        prefix_labels=viz_params.get("prefix_labels", True),
                         output_path=legend_overlay,
                     )
                     FrameProcessor.render_legend_overlay(
@@ -267,11 +268,15 @@ class Pipeline:
                         cmap_type=viz_params.get("cmap_type", "sequential"),
                         label="", rgb_legend=viz_params.get("rgb_legend"),
                         legend_order=viz_params.get("legend_order"),
+                        prefix_labels=viz_params.get("prefix_labels", True),
                         output_path=legend_collage_overlay,
                     )
                     timings["overlay_legend"] = round(time.perf_counter() - t_ol, 1)
                     print(f"  ({timings['overlay_legend']}s)")
                     state.mark_complete("overlay_legend")
+                else:
+                    legend_overlay = os.path.join(output_dir, f"{product_id}_{territory_id}_legend_frames.png")
+                    legend_collage_overlay = os.path.join(output_dir, f"{product_id}_{territory_id}_legend_collage.png")
 
             product_label = product_info.get("name", product_id)
             territory_name = territory_info["name"]
@@ -296,7 +301,7 @@ class Pipeline:
                     if not state.is_complete("collage_scale_north"):
                         print(f"\n[3a/4] Adicionando escala e norte aos frames...")
                         t3a = time.perf_counter()
-                        FrameProcessor.batch_add_bottom_bars(frame_paths, bounds['lon_min'], bounds['lon_max'], bounds['lat_min'], bounds['lat_max'], palette=viz_params.get("palette", ["fdfdfd", "800000"]), vmin=viz_params.get("min", 0), vmax=viz_params.get("max", 1), font_size=fs(50), discrete_labels=viz_params.get("discrete_labels"), cmap_type=viz_params.get("cmap_type", "sequential"), show_legend=False, show_scale=True)
+                        FrameProcessor.batch_add_bottom_bars(frame_paths, bounds['lon_min'], bounds['lon_max'], bounds['lat_min'], bounds['lat_max'], palette=viz_params.get("palette", ["fdfdfd", "800000"]), vmin=viz_params.get("min", 0), vmax=viz_params.get("max", 1), font_size=fs(50), discrete_labels=viz_params.get("discrete_labels"), cmap_type=viz_params.get("cmap_type", "sequential"), show_legend=False, show_scale=True, prefix_labels=viz_params.get("prefix_labels", True))
                         timings["collage_scale_north"] = round(time.perf_counter() - t3a, 1)
                         print(f"    escala/norte: {timings['collage_scale_north']}s")
                         state.mark_complete("collage_scale_north")
@@ -365,7 +370,7 @@ class Pipeline:
                     print(f"  Colando legendas nos frames...")
                     t4b = time.perf_counter()
                     if not create_collage:
-                        FrameProcessor.batch_add_bottom_bars(frame_paths, bounds['lon_min'], bounds['lon_max'], bounds['lat_min'], bounds['lat_max'], palette=viz_params.get("palette", ["fdfdfd", "800000"]), vmin=viz_params.get("min", 0), vmax=viz_params.get("max", 1), font_size=fs(50), discrete_labels=viz_params.get("discrete_labels"), cmap_type=viz_params.get("cmap_type", "sequential"), show_legend=False, show_scale=True)
+                        FrameProcessor.batch_add_bottom_bars(frame_paths, bounds['lon_min'], bounds['lon_max'], bounds['lat_min'], bounds['lat_max'], palette=viz_params.get("palette", ["fdfdfd", "800000"]), vmin=viz_params.get("min", 0), vmax=viz_params.get("max", 1), font_size=fs(50), discrete_labels=viz_params.get("discrete_labels"), cmap_type=viz_params.get("cmap_type", "sequential"), show_legend=False, show_scale=True, prefix_labels=viz_params.get("prefix_labels", True))
                     if legend_overlay and os.path.exists(legend_overlay):
                         FrameProcessor.batch_paste_overlay_below(frame_paths, legend_overlay)
                     timings["frame_bottom_bars"] = round(time.perf_counter() - t4b, 1)
