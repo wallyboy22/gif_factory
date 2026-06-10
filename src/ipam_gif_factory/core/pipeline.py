@@ -1,6 +1,7 @@
 import json
 import os
 import re
+import shutil
 import time
 from datetime import datetime
 from typing import Any, Dict, List, Optional, Tuple
@@ -47,7 +48,7 @@ class Pipeline:
         output_dir: Optional[str] = None,
         create_collage: bool = True,
         add_labels: bool = True,
-        vertical_dimension: int = 1560,
+        vertical_dimension: int = 2048,
         max_bands: int = 0,
         band_names_filter: Optional[List[str]] = None,
         cell_height: int = 300,
@@ -309,8 +310,29 @@ class Pipeline:
                         print(f"\n[3a/4] Escala/norte ja adicionados (resume)")
                         timings["collage_scale_north"] = 0
 
+                if not state.is_complete("add_year_clean"):
+                    print(f"\n[3a2/4] Adicionando ano e salvando frames_clean...")
+                    t_clean = time.perf_counter()
+                    clean_dir = os.path.join(output_dir, "frames_clean")
+                    os.makedirs(clean_dir, exist_ok=True)
+                    year_only_map = {}
+                    for fp in frame_paths:
+                        year_text = label_map.get(fp, "")
+                        if year_text:
+                            clean_fp = os.path.join(clean_dir, os.path.basename(fp))
+                            shutil.copy2(fp, clean_fp)
+                            FrameProcessor.add_year_only(clean_fp, year_text)
+                            year_only_map[fp] = clean_fp
+                    timings["add_year_clean"] = round(time.perf_counter() - t_clean, 1)
+                    print(f"    {len(year_only_map)} frames salvos em frames_clean/ ({timings['add_year_clean']}s)")
+                    state.mark_complete("add_year_clean")
+                else:
+                    print(f"\n[3a2/4] frames_clean ja salvos (resume)")
+                    timings["add_year_clean"] = 0
+                    clean_dir = os.path.join(output_dir, "frames_clean")
+
                 if not state.is_complete("collage"):
-                    print(f"\n[3b/4] Criando colagem...")
+                    print(f"\n[3b/4] Criando colagem principal...")
                     t3b = time.perf_counter()
                     collage_path = self.gif_generator.create_collage(
                         image_paths=frame_paths,
@@ -324,17 +346,44 @@ class Pipeline:
                     print(f"    grid: {timings['collage_build']}s")
                     state.mark_complete("collage")
                 else:
-                    print(f"\n[3b/4] Colagem ja criada (resume)")
+                    print(f"\n[3b/4] Colagem principal ja criada (resume)")
                     timings["collage_build"] = 0
+
+                if not state.is_complete("special_collages"):
+                    print(f"\n[3b2/4] Criando colagens especiais...")
+                    t_sc = time.perf_counter()
+                    clean_dir = os.path.join(output_dir, "frames_clean")
+                    has_clean = os.path.isdir(clean_dir)
+                    special_modes = {
+                        "decadal": {"grid_size": 2},
+                        "quinzenal": {"force_horizontal": True},
+                        "first_last": {"force_horizontal": True},
+                        "last_six": {"grid_size": 3},
+                    }
+                    special_paths = self._build_special_collages(
+                        output_dir, product_id, territory_id,
+                        frame_paths, clean_dir, has_clean,
+                        special_modes, cell_height, fs,
+                    )
+                    timings["special_collages"] = round(time.perf_counter() - t_sc, 1)
+                    print(f"    colagens especiais: {timings['special_collages']}s")
+                    state.mark_complete("special_collages")
+                else:
+                    print(f"\n[3b2/4] Colagens especiais ja criadas (resume)")
+                    timings["special_collages"] = 0
 
                 if add_labels:
                     if not state.is_complete("collage_labels"):
-                        print(f"\n[3c/4] Adicionando titulo e legenda ao grid...")
+                        print(f"\n[3c/4] Adicionando titulo e legenda a(s) colagen(s)...")
                         t3c = time.perf_counter()
-                        FrameProcessor.add_year_label(collage_path, title_line1, position="top_left", font_size=fs(34), padding_top=130, bar_color=(255, 255, 255), text_color=(0, 0, 0), subtitle=title_line2, subtitle_size=fs(30))
-                        if legend_collage_overlay and os.path.exists(legend_collage_overlay):
-                            FrameProcessor.paste_overlay_below(collage_path, legend_collage_overlay)
-                        FrameProcessor.add_margin(collage_path, 30)
+                        all_collages = [collage_path] + special_paths
+                        for cp in all_collages:
+                            if not os.path.isfile(cp):
+                                continue
+                            FrameProcessor.add_year_label(cp, title_line1, position="top_left", font_size=fs(34), padding_top=130, bar_color=(255, 255, 255), text_color=(0, 0, 0), subtitle=title_line2, subtitle_size=fs(30))
+                            if legend_collage_overlay and os.path.exists(legend_collage_overlay):
+                                FrameProcessor.paste_overlay_below(cp, legend_collage_overlay)
+                            FrameProcessor.add_margin(cp, 30)
                         timings["collage_labels"] = round(time.perf_counter() - t3c, 1)
                         print(f"    titulo/legenda: {timings['collage_labels']}s")
                         state.mark_complete("collage_labels")
@@ -381,7 +430,7 @@ class Pipeline:
 
             if create_collage or add_labels:
                 if not state.is_complete("gif"):
-                    print(f"\n[4/4] Criando GIF...")
+                    print(f"\n[4/4] Criando GIF principal...")
                     t5 = time.perf_counter()
                     frame_ms = self.config.get_processing_config("gif_creation").get("frame_duration", 300)
                     secs = frame_ms / 1000
@@ -400,9 +449,31 @@ class Pipeline:
                     print(f"  GIF: {gif_path}")
                     state.mark_complete("gif")
                 else:
-                    print(f"\n[4/4] GIF ja criado (resume)")
+                    print(f"\n[4/4] GIF principal ja criado (resume)")
                     timings["gif_creation"] = 0
                     gif_path = result.get("gif_path")
+
+                if not state.is_complete("special_gifs"):
+                    print(f"\n[4b/4] Criando GIFs especiais...")
+                    t_sg = time.perf_counter()
+                    special_modes = ["decadal", "quinzenal", "first_last", "last_six"]
+                    from ..postprocessing.frame_selector import select_frames
+                    for smode in special_modes:
+                        selected = select_frames(frame_paths, smode)
+                        if len(selected) >= 2:
+                            sgif_name = f"{product_id}_{territory_id}_gif_{smode}.gif"
+                            self.gif_generator.create_gif(
+                                image_paths=selected,
+                                output_dir=output_dir,
+                                filename=sgif_name,
+                                sort_frames=True,
+                            )
+                    timings["special_gifs"] = round(time.perf_counter() - t_sg, 1)
+                    print(f"    gifs especiais: {timings['special_gifs']}s")
+                    state.mark_complete("special_gifs")
+                else:
+                    print(f"\n[4b/4] GIFs especiais ja criados (resume)")
+                    timings["special_gifs"] = 0
 
             if not result.get("gif_path"):
                 gif_path = self._find_existing_gif(output_dir, product_id, territory_id)
@@ -424,6 +495,7 @@ class Pipeline:
                 frame_paths=frame_paths,
                 output_dir=output_dir,
                 timings=timings,
+                vertical_dimension=vertical_dimension,
             )
             self._save_metadata_json(metadata, output_dir, product_id)
             timings["metadata_save"] = round(time.perf_counter() - t6, 1)
@@ -510,6 +582,7 @@ class Pipeline:
         frame_paths: List[str],
         output_dir: str,
         timings: Optional[Dict[str, float]] = None,
+        vertical_dimension: int = 2048,
     ) -> Dict[str, Any]:
         processor_name = product_info.get("processor")
         asset_id = product_info.get("asset", "")
@@ -534,6 +607,24 @@ class Pipeline:
         collage_filename = f"{product_id}_{territory_id}_collage.png"
         collage_path = os.path.join(output_dir, collage_filename)
         collage_size_mb = _file_size_mb(collage_path)
+
+        margin_px = 30
+        header_offset = 230  # padding_top(220) + gap(10)
+        frame_layout = None
+        if frame_paths:
+            try:
+                first_frame = PILImage.open(frame_paths[0])
+                fw, fh = first_frame.size
+                frame_layout = {
+                    "map_offset_x": margin_px,
+                    "map_offset_y": margin_px + header_offset,
+                    "map_width": fw - 2 * margin_px,
+                    "map_height": vertical_dimension,
+                    "total_width": fw,
+                    "total_height": fh,
+                }
+            except Exception:
+                pass
 
         metadata = {
             "metadata_version": "1.1",
@@ -586,6 +677,9 @@ class Pipeline:
                 "frames_sizes_mb": frame_sizes,
             },
         }
+
+        if frame_layout:
+            metadata["frame_layout"] = frame_layout
 
         if timings:
             metadata["timing"] = {
@@ -674,6 +768,59 @@ class Pipeline:
         pattern = os.path.join(output_dir, f"{product_id}_{territory_id}_*.gif")
         gifs = sorted(glob_mod.glob(pattern))
         return gifs[-1] if gifs else None
+
+    @staticmethod
+    def _build_special_collages(
+        output_dir: str,
+        product_id: str,
+        territory_id: str,
+        frame_paths: List[str],
+        clean_dir: str,
+        has_clean: bool,
+        special_modes: Dict[str, Dict],
+        cell_height: int,
+        fs: Any,
+    ) -> List[str]:
+        from ..postprocessing.frame_selector import select_frames, extract_year
+        created = []
+
+        for mode, grid_cfg in special_modes.items():
+            selected = select_frames(frame_paths, mode)
+            if not selected:
+                continue
+
+            if has_clean:
+                collage_src = [
+                    os.path.join(clean_dir, os.path.basename(p))
+                    for p in selected
+                ]
+                collage_src = [p for p in collage_src if os.path.isfile(p)]
+            else:
+                collage_src = selected
+
+            if not collage_src:
+                continue
+
+            cname = f"{product_id}_{territory_id}_collage_{mode}.png"
+            has_year_stamp = (has_clean and len(collage_src) > 0)
+            short_labels = None if has_year_stamp else [str(extract_year(p) or i + 1) for i, p in enumerate(collage_src)]
+            try:
+                from ..core.gif_generator import GIFGenerator
+                gen = GIFGenerator()
+                cpath = gen.create_collage(
+                    image_paths=collage_src,
+                    output_dir=output_dir,
+                    filename=cname,
+                    cell_labels=short_labels,
+                    cell_height=cell_height,
+                    grid_size=grid_cfg.get("grid_size"),
+                    force_horizontal=grid_cfg.get("force_horizontal", False),
+                )
+                created.append(cpath)
+                print(f"    {mode} grid: {os.path.basename(cpath)}")
+            except Exception as e:
+                print(f"    {mode} erro: {e}")
+        return created
 
     @staticmethod
     def _save_metadata_json(metadata: Dict[str, Any], output_dir: str, product_id: str) -> str:

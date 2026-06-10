@@ -34,26 +34,42 @@ def load_metadata(prod_id, terr_id):
                 return json.load(f)
     return None
 
+def discover_collages(prod_id, terr_id, output_dir):
+    """Retorna lista de (nome_arquivo, label_modo) para colagens encontradas no disco."""
+    found = []
+    main_path = os.path.join(output_dir, f"{prod_id}_{terr_id}_collage.png")
+    if os.path.isfile(main_path):
+        found.append((f"{prod_id}_{terr_id}_collage.png", "principal"))
+    for mode in ["decadal", "quinzenal", "first_last", "last_six"]:
+        path = os.path.join(output_dir, f"{prod_id}_{terr_id}_collage_{mode}.png")
+        if os.path.isfile(path):
+            found.append((f"{prod_id}_{terr_id}_collage_{mode}.png", mode))
+    return found
+
+
 FIELDS = [
-    "link_direto","dataset","colecao",
-    "produto_id","nome_produto",
-    "territorio_id","nome_territorio","tipo_territorio",
-    "tipo_arquivo","arquivo",
+    "link_direto", "dataset", "colecao",
+    "produto_id", "nome_produto",
+    "territorio_id", "nome_territorio", "tipo_territorio",
+    "tipo_arquivo", "arquivo", "ano",
     "data_geracao",
-    "bandas","ano_inicial","ano_final",
-    "gif_tamanho_mb","frames_total_mb","frames_count",
-    "tempo_total_s","tempo_download_s","tempo_resize_s",
-    "tempo_colagem_s","tempo_gif_s",
-    "ee_cu","pixels_por_frame","total_pixels_m","dimensao_frame",
+    "bandas", "ano_inicial", "ano_final",
+    "gif_tamanho_mb", "frames_total_mb", "frames_count",
+    "tempo_total_s", "tempo_download_s", "tempo_resize_s",
+    "tempo_colagem_s", "tempo_gif_s",
+    "ee_cu", "pixels_por_frame", "total_pixels_m", "dimensao_frame",
 ]
 
 rows = []
 for prod_id in sorted(os.listdir(BASE)):
     pp = os.path.join(BASE, prod_id)
-    if not os.path.isdir(pp): continue
+    if not os.path.isdir(pp):
+        continue
     for terr_id in sorted(os.listdir(pp)):
+        terr_dir = os.path.join(BASE, prod_id, terr_id)
         meta = load_metadata(prod_id, terr_id)
-        if not meta: continue
+        if not meta:
+            continue
         prod_name = meta["product"]["name"]
         terr_name = meta["territory"]["name"]
         trange = meta["product"].get("temporal_range", [1985, 2024])
@@ -64,38 +80,57 @@ for prod_id in sorted(os.listdir(BASE)):
         ttotal = meta.get("timing", {}).get("total_seconds", 0)
         ee = meta.get("ee_estimate", {})
         dim = ee.get("frame_dimensions", {})
-        dim_str = f"{dim.get('width',0)}x{dim.get('height',0)}"
+        dim_str = f"{dim.get('width', 0)}x{dim.get('height', 0)}"
         tpx = ee.get("total_pixels_processed", 0)
+
+        base = dict(
+            dataset=DS_ID,
+            colecao="10.1",
+            produto_id=prod_id,
+            nome_produto=prod_name,
+            territorio_id=terr_id,
+            nome_territorio=terr_name,
+            tipo_territorio=get_type(terr_id),
+            data_geracao=gen_at[:10] if gen_at else "",
+            bandas=fcount,
+            ano_inicial=trange[0],
+            ano_final=trange[1],
+            gif_tamanho_mb=fi.get("gif_size_mb", ""),
+            frames_total_mb=fi.get("frames_total_mb", ""),
+            frames_count=fi.get("frames_count", fcount),
+            tempo_total_s=round(ttotal, 1) if ttotal else "",
+            tempo_download_s=round(timing.get("download", 0), 1) or "",
+            tempo_resize_s=round(timing.get("resize", 0), 1) or "",
+            tempo_colagem_s=round(timing.get("collage_build", 0), 1) or "",
+            tempo_gif_s=round(timing.get("gif_creation", 0), 1) or "",
+            ee_cu=ee.get("estimated_eecu", ""),
+            pixels_por_frame=ee.get("pixels_per_frame", ""),
+            total_pixels_m=round(tpx / 1_000_000, 1) if tpx else "",
+            dimensao_frame=dim_str,
+        )
+
+        # GIF
         gif_fn = f"{prod_id}_{terr_id}_0_3s.gif"
-        url = f"{GCS_BASE}/{DS_ID}/{prod_id}/{terr_id}/{gif_fn}"
+        gif_url = f"{GCS_BASE}/{DS_ID}/{prod_id}/{terr_id}/{gif_fn}"
         rows.append(OrderedDict([
-            ("link_direto", url),
-            ("dataset", DS_ID),
-            ("colecao", "10.1"),
-            ("produto_id", prod_id),
-            ("nome_produto", prod_name),
-            ("territorio_id", terr_id),
-            ("nome_territorio", terr_name),
-            ("tipo_territorio", get_type(terr_id)),
+            *base.items(),
+            ("link_direto", gif_url),
             ("tipo_arquivo", "GIF animado"),
             ("arquivo", gif_fn),
-            ("data_geracao", gen_at[:10] if gen_at else ""),
-            ("bandas", fcount),
-            ("ano_inicial", trange[0]),
-            ("ano_final", trange[1]),
-            ("gif_tamanho_mb", fi.get("gif_size_mb", "")),
-            ("frames_total_mb", fi.get("frames_total_mb", "")),
-            ("frames_count", fi.get("frames_count", fcount)),
-            ("tempo_total_s", round(ttotal, 1) if ttotal else ""),
-            ("tempo_download_s", round(timing.get("download", 0), 1) or ""),
-            ("tempo_resize_s", round(timing.get("resize", 0), 1) or ""),
-            ("tempo_colagem_s", round(timing.get("collage_build", 0), 1) or ""),
-            ("tempo_gif_s", round(timing.get("gif_creation", 0), 1) or ""),
-            ("ee_cu", ee.get("estimated_eecu", "")),
-            ("pixels_por_frame", ee.get("pixels_per_frame", "")),
-            ("total_pixels_m", round(tpx / 1_000_000, 1) if tpx else ""),
-            ("dimensao_frame", dim_str),
+            ("ano", "gif"),
         ]))
+
+        # Collages
+        for cfn, cmode in discover_collages(prod_id, terr_id, terr_dir):
+            curl = f"{GCS_BASE}/{DS_ID}/{prod_id}/{terr_id}/{cfn}"
+            rows.append(OrderedDict([
+                *base.items(),
+                ("link_direto", curl),
+                ("tipo_arquivo", f"Collage {cmode}"),
+                ("arquivo", cfn),
+                ("ano", cmode),
+            ]))
+
 print(f"Total: {len(rows)} rows")
 
 # ── CSV helpers ──────────────────────────────────────

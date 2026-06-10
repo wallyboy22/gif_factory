@@ -37,7 +37,7 @@ class GIFactoryUI(PipelineStepUI):
         self.resume_cb = widgets.Checkbox(value=True, description='Resume')
         self.collage_cb = widgets.Checkbox(value=True, description='Collage')
         self.dimension_tx = widgets.IntText(
-            value=1560, description='Altura px:',
+            value=2048, description='Altura px:',
             layout=widgets.Layout(width='150px'))
         self.edit_cb = widgets.Checkbox(
             value=False, description='Modo Edicao (desbloqueia checkboxes)')

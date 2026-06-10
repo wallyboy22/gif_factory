@@ -207,14 +207,24 @@ def parse_metadata_dir(dataset_id, base_dir):
                 ("ano", "gif"),
             ]))
 
-            # Collage
+            # Collages (principal + especiais)
             rows.append(OrderedDict([
                 *base_values.items(),
                 ("link_direto", collage_url),
-                ("tipo_arquivo", "Colagem"),
+                ("tipo_arquivo", "Collage principal"),
                 ("arquivo", collage_fn),
-                ("ano", "colagem"),
+                ("ano", "principal"),
             ]))
+            for mode in ("decadal", "quinzenal", "first_last", "last_six"):
+                cfn = f"{prod_id}_{terr_id}_collage_{mode}.png"
+                curl = f"{GCS_BASE_URL}/{dataset_id}/{prod_id}/{terr_id}/{cfn}"
+                rows.append(OrderedDict([
+                    *base_values.items(),
+                    ("link_direto", curl),
+                    ("tipo_arquivo", f"Collage {mode}"),
+                    ("arquivo", cfn),
+                    ("ano", mode),
+                ]))
 
             # Frames (exclui collage e gif do loop de frames)
             for ffn in frames_fnames:

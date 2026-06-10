@@ -8,6 +8,7 @@ from datetime import datetime
 from typing import Any, Dict, List, Optional
 
 from ..config import ConfigLoader
+from ..postprocessing.frame_selector import FRAME_MODES
 from ..core import (
     DatasetManager,
     TerritoryManager,
@@ -53,6 +54,18 @@ class CLI:
         parser.add_argument("--workers", type=int, default=1, help="Processos paralelos no modo batch (padrão: 1, sequencial)")
         parser.add_argument("--no-upload", action="store_true", help="Pular upload para GCS apos cada combo")
         parser.add_argument("--font-scale", type=float, default=1.0, help="Escala das fontes (padrão: 1.0)")
+        parser.add_argument("--postprocess", type=str,
+                            choices=["geopdfs", "catalogs", "special-collages"],
+                            help="Pós-processamento: gerar GeoPDFs, catálogos ou collages especiais")
+        parser.add_argument("--all", action="store_true", help="Processar todos (para --postprocess geopdfs)")
+        parser.add_argument("--mega", action="store_true", help="Apenas catálogo mega")
+        parser.add_argument("--by-territory", action="store_true", help="Apenas catálogo por território")
+        parser.add_argument("--by-collection", action="store_true", help="Apenas catálogo por coleção")
+        parser.add_argument("--by-territory-collection", action="store_true", help="Apenas catálogo por par")
+        parser.add_argument("--catalog-mode", type=str, default="all", choices=FRAME_MODES,
+                            help="Modo de seleção de frames para catálogos")
+        parser.add_argument("--special-mode", type=str, default="first_last", choices=FRAME_MODES,
+                            help="Modo para special collages")
 
         parsed = parser.parse_args(args)
 
@@ -72,6 +85,26 @@ class CLI:
             return self._auth()
         if parsed.validate:
             return self._validate()
+        if parsed.postprocess:
+            if parsed.postprocess == "geopdfs":
+                from ..postprocessing.cli import main as pp_main
+                pp_main(["build-geopdfs"] + (["--all"] if parsed.all else []))
+            elif parsed.postprocess == "catalogs":
+                from ..postprocessing.cli import main as pp_main
+                mode = parsed.catalog_mode or "all"
+                pp_main(["build-catalogs"] + (["--mega"] if parsed.mega else []) +
+                        (["--by-territory"] if parsed.by_territory else []) +
+                        (["--by-collection"] if parsed.by_collection else []) +
+                        (["--by-territory-collection"] if parsed.by_territory_collection else []) +
+                        ["--mode", mode])
+            elif parsed.postprocess == "special-collages":
+                from ..postprocessing.cli import main as pp_main
+                pp_main(["build-special-collages", "--mode", parsed.special_mode or "first_last",
+                         "--dataset", parsed.dataset or "",
+                         "--product", parsed.product or "",
+                         "--territory", parsed.territory or ""])
+            return
+
         if parsed.generate:
             if parsed.batch:
                 return self._execute_batch(

@@ -18,6 +18,9 @@ visualizations:
     - '800000'
     label: Pixel queimado
     cmap_type: binary
+    discrete_labels:
+    - Não observado
+    - Fogo
   monthly:
     name: Fogo - Mês
     min: 0

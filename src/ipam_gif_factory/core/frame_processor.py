@@ -171,6 +171,25 @@ class FrameProcessor:
         image.save(image_path)
 
     @staticmethod
+    def add_year_only(image_path: str, year_text: str, font_size: int = 80) -> None:
+        FrameProcessor.add_year_label(
+            image_path, year_text,
+            position="top_left",
+            font_size=font_size,
+            padding_top=130,
+            bar_color=(255, 255, 255),
+            text_color=(0, 0, 0),
+        )
+
+    @staticmethod
+    def batch_add_year_only(image_paths: Dict[str, str]) -> None:
+        for path, label in image_paths.items():
+            try:
+                FrameProcessor.add_year_only(path, label)
+            except Exception as e:
+                print(f"Erro ao adicionar ano em {path}: {e}")
+
+    @staticmethod
     def batch_add_labels(
         image_paths: Dict[str, str],
         position: str = "top_left",
@@ -776,22 +795,27 @@ class FrameProcessor:
             content_h = 90
             tfont = FrameProcessor._make_font(font_size - 14)
             entries_rgb = rgb_legend["entries"]
-        elif is_discrete:
+        elif is_discrete and discrete_labels:
             box_size = 28
             row_h = 46
             entries = []
             indices = legend_order if legend_order else range(n)
             for i in indices:
-                if not discrete_labels or i >= len(discrete_labels) or not discrete_labels[i]:
+                if i >= len(discrete_labels) or not discrete_labels[i]:
                     continue
                 raw = discrete_labels[i]
                 lbl = f"{i} - {raw}" if prefix_labels else raw
                 lbl = FrameProcessor._truncate_label(lbl)
                 entries.append((colors[i], lbl))
-            tfont = FrameProcessor._make_font(font_size - 14)
-            cols, rows, tfont, _ = FrameProcessor._layout_discrete(
-                width, entries, tfont, box_size, 14, margin, max_cols=3)
-            content_h = rows * row_h
+            if entries:
+                tfont = FrameProcessor._make_font(font_size - 14)
+                cols, rows, tfont, _ = FrameProcessor._layout_discrete(
+                    width, entries, tfont, box_size, 14, margin, max_cols=3)
+                content_h = rows * row_h
+            else:
+                box_size = 28
+                content_h = box_size + 60
+                tfont = FrameProcessor._make_font(font_size - 14)
         else:
             box_size = 50
             content_h = box_size + 60
@@ -813,7 +837,7 @@ class FrameProcessor:
 
         if rgb_legend and rgb_legend.get("entries"):
             _render_rgb_legend(draw, width, y - label_h + 5, margin, entries_rgb, vmin, vmax, font_size=font_size)
-        elif is_discrete:
+        elif is_discrete and discrete_labels and entries:
             col_w = (width - 2 * margin) // cols
             for idx, (color, lbl) in enumerate(entries):
                 col = idx // rows if cols > 1 else idx // len(entries)

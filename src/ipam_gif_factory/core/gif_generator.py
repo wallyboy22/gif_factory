@@ -104,6 +104,7 @@ class GIFGenerator:
         cell_labels: Optional[List[str]] = None,
         font_path: Optional[str] = None,
         cell_height: int = 300,
+        force_horizontal: bool = False,
     ) -> str:
         if not image_paths:
             raise ValueError("Nenhuma imagem fornecida para a colagem")
@@ -129,14 +130,17 @@ class GIFGenerator:
             raise ValueError("Nenhuma imagem pôde ser carregada")
 
         n = len(images)
-        if grid_size is None:
+        if force_horizontal:
+            n_cols = n
+            n_rows = 1
+        elif grid_size is not None:
+            n_cols = grid_size
+            n_rows = math.ceil(n / n_cols)
+        else:
             if n <= 3:
                 n_cols = n
             else:
                 n_cols = min(max(math.ceil(n / 5), 2), 10)
-            n_rows = math.ceil(n / n_cols)
-        else:
-            n_cols = grid_size
             n_rows = math.ceil(n / n_cols)
 
         target_h = cell_height

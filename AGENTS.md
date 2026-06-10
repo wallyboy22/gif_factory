@@ -44,6 +44,17 @@ python scripts/build_looker_csvs.py
 
 # Upload para GCS
 python sync_to_hub.py
+
+# Pós-processamento: GeoPDFs (GeoTIFF + tentativa GeoPDF)
+python -m src.ipam_gif_factory.postprocessing.cli build-geopdfs --all
+
+# Pós-processamento: Collages especiais (first_last, decadal_10, decadal_15, last)
+python -m src.ipam_gif_factory.postprocessing.cli build-special-collages --mode first_last
+python -m src.ipam_gif_factory.postprocessing.cli build-special-collages --mode decadal_10
+
+# Pós-processamento: Catálogos PDF (mega, por território, por coleção, por par)
+python -m src.ipam_gif_factory.postprocessing.cli build-catalogs --mode all
+python -m src.ipam_gif_factory.postprocessing.cli build-catalogs --mode first_last --mega
 ```
 
 ## Arquivos-Chave
@@ -59,6 +70,11 @@ python sync_to_hub.py
 | `src/ipam_gif_factory/core/pipeline.py` | Orquestrador principal |
 | `src/ipam_gif_factory/core/ee_transforms.py` | Processors EE (novos cálculos) |
 | `src/ipam_gif_factory/core/frame_processor.py` | Labels, legendas, escala |
+| `src/ipam_gif_factory/postprocessing/geo_pdf.py` | GeoPDF/GeoTIFF por frame |
+| `src/ipam_gif_factory/postprocessing/special_collages.py` | Collages PNG + GIF especiais |
+| `src/ipam_gif_factory/postprocessing/catalog_pdf.py` | Catálogos PDF |
+| `src/ipam_gif_factory/postprocessing/frame_selector.py` | Seleção de frames (compartilhado) |
+| `src/ipam_gif_factory/postprocessing/cli.py` | CLI do pós-processamento |
 | `scripts/_template_batch.py` | Template para criar novos batches |
 | `notebooks/fabrica_fire_col5.ipynb` | Notebook interativo Colab/VS Code |
 
@@ -121,4 +137,6 @@ Ver pasta `specs/`:
 
 ## Backlog / Próximos Passos
 
-- **GeoPDF/GeoTIFF pós-processamento** — Script independente que lê os PNGs + metadados já gerados pelo pipeline, atribui CRS (EPSG:4326) e geotransform a partir dos bounds do território (`config/territories.yaml`), e salva como GeoTIFF (via `rasterio` ou GDAL). Eventualmente GeoPDF para uso em campo (Avenza Maps). Zero acoplamento com o pipeline principal.
+- **Factsheets** — PDFs com mapas + tabelas de estatísticas + gráficos integrados
+- **GeoPDF nativo (sem GDAL CLI)** — Implementar escrita direta de GeoPDF via `rasterio` + PDF proper metadata
+- **Catálogos com sumário** — Página de índice nos catálogos com links para cada seção

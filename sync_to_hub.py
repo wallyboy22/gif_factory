@@ -37,7 +37,7 @@ def main():
     print(f"Local: {LOCAL_OUTPUT} -> gs://{BUCKET_NAME}/{GCS_HUB_ROOT}")
     
     files_to_upload = []
-    valid_exts = {'.gif', '.png', '.json', '.jpg'}
+    valid_exts = {'.gif', '.png', '.json', '.jpg', '.pdf', '.tif', '.tiff'}
     
     for root, dirs, files in os.walk(LOCAL_OUTPUT):
         for f in files:
