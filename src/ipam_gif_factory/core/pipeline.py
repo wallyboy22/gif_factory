@@ -304,7 +304,6 @@ class Pipeline:
                             continue
                         clean_fp = os.path.join(frames_clean_dir, os.path.basename(fp))
                         shutil.copy2(fp, clean_fp)
-                        FrameProcessor.add_year_only(clean_fp, year_text)
                         clean_paths.append(clean_fp)
                     FrameProcessor.batch_add_bottom_bars(
                         clean_paths, bounds['lon_min'], bounds['lon_max'],
