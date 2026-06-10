@@ -81,6 +81,38 @@ def _list_local_metadata(output_dir: Path) -> list:
     return sorted(items)
 
 
+def is_combo_complete_on_gcs(ds: str, prod: str, terr: str, output_dir: Path) -> bool:
+    """Verifica no GCS se todos os arquivos esperados de um combo existem."""
+    meta_local = output_dir / ds / prod / terr / f"metadata_{prod}.json"
+    if not meta_local.is_file():
+        return False
+
+    with open(meta_local, encoding="utf-8") as f:
+        meta = json.load(f)
+
+    bucket = _get_bucket()
+    prefix = f"{GCS_HUB_ROOT}/{ds}/{prod}/{terr}/"
+
+    # Arquivos essenciais
+    expected = [
+        f"{prod}_{terr}_0_3s.gif",
+        f"{prod}_{terr}_collage.png",
+        f"{prod}_{terr}_collage_decadal.png",
+        f"{prod}_{terr}_collage_quinzenal.png",
+        f"{prod}_{terr}_collage_first_last.png",
+        f"{prod}_{terr}_collage_last_six.png",
+        f"metadata_{prod}.json",
+    ]
+    # Frames individuais
+    for fn in meta.get("output", {}).get("frames", []):
+        expected.append(fn.split("/")[-1])
+
+    for filename in expected:
+        if not bucket.blob(f"{prefix}{filename}").exists():
+            return False
+    return True
+
+
 def upload_combo(ds: str, prod: str, terr: str, output_dir: Path, dry_run: bool = False) -> int:
     local_dir = output_dir / ds / prod / terr
     if not local_dir.exists():

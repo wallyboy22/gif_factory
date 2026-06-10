@@ -96,10 +96,17 @@ def filter_products(tipo):
         return PRODUCTS_PERIODO
     return PRODUCTS
 
-def process_one(config, territory, prod, resume, upload, font_scale=1.0):
+def process_one(config, territory, prod, resume, resume_from_gcs, upload, font_scale=1.0):
     from pathlib import Path
-    from scripts.upload_to_gcs import upload_combo
+    from scripts.upload_to_gcs import upload_combo, is_combo_complete_on_gcs
     from src.ipam_gif_factory.core.pipeline import Pipeline
+
+    if resume_from_gcs:
+        output_dir = Path(config.get_output_dir())
+        if is_combo_complete_on_gcs(DATASET_ID, prod, territory, output_dir):
+            with print_lock:
+                print(f"\n[SKIP GCS] {prod} / {territory} — completo no GCS")
+            return {"status": "success", "skipped_gcs": True}
 
     pipeline = Pipeline(config)
 
@@ -146,7 +153,9 @@ def main():
     parser.add_argument("--workers", type=int, default=None,
                         help="Workers paralelos (padrao: 12)")
     parser.add_argument("--resume", action="store_true",
-                        help="Retomar de onde parou")
+                        help="Retomar de onde parou (checkpoint local)")
+    parser.add_argument("--resume-from-gcs", action="store_true",
+                        help="Pular combos já completos no GCS + resume local no resto")
     parser.add_argument("--tipo", choices=["anual", "periodo", "todos"], default="todos",
                         help="Filtrar por tipo de analise (padrao: todos)")
     parser.add_argument("--no-upload", action="store_true",
@@ -156,7 +165,7 @@ def main():
     args = parser.parse_args()
 
     workers = args.workers or detect_workers()
-    resume = args.resume
+    resume = args.resume or args.resume_from_gcs
     active_products = filter_products(args.tipo)
     do_upload = not args.no_upload
     font_scale = args.font_scale
@@ -175,12 +184,13 @@ def main():
     print(f"Total: {total} combinações")
     print(f"Workers: {workers}")
     print(f"Resume: {resume}")
+    print(f"Resume from GCS: {args.resume_from_gcs}")
     print(f"Upload: {'sim' if do_upload else 'nao'}")
     print(f"{'=' * 60}\n")
 
     with ThreadPoolExecutor(max_workers=workers) as executor:
         futures = [
-            executor.submit(process_one, config, t, p, resume, do_upload, font_scale)
+            executor.submit(process_one, config, t, p, resume, args.resume_from_gcs, do_upload, font_scale)
             for t, p in combos
         ]
         for i, f in enumerate(as_completed(futures), 1):

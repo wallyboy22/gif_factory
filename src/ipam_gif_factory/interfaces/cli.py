@@ -48,7 +48,9 @@ class CLI:
         parser.add_argument("--auth", action="store_true", help="Autenticar Earth Engine")
         parser.add_argument("--validate", action="store_true", help="Validar configuração")
         parser.add_argument("--cell-height", type=int, default=300, help="Altura de cada célula na colagem (padrão: 300)")
-        parser.add_argument("--resume", action="store_true", help="Retomar processamento de onde parou")
+        parser.add_argument("--resume", action="store_true", help="Retomar processamento de onde parou (checkpoint local)")
+        parser.add_argument("--resume-from-gcs", action="store_true",
+                            help="Pular combos já completos no GCS + resume local no resto")
         parser.add_argument("--frames-only", action="store_true", help="Apenas baixar frames, sem colagem/GIF")
         parser.add_argument("--batch", type=str, help="Caminho para arquivo batch.json com lista de itens para processar em lote")
         parser.add_argument("--workers", type=int, default=1, help="Processos paralelos no modo batch (padrão: 1, sequencial)")
@@ -114,6 +116,7 @@ class CLI:
                     parsed.resume,
                     parsed.workers,
                     parsed.no_upload,
+                    resume_from_gcs=parsed.resume_from_gcs,
                     font_scale=parsed.font_scale,
                 )
             return self._execute_pipeline(
@@ -269,6 +272,7 @@ class CLI:
     def _execute_batch(self, batch_path: str, output_dir: Optional[str],
                        cell_height: int = 300, resume: bool = False,
                        workers: int = 1, no_upload: bool = False,
+                       resume_from_gcs: bool = False,
                        font_scale: float = 1.0):
         try:
             with open(batch_path, encoding="utf-8") as f:
@@ -284,11 +288,13 @@ class CLI:
             return
 
         do_upload = not no_upload
+        r = resume or resume_from_gcs
 
         print()
         print("=" * 52)
         print(f"  MapBiomas GIF Factory  -  {total} iten{'s' if total > 1 else ''}"  )
-        print(f"  Workers: {workers}  |  Modo: {'resume' if resume else 'fresh'}")
+        print(f"  Workers: {workers}  |  Modo: {'resume' if r else 'fresh'}")
+        print(f"  Resume from GCS: {resume_from_gcs}")
         print(f"  Upload: {'sim' if do_upload else 'nao'}")
         print(f"  Inicio: {datetime.now().strftime('%d/%m/%Y %H:%M')}")
         print("-" * 52)
@@ -314,6 +320,18 @@ class CLI:
             except Exception:
                 pname = prod
 
+            # Resume-from-GCS check
+            if resume_from_gcs:
+                from pathlib import Path
+                from scripts.upload_to_gcs import is_combo_complete_on_gcs
+                base = Path(self.config.get_output_dir())
+                if is_combo_complete_on_gcs(ds, prod, terr, base):
+                    with lock:
+                        done += 1
+                        i = done
+                    print(f"\n[{i:02d}/{total:02d}] [SKIP GCS] {pname} — completo no GCS")
+                    return
+
             with lock:
                 done += 1
                 i = done
@@ -335,8 +353,8 @@ class CLI:
                 if do_upload:
                     from pathlib import Path
                     from scripts.upload_to_gcs import upload_combo
-                    base = self.config.get_output_dir()
-                    upload_combo(ds, prod, terr, Path(base))
+                    base = Path(self.config.get_output_dir())
+                    upload_combo(ds, prod, terr, base)
             except SystemExit:
                 with lock:
                     errors += 1
