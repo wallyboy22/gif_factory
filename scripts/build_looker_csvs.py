@@ -8,7 +8,7 @@ DS_IDS = [
     "brasil_degradation_col10_1",
     "brasil_fire_col5",
 ]
-OUTPUT_BASE = "outputs/v001"
+OUTPUT_BASE = "outputs/v002"
 ROOT = "outputs/looker_studio"
 GCS_BASE = "https://storage.googleapis.com/mapbiomas-fire/gif-factory"
 

@@ -14,7 +14,7 @@ warnings.filterwarnings("ignore", message="Your application has authenticated us
 BUCKET_NAME = "mapbiomas-fire"
 PROJECT_ID = "mapbiomas-fire-485203" # Adicionado para resolver o erro de cota
 GCS_HUB_ROOT = "gif-factory"
-LOCAL_OUTPUT = Path(r"outputs\v001")
+LOCAL_OUTPUT = Path(r"outputs\v002")
 
 # Inicializa o cliente uma única vez com o projeto de cota
 client = storage.Client(project=PROJECT_ID)

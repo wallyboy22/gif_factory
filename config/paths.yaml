@@ -13,7 +13,7 @@ paths:
 
   local:
     cache_dir: "./cache/"
-    output_dir: "./outputs/v001/"
+    output_dir: "./outputs/v002/"
     logs_dir: "./logs/"
 
   earth_engine:
