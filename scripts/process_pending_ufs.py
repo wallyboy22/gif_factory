@@ -29,7 +29,7 @@ from ipam_gif_factory.config import ConfigLoader
 from ipam_gif_factory.core import DatasetManager
 
 GCS_BUCKET = "mapbiomas-fire"
-GCS_HUB_ROOT = "gif-factory"
+GCS_HUB_ROOT = "data-container"
 GCS_PROJECT = "mapbiomas-fire-485203"
 
 UFS = [

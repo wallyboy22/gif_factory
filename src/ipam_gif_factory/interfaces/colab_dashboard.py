@@ -22,7 +22,7 @@ class ColabStreamDash:
         self.config = ConfigLoader().load_all()
         gcs_conf = self.config.paths.get('paths', {}).get('google_cloud_storage', {})
         self.bucket_name = gcs_conf.get('bucket', 'mapbiomas-fire')
-        self.hub_root = gcs_conf.get('hub_root', 'gif-factory')
+        self.hub_root = gcs_conf.get('hub_root', 'data-container')
         self.project_id = gcs_conf.get('project_id', 'mapbiomas-fire-485203')
         
         # Estado Global

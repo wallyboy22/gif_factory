@@ -24,7 +24,7 @@ warnings.filterwarnings("ignore", message="Your application has authenticated us
 from ipam_gif_factory.config import ConfigLoader
 
 GCS_BUCKET = "mapbiomas-fire"
-GCS_HUB_ROOT = "gif-factory"
+GCS_HUB_ROOT = "data-container"
 GCS_PROJECT = "mapbiomas-fire-485203"
 
 # Singleton: cria cliente uma vez só

@@ -882,7 +882,7 @@ class Pipeline:
         import csv
         from urllib.parse import quote
 
-        base_url = "https://storage.googleapis.com/mapbiomas-fire/gif-factory"
+        base_url = "https://storage.googleapis.com/mapbiomas-fire/data-container"
         gcs_root = f"{base_url}/{quote(dataset_id)}/{quote(product_id)}/{quote(territory_id)}"
         prod_name = metadata.get("product", {}).get("name", product_id)
         terr_name = metadata.get("territory", {}).get("name", territory_id)

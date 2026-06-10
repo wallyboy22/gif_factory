@@ -23,7 +23,7 @@ class NotebookContext:
     in_colab: bool
     ee_project: str = "mapbiomas-fire-485203"
     gcs_bucket: str = "mapbiomas-fire"
-    gcs_root: str = "gif-factory"
+    gcs_root: str = "data-container"
     active_projects: List[str] = field(default_factory=list)
     active_gts: List[str] = field(default_factory=list)
     gif_cache: Dict[Tuple[str, str], Set[str]] = field(default_factory=lambda: defaultdict(set))
@@ -164,7 +164,7 @@ def build_project_hierarchy(datasets_dict, active_projects=None, active_gts=None
 
 
 def setup(ee_project="mapbiomas-fire-485203", gcs_bucket="mapbiomas-fire",
-          gcs_root="gif-factory", active_projects=None, active_gts=None) -> NotebookContext:
+           gcs_root="data-container", active_projects=None, active_gts=None) -> NotebookContext:
     """Inicializa ambiente, autentica, carrega config e cache.
        Retorna NotebookContext com todos os dados prontos."""
     from src.ipam_gif_factory.config import ConfigLoader

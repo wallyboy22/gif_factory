@@ -33,7 +33,7 @@ warnings.filterwarnings("ignore", message="Your application has authenticated us
 from google.cloud import storage
 
 GCS_BUCKET = "mapbiomas-fire"
-GCS_ROOT = "gif-factory"
+GCS_ROOT = "data-container"
 GCS_PROJECT = "mapbiomas-fire-485203"
 OUTPUT_DIR = "outputs/v001"
 

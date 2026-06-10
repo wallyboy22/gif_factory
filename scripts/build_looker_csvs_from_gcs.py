@@ -7,7 +7,7 @@ Fluxo:
   3. Gera CSVs:
      - Raiz: 3 arquivos flat combinando TODOS os datasets (Looker Studio le estes)
      - Subpastas: raw/, pivot_territorios/, pivot_produtos/ (versoes por dataset)
-  4. Upload para gs://.../gif-factory/looker studio/
+   4. Upload para gs://.../data-container/looker studio/
   5. Limpa pasta temp
 
 Uso:
@@ -32,8 +32,8 @@ import yaml
 # GCS Config
 BUCKET_NAME = "mapbiomas-fire"
 PROJECT_ID = "mapbiomas-fire-485203"
-GCS_ROOT = "gif-factory"
-GCS_BASE_URL = "https://storage.googleapis.com/mapbiomas-fire/gif-factory"
+GCS_ROOT = "data-container"
+GCS_BASE_URL = "https://storage.googleapis.com/mapbiomas-fire/data-container"
 LOCAL_CSV_ROOT = "outputs/looker_studio"
 
 warnings.filterwarnings("ignore", message="Your application has authenticated using end user credentials")

@@ -87,7 +87,7 @@ def upload_to_gcs(index: dict, config, mode: str = "prod") -> str:
 
     gcs_conf = config.paths.get("paths", {}).get("google_cloud_storage", {})
     bucket_name = gcs_conf.get("bucket", "mapbiomas-fire")
-    hub_root = gcs_conf.get("hub_root", "gif-factory")
+    hub_root = gcs_conf.get("hub_root", "data-container")
     project_id = gcs_conf.get("project_id", "mapbiomas-fire-485203")
 
     index["_meta"]["mode"] = mode

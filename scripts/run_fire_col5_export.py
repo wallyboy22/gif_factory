@@ -98,7 +98,7 @@ CELL_HEIGHT = 300
 # GCS Config
 BUCKET_NAME = "mapbiomas-fire"
 PROJECT_ID = "mapbiomas-fire-485203"
-GCS_ROOT = "gif-factory"
+GCS_ROOT = "data-container"
 
 # ============================================================
 # UPLOAD STATE (persiste entre execucoes)

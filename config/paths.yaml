@@ -8,7 +8,7 @@ paths:
 
   google_cloud_storage:
     bucket: "mapbiomas-fire"
-    hub_root: "gif-factory"
+    hub_root: "data-container"
     project_id: "mapbiomas-fire-485203"
 
   local:

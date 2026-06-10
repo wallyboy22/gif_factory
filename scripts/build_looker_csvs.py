@@ -10,7 +10,7 @@ DS_IDS = [
 ]
 OUTPUT_BASE = "outputs/v002"
 ROOT = "outputs/looker_studio"
-GCS_BASE = "https://storage.googleapis.com/mapbiomas-fire/gif-factory"
+GCS_BASE = "https://storage.googleapis.com/mapbiomas-fire/data-container"
 
 FIELDS = [
     "link_direto", "dataset", "colecao",

@@ -13,7 +13,7 @@ warnings.filterwarnings("ignore", message="Your application has authenticated us
 # Configurações
 BUCKET_NAME = "mapbiomas-fire"
 PROJECT_ID = "mapbiomas-fire-485203" # Adicionado para resolver o erro de cota
-GCS_HUB_ROOT = "gif-factory"
+GCS_HUB_ROOT = "data-container"
 LOCAL_OUTPUT = Path(r"outputs\v002")
 
 # Inicializa o cliente uma única vez com o projeto de cota
