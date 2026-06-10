@@ -32,9 +32,9 @@ def build_index(output_dir: str) -> dict:
             continue
 
         ds, prod, terr = parts[0], parts[1], parts[2]
-        combo_dir = gif_path.parent
+        base_dir = output_dir / ds / prod / terr
 
-        meta_path = combo_dir / f"metadata_{prod}.json"
+        meta_path = base_dir / "metadata" / f"metadata_{prod}.json"
         metadata = {}
         if meta_path.exists():
             try:
@@ -42,8 +42,8 @@ def build_index(output_dir: str) -> dict:
             except (json.JSONDecodeError, OSError):
                 metadata = {}
 
-        collages = list(combo_dir.glob("*collage*.png"))
-        collage_rel = str(Path(ds) / prod / terr / collages[0].name) if collages else None
+        collages = list((base_dir / "collages").glob("*collage*.png"))
+        collage_rel = str(Path(ds) / prod / terr / "collages" / collages[0].name) if collages else None
         gif_rel = str(rel.as_posix())
 
         frames_count = metadata.get("output", {}).get("frames_count", 0)

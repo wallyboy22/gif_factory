@@ -120,13 +120,14 @@ def upload_combo(ds: str, prod: str, terr: str, output_dir: Path, dry_run: bool 
 
     bucket = _get_bucket()
     enviados = 0
-    for fpath in sorted(local_dir.iterdir()):
+    for fpath in sorted(local_dir.rglob("*")):
+        if not fpath.is_file():
+            continue
         name = fpath.name
         if name.startswith(".state"):
             continue
-        if not fpath.is_file():
-            continue
-        blob_path = f"{GCS_HUB_ROOT}/{ds}/{prod}/{terr}/{name}"
+        rel = fpath.relative_to(local_dir).as_posix()
+        blob_path = f"{GCS_HUB_ROOT}/{ds}/{prod}/{terr}/{rel}"
         if dry_run:
             print(f"     [DRY-RUN] {blob_path}")
         else:

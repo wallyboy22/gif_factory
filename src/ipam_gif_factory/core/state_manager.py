@@ -13,13 +13,14 @@ class StateManager:
     STEPS = [
         "download",
         "resize",
-        "collage_scale_north",
-        "collage_margins",
+        "overlay_legend",
+        "frames_clean",
         "collage",
+        "special_collages",
         "collage_labels",
-        "frame_headers",
-        "frame_bottom_bars",
+        "frames_maps",
         "gif",
+        "special_gifs",
     ]
 
     def __init__(self, output_dir: str):
