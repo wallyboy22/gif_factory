@@ -1,11 +1,11 @@
 """
-Batch Fire Collection 5: Brasil (1 território × 23 produtos).
+Batch Fire Collection 5: Regiões customizadas (9 territórios × 23 produtos).
 Gera GIFs completos (todos os anos) com colagem, labels, escala e norte.
 
 Uso:
-    python run_fire_col5_brasil.py                          # fresco, auto-detect workers
-    python run_fire_col5_brasil.py --workers 6 --resume     # retomando com 6 workers
-    python run_fire_col5_brasil.py --workers 8              # 8 workers, sem resume
+    python run_fire_col5_regions.py                          # fresco, auto-detect workers
+    python run_fire_col5_regions.py --workers 6 --resume     # retomando com 6 workers
+    python run_fire_col5_regions.py --workers 8              # 8 workers, sem resume
 """
 
 import sys
@@ -75,7 +75,17 @@ PRODUCTS_PERIODO = [
     "fire_return_interval", "mean_fire_return_interval",
 ]
 
-TERRITORIES = ["brasil"]
+TERRITORIES = [
+    "matopiba_cerrado",
+    "matopiba",
+    "centro_oeste",
+    "nordeste",
+    "norte",
+    "sudeste",
+    "sul",
+    "bap",
+    "bap_planalto",
+]
 
 CREATE_COLLAGE = True
 ADD_LABELS = True
@@ -148,7 +158,7 @@ def main():
     from src.ipam_gif_factory.config import ConfigLoader
 
     parser = argparse.ArgumentParser(
-        description="Batch Fire Col5 — Brasil (1 território × 23 produtos)"
+        description="Batch Fire Col5 — Regiões (9 territórios × 23 produtos)"
     )
     parser.add_argument("--workers", type=int, default=None,
                         help="Workers paralelos (padrao: 12)")
@@ -176,7 +186,7 @@ def main():
     total = len(combos)
 
     print(f"\n{'=' * 60}")
-    print(f"FÁBRICA DE GIFS — FIRE COLLECTION 5 — BRASIL")
+    print(f"FÁBRICA DE GIFS — FIRE COLLECTION 5 — REGIÕES")
     print(f"{'=' * 60}")
     print(f"Tipo: {args.tipo}")
     print(f"Produtos: {len(active_products)}")
@@ -209,9 +219,10 @@ def main():
     if ok_count > 0:
         output_base = config.get_output_dir()
         print(f"\nOutput: {output_base}{DATASET_ID}/")
+        root = os.path.dirname(os.path.dirname(__file__))
         print("Reconstruindo indice...")
-        subprocess.run([sys.executable, "scripts/build_index.py", "--upload"],
-                       cwd=os.path.dirname(os.path.dirname(__file__)), check=True)
+        subprocess.run([sys.executable, "scripts/index/build_index.py", "--upload"],
+                       cwd=root, check=True)
         print("\nProximos passos:")
         print("  python scripts/sync_fire_col5.py  # atualizar planilhas Looker")
 

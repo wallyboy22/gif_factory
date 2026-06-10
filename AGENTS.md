@@ -28,7 +28,7 @@ python -c "import ee; ee.Authenticate()"
 
 ```powershell
 # Gerar um GIF de teste rápido (DF, rápido, ~30s)
-python scripts/run_pipeline_df.py
+python scripts/run/run_pipeline_df.py
 
 # Gerar batch completo de degradação com resume
 python -m src.ipam_gif_factory.interfaces.cli --generate --batch config/batches/v001.json --workers 6 --resume
@@ -40,10 +40,10 @@ python -m src.ipam_gif_factory.interfaces.cli --list-datasets
 python -m src.ipam_gif_factory.interfaces.cli --list-territories
 
 # Gerar CSVs para Looker Studio
-python scripts/build_looker_csvs.py
+python scripts/looker/build_looker_csvs.py
 
 # Upload para GCS
-python sync_to_hub.py
+python scripts/sync/sync_to_hub.py
 
 # Pós-processamento: GeoPDFs (GeoTIFF + tentativa GeoPDF)
 python -m src.ipam_gif_factory.postprocessing.cli build-geopdfs --all

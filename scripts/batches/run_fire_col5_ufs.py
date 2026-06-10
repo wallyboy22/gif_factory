@@ -239,7 +239,7 @@ def main():
         print(f"\nOutput: {output_base}{DATASET_ID}/")
         root = os.path.dirname(os.path.dirname(__file__))
         print("Reconstruindo indice...")
-        subprocess.run([sys.executable, "scripts/build_index.py", "--upload"],
+        subprocess.run([sys.executable, "scripts/index/build_index.py", "--upload"],
                        cwd=root, check=True)
         print("\nProximos passos:")
         print("  python scripts/sync_fire_col5.py  # atualizar planilhas Looker")

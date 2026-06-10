@@ -161,7 +161,7 @@ def main():
     if args.upload:
         print(f"\n  Enviando para GCS...")
         subprocess.run(
-            [sys.executable, "scripts/upload_to_gcs.py", "--pending"],
+            [sys.executable, "scripts/sync/upload_to_gcs.py", "--pending"],
             cwd=str(root), check=True)
 
 

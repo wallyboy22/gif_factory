@@ -228,7 +228,7 @@ def main():
         print(f"  ✅ {len(combos)} combo(s), {total} arquivo(s) enviados")
         print("\n  Reconstruindo índice...")
         root = Path(__file__).resolve().parent.parent
-        subprocess.run([sys.executable, "scripts/build_index.py", "--upload"],
+        subprocess.run([sys.executable, "scripts/index/build_index.py", "--upload"],
                        cwd=str(root), check=True)
     print()
 

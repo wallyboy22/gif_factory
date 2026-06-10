@@ -152,5 +152,5 @@ if __name__ == "__main__":
         root = Path(__file__).resolve().parent.parent
         print("Reconstruindo indice...")
         import subprocess
-        subprocess.run([sys.executable, "scripts/build_index.py", "--upload"],
+        subprocess.run([sys.executable, "scripts/index/build_index.py", "--upload"],
                        cwd=str(root), check=True)

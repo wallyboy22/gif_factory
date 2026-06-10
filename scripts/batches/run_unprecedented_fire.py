@@ -1,11 +1,11 @@
 """
-Batch Fire Collection 5: Biomas (7 territórios × 23 produtos).
+Batch: unprecedented_fire — Brasil + Biomas + Biomas individuais + Regiões (17 territórios).
 Gera GIFs completos (todos os anos) com colagem, labels, escala e norte.
 
 Uso:
-    python run_fire_col5_biomes.py                          # fresco, auto-detect workers
-    python run_fire_col5_biomes.py --workers 6 --resume     # retomando com 6 workers
-    python run_fire_col5_biomes.py --workers 8              # 8 workers, sem resume
+    python scripts/run_unprecedented_fire.py                          # fresco
+    python scripts/run_unprecedented_fire.py --workers 6 --resume     # retomando
+    python scripts/run_unprecedented_fire.py --no-upload              # sem upload GCS
 """
 
 import sys
@@ -30,52 +30,10 @@ except Exception:
     pass
 
 DATASET_ID = "brasil_fire_col5"
-
-PRODUCTS = [
-    "annual_burned",
-    "monthly_burned",
-    "scar_size_range",
-    "accumulated_burned",
-    "fire_frequency",
-    "year_last_fire",
-    "time_after_fire",
-    "unprecedented_fire",
-    "annual_burned_coverage_nivel0",
-    "annual_burned_coverage_nivel1",
-    "annual_burned_coverage_nivel1_1",
-    "annual_burned_coverage_nivel2",
-    "annual_burned_coverage_nivel3",
-    "annual_burned_coverage_nivel4",
-    "accumulated_burned_coverage_nivel0",
-    "accumulated_burned_coverage_nivel1",
-    "accumulated_burned_coverage_nivel1_1",
-    "accumulated_burned_coverage_nivel2",
-    "accumulated_burned_coverage_nivel3",
-    "accumulated_burned_coverage_nivel4",
-    "severity",
-    "fire_return_interval",
-    "mean_fire_return_interval",
-    "nbr_min",
-]
-
-PRODUCTS_ANUAL = [
-    "annual_burned", "monthly_burned", "scar_size_range",
-    "annual_burned_coverage_nivel0", "annual_burned_coverage_nivel1",
-    "annual_burned_coverage_nivel1_1", "annual_burned_coverage_nivel2",
-    "annual_burned_coverage_nivel3", "annual_burned_coverage_nivel4",
-    "severity", "nbr_min",
-]
-
-PRODUCTS_PERIODO = [
-    "accumulated_burned",
-    "accumulated_burned_coverage_nivel0", "accumulated_burned_coverage_nivel1",
-    "accumulated_burned_coverage_nivel1_1", "accumulated_burned_coverage_nivel2",
-    "accumulated_burned_coverage_nivel3", "accumulated_burned_coverage_nivel4",
-    "fire_frequency", "year_last_fire", "time_after_fire", "unprecedented_fire",
-    "fire_return_interval", "mean_fire_return_interval",
-]
+PRODUCT = "unprecedented_fire"
 
 TERRITORIES = [
+    "brasil",
     "biomas",
     "amazonia",
     "caatinga",
@@ -83,6 +41,15 @@ TERRITORIES = [
     "mata_atlantica",
     "pampa",
     "pantanal",
+    "matopiba_cerrado",
+    "matopiba",
+    "centro_oeste",
+    "nordeste",
+    "norte",
+    "sudeste",
+    "sul",
+    "bap",
+    "bap_planalto",
 ]
 
 CREATE_COLLAGE = True
@@ -94,36 +61,24 @@ print_lock = threading.Lock()
 results_lock = threading.Lock()
 results_list = []
 
+
 def detect_workers():
     return 12
 
-def filter_products(tipo):
-    if tipo == "anual":
-        return PRODUCTS_ANUAL
-    if tipo == "periodo":
-        return PRODUCTS_PERIODO
-    return PRODUCTS
 
-def process_one(config, territory, prod, resume, resume_from_gcs, upload, font_scale=1.0):
+def process_one(config, territory, resume, upload, font_scale=1.0):
     from pathlib import Path
-    from scripts.upload_to_gcs import upload_combo, is_combo_complete_on_gcs
+    from scripts.upload_to_gcs import upload_combo
     from src.ipam_gif_factory.core.pipeline import Pipeline
-
-    if resume_from_gcs:
-        output_dir = Path(config.get_output_dir())
-        if is_combo_complete_on_gcs(DATASET_ID, prod, territory, output_dir):
-            with print_lock:
-                print(f"\n[SKIP GCS] {prod} / {territory} — completo no GCS")
-            return {"status": "success", "skipped_gcs": True}
 
     pipeline = Pipeline(config)
 
     with print_lock:
-        print(f"\n[INICIANDO] {prod} / {territory}")
+        print(f"\n[INICIANDO] {PRODUCT} / {territory}")
 
     result = pipeline.run(
         dataset_id=DATASET_ID,
-        product_id=prod,
+        product_id=PRODUCT,
         territory_id=territory,
         create_collage=CREATE_COLLAGE,
         add_labels=ADD_LABELS,
@@ -135,15 +90,15 @@ def process_one(config, territory, prod, resume, resume_from_gcs, upload, font_s
 
     with print_lock:
         if result["status"] == "success":
-            print(f"  [OK] {prod} / {territory}")
+            print(f"  [OK] {PRODUCT} / {territory}")
             if result.get("collage_path"):
                 print(f"  Colagem: {result['collage_path']}")
             if upload:
                 output_dir = Path(config.get_output_dir())
-                n = upload_combo(DATASET_ID, prod, territory, output_dir)
+                n = upload_combo(DATASET_ID, PRODUCT, territory, output_dir)
                 print(f"  Upload GCS: {n} arquivo(s)")
         else:
-            print(f"  [FALHA] {prod} / {territory}")
+            print(f"  [FALHA] {PRODUCT} / {territory}")
             if result.get("error"):
                 print(f"  Erro: {result['error']}")
 
@@ -152,20 +107,17 @@ def process_one(config, territory, prod, resume, resume_from_gcs, upload, font_s
 
     return result
 
+
 def main():
     from src.ipam_gif_factory.config import ConfigLoader
 
     parser = argparse.ArgumentParser(
-        description="Batch Fire Col5 — Biomas (7 territórios × 23 produtos)"
+        description="Batch unprecedented_fire — 17 territórios"
     )
     parser.add_argument("--workers", type=int, default=None,
                         help="Workers paralelos (padrao: 12)")
     parser.add_argument("--resume", action="store_true",
-                        help="Retomar de onde parou (checkpoint local)")
-    parser.add_argument("--resume-from-gcs", action="store_true",
-                        help="Pular combos já completos no GCS + resume local no resto")
-    parser.add_argument("--tipo", choices=["anual", "periodo", "todos"], default="todos",
-                        help="Filtrar por tipo de analise (padrao: todos)")
+                        help="Retomar de onde parou")
     parser.add_argument("--no-upload", action="store_true",
                         help="Pular upload para GCS apos cada combo")
     parser.add_argument("--font-scale", type=float, default=1.0,
@@ -173,36 +125,33 @@ def main():
     args = parser.parse_args()
 
     workers = args.workers or detect_workers()
-    resume = args.resume or args.resume_from_gcs
-    active_products = filter_products(args.tipo)
+    resume = args.resume
     do_upload = not args.no_upload
     font_scale = args.font_scale
 
     config = ConfigLoader()
 
-    combos = [(t, p) for t in TERRITORIES for p in active_products]
-    total = len(combos)
+    total = len(TERRITORIES)
 
     print(f"\n{'=' * 60}")
-    print(f"FÁBRICA DE GIFS — FIRE COLLECTION 5 — BIOMAS")
+    print(f"FÁBRICA DE GIFS — UNPRECEDENTED FIRE")
     print(f"{'=' * 60}")
-    print(f"Tipo: {args.tipo}")
-    print(f"Produtos: {len(active_products)}")
+    print(f"Dataset: {DATASET_ID}")
+    print(f"Produto: {PRODUCT}")
     print(f"Territórios: {len(TERRITORIES)}")
-    print(f"Total: {total} combinações")
+    print(f"Total: {total} execuções")
     print(f"Workers: {workers}")
     print(f"Resume: {resume}")
-    print(f"Resume from GCS: {args.resume_from_gcs}")
     print(f"Upload: {'sim' if do_upload else 'nao'}")
     print(f"{'=' * 60}\n")
 
     with ThreadPoolExecutor(max_workers=workers) as executor:
         futures = [
-            executor.submit(process_one, config, t, p, resume, args.resume_from_gcs, do_upload, font_scale)
-            for t, p in combos
+            executor.submit(process_one, config, t, resume, do_upload, font_scale)
+            for t in TERRITORIES
         ]
         for i, f in enumerate(as_completed(futures), 1):
-            if i % 10 == 0 or i == total:
+            if i % 5 == 0 or i == total:
                 print(f"\n--- Progresso: {i}/{total} ---")
 
     ok_count = sum(1 for r in results_list if r["status"] == "success")
@@ -219,7 +168,7 @@ def main():
         print(f"\nOutput: {output_base}{DATASET_ID}/")
         root = os.path.dirname(os.path.dirname(__file__))
         print("Reconstruindo indice...")
-        subprocess.run([sys.executable, "scripts/build_index.py", "--upload"],
+        subprocess.run([sys.executable, "scripts/index/build_index.py", "--upload"],
                        cwd=root, check=True)
         print("\nProximos passos:")
         print("  python scripts/sync_fire_col5.py  # atualizar planilhas Looker")

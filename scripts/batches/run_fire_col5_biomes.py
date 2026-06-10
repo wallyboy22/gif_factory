@@ -1,13 +1,11 @@
 """
-Batch Fire Collection 5: Brasil + Biomas + Estados (35 territórios × 23 produtos).
+Batch Fire Collection 5: Biomas (7 territórios × 23 produtos).
 Gera GIFs completos (todos os anos) com colagem, labels, escala e norte.
 
 Uso:
-    python run_fire_col5_batch.py                          # fresco, auto-detect workers
-    python run_fire_col5_batch.py --workers 6 --resume     # retomando com 6 workers
-    python run_fire_col5_batch.py --workers 8              # 8 workers, sem resume
-
-Auto-detecta ambiente: VS Code (local) ou Google Colab.
+    python run_fire_col5_biomes.py                          # fresco, auto-detect workers
+    python run_fire_col5_biomes.py --workers 6 --resume     # retomando com 6 workers
+    python run_fire_col5_biomes.py --workers 8              # 8 workers, sem resume
 """
 
 import sys
@@ -16,10 +14,6 @@ import subprocess
 import argparse
 import threading
 from concurrent.futures import ThreadPoolExecutor, as_completed
-
-# ============================================================
-# SETUP
-# ============================================================
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 cwd = os.getcwd()
@@ -34,10 +28,6 @@ try:
     ee.Initialize(project='mapbiomas-fire-485203')
 except Exception:
     pass
-
-# ============================================================
-# CONFIGURAÇÃO
-# ============================================================
 
 DATASET_ID = "brasil_fire_col5"
 
@@ -86,9 +76,6 @@ PRODUCTS_PERIODO = [
 ]
 
 TERRITORIES = [
-    # País
-    "brasil",
-    # Biomas (7)
     "biomas",
     "amazonia",
     "caatinga",
@@ -96,34 +83,6 @@ TERRITORIES = [
     "mata_atlantica",
     "pampa",
     "pantanal",
-    # Estados (27)
-    "df",
-    "acre",
-    "alagoas",
-    "amapa",
-    "amazonas",
-    "bahia",
-    "ceara",
-    "espirito_santo",
-    "goias",
-    "maranhao",
-    "mato_grosso",
-    "mato_grosso_do_sul",
-    "minas_gerais",
-    "para",
-    "paraiba",
-    "parana",
-    "pernambuco",
-    "piaui",
-    "rio_de_janeiro",
-    "rio_grande_do_norte",
-    "rio_grande_do_sul",
-    "rondonia",
-    "roraima",
-    "santa_catarina",
-    "sao_paulo",
-    "sergipe",
-    "tocantins",
 ]
 
 CREATE_COLLAGE = True
@@ -131,14 +90,9 @@ ADD_LABELS = True
 VERTICAL_DIMENSION = 1560
 CELL_HEIGHT = 300
 
-# ============================================================
-# PIPELINE
-# ============================================================
-
 print_lock = threading.Lock()
 results_lock = threading.Lock()
 results_list = []
-
 
 def detect_workers():
     return 12
@@ -198,12 +152,11 @@ def process_one(config, territory, prod, resume, resume_from_gcs, upload, font_s
 
     return result
 
-
 def main():
     from src.ipam_gif_factory.config import ConfigLoader
 
     parser = argparse.ArgumentParser(
-        description="Batch Fire Col5 — 35 territórios × 23 produtos"
+        description="Batch Fire Col5 — Biomas (7 territórios × 23 produtos)"
     )
     parser.add_argument("--workers", type=int, default=None,
                         help="Workers paralelos (padrao: 12)")
@@ -231,7 +184,7 @@ def main():
     total = len(combos)
 
     print(f"\n{'=' * 60}")
-    print(f"FÁBRICA DE GIFS — FIRE COLLECTION 5")
+    print(f"FÁBRICA DE GIFS — FIRE COLLECTION 5 — BIOMAS")
     print(f"{'=' * 60}")
     print(f"Tipo: {args.tipo}")
     print(f"Produtos: {len(active_products)}")
@@ -266,7 +219,7 @@ def main():
         print(f"\nOutput: {output_base}{DATASET_ID}/")
         root = os.path.dirname(os.path.dirname(__file__))
         print("Reconstruindo indice...")
-        subprocess.run([sys.executable, "scripts/build_index.py", "--upload"],
+        subprocess.run([sys.executable, "scripts/index/build_index.py", "--upload"],
                        cwd=root, check=True)
         print("\nProximos passos:")
         print("  python scripts/sync_fire_col5.py  # atualizar planilhas Looker")
