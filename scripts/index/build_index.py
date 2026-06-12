@@ -15,7 +15,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
-from ipam_gif_factory.config import ConfigLoader
+from mapbiomas_data.config import ConfigLoader
 
 
 def build_index(output_dir: str) -> dict:
@@ -42,8 +42,8 @@ def build_index(output_dir: str) -> dict:
             except (json.JSONDecodeError, OSError):
                 metadata = {}
 
-        collages = list((base_dir / "collages").glob("*collage*.png"))
-        collage_rel = str(Path(ds) / prod / terr / "collages" / collages[0].name) if collages else None
+        collages = list((base_dir / "collages_combined").glob("*collage*.png"))
+        collage_rel = str(Path(ds) / prod / terr / "collages_combined" / collages[0].name) if collages else None
         gif_rel = str(rel.as_posix())
 
         frames_count = metadata.get("output", {}).get("frames_count", 0)

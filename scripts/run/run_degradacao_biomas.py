@@ -17,8 +17,8 @@ import concurrent.futures
 import threading
 sys.path.insert(0, "src")
 
-from ipam_gif_factory.config import ConfigLoader
-from ipam_gif_factory.core.pipeline import Pipeline
+from mapbiomas_data.config import ConfigLoader
+from mapbiomas_data.core.pipeline import Pipeline
 
 DATASET = "brasil_degradation_col10_1"
 
@@ -39,15 +39,15 @@ PRODUCTS = [
 ]
 
 BIOMAS = [
-    "amazonia",
-    "caatinga",
-    "cerrado",
-    "mata_atlantica",
-    "pampa",
-    "pantanal",
+    "bioma_amazonia",
+    "bioma_caatinga",
+    "bioma_cerrado",
+    "bioma_mata_atlantica",
+    "bioma_pampa",
+    "bioma_pantanal",
 ]
 
-TERRITORIOS = BIOMAS + ["biomas", "brasil"]
+TERRITORIOS = BIOMAS + ["biomas_todos", "pais_brasil"]
 
 print_lock = threading.Lock()
 results_lock = threading.Lock()

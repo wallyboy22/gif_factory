@@ -4,8 +4,8 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 import pytest
-from ipam_gif_factory.config import ConfigLoader
-from ipam_gif_factory.core.ee_transforms import (
+from mapbiomas_data.config import ConfigLoader
+from mapbiomas_data.core.ee_transforms import (
     PROCESSOR_REGISTRY,
     run_processor,
 )
@@ -53,7 +53,7 @@ class TestEETransforms:
             assert callable(PROCESSOR_REGISTRY[name]), f"{name} is not callable"
 
     def test_burned_at_least_once_logic_natural_filter(self):
-        from ipam_gif_factory.core.ee_transforms import build_burned_at_least_once_col101
+        from mapbiomas_data.core.ee_transforms import build_burned_at_least_once_col101
         from inspect import getsource
         source = getsource(build_burned_at_least_once_col101)
         assert "natural" in source.split(".where(freq.eq(0).And(cummax.gt(freq))")[1].split(",")[0], \

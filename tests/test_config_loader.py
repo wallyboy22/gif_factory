@@ -5,7 +5,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 import pytest
-from ipam_gif_factory.config import ConfigLoader
+from mapbiomas_data.config import ConfigLoader
 
 
 @pytest.fixture
@@ -27,10 +27,10 @@ class TestConfigLoader:
         assert "biomes" in territories
         assert "states" in territories
 
-    def test_df_territory_exists(self, config):
+    def test_uf_df_territory_exists(self, config):
         states = config.territories.get("states", {})
-        assert "df" in states, "DF (Distrito Federal) deve existir como território de teste"
-        assert states["df"]["name"] == "Distrito Federal"
+        assert "uf_df" in states, "DF (Distrito Federal) deve existir como território de teste"
+        assert states["uf_df"]["name"] == "Distrito Federal"
 
     def test_load_visualizations(self, config):
         viz = config.visualizations

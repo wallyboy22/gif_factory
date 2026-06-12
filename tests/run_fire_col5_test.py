@@ -8,8 +8,8 @@ import os
 
 sys.path.insert(0, os.path.dirname(__file__))
 
-from src.ipam_gif_factory.config import ConfigLoader
-from src.ipam_gif_factory.core.pipeline import Pipeline
+from src.mapbiomas_data.config import ConfigLoader
+from src.mapbiomas_data.core.pipeline import Pipeline
 
 DATASET = "brasil_fire_col5"
 TERRITORIES = ["df", "tocantins"]

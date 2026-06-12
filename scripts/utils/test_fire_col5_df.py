@@ -22,11 +22,11 @@ if not os.path.exists(os.path.join(cwd, 'src')):
 
 sys.path.insert(0, os.getcwd())
 
-from src.ipam_gif_factory.config import ConfigLoader
-from src.ipam_gif_factory.core.pipeline import Pipeline
+from src.mapbiomas_data.config import ConfigLoader
+from src.mapbiomas_data.core.pipeline import Pipeline
 
 DATASET_ID = "brasil_fire_col5"
-TERRITORY_ID = "df"
+TERRITORY_ID = "uf_df"
 
 PRODUCTS = [
     "annual_burned",

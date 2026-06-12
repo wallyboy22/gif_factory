@@ -4,7 +4,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 import pytest
 
-from ipam_gif_factory.config import ConfigLoader
+from mapbiomas_data.config import ConfigLoader
 
 
 class TestDatasetManagerDegradation:
@@ -12,13 +12,13 @@ class TestDatasetManagerDegradation:
         self.config = ConfigLoader(config_dir="config").load_all()
 
     def test_degradation_dataset_exists(self):
-        from ipam_gif_factory.core import DatasetManager
+        from mapbiomas_data.core import DatasetManager
         dm = DatasetManager(self.config)
         datasets = dm.list_datasets("degradation")
         assert any(d["id"] == "brasil_degradation_col9" for d in datasets)
 
     def test_degradation_products_use_processor(self):
-        from ipam_gif_factory.core import DatasetManager
+        from mapbiomas_data.core import DatasetManager
         dm = DatasetManager(self.config)
         products = dm.list_products("brasil_degradation_col9")
         assert len(products) > 0
@@ -28,7 +28,7 @@ class TestDatasetManagerDegradation:
             assert info["processor"] is not None
 
     def test_all_products_have_visualization(self):
-        from ipam_gif_factory.core import DatasetManager
+        from mapbiomas_data.core import DatasetManager
         dm = DatasetManager(self.config)
         for ds in dm.list_datasets():
             for p in dm.list_products(ds["id"]):

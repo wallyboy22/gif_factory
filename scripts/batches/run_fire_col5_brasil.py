@@ -99,7 +99,7 @@ def filter_products(tipo):
 def process_one(config, territory, prod, resume, resume_from_gcs, upload, font_scale=1.0):
     from pathlib import Path
     from scripts.upload_to_gcs import upload_combo, is_combo_complete_on_gcs
-    from src.ipam_gif_factory.core.pipeline import Pipeline
+    from src.mapbiomas_data.core.pipeline import Pipeline
 
     if resume_from_gcs:
         output_dir = Path(config.get_output_dir())
@@ -145,7 +145,7 @@ def process_one(config, territory, prod, resume, resume_from_gcs, upload, font_s
     return result
 
 def main():
-    from src.ipam_gif_factory.config import ConfigLoader
+    from src.mapbiomas_data.config import ConfigLoader
 
     parser = argparse.ArgumentParser(
         description="Batch Fire Col5 — Brasil (1 território × 23 produtos)"

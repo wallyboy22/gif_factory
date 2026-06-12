@@ -10,7 +10,7 @@ date: 2026-06-01
 
 ## Orquestrador Principal
 
-`Pipeline.run()` em `src/ipam_gif_factory/core/pipeline.py` — ponto central de toda geração.
+`Pipeline.run()` em `src/mapbiomas_data/core/pipeline.py` — ponto central de toda geração.
 
 ```python
 pipeline.run(
@@ -123,3 +123,4 @@ Cada execução gera `metadata_<product>.json` com:
 - `timings` (tempo de cada etapa + total)
 - `ee_estimates` (estimativas de consumo GEE)
 - `pixel_info` (dimensões, resolução)
+

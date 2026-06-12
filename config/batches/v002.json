@@ -1,0 +1,3744 @@
+{
+  "items": [
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_frequency",
+      "territory": "pais_brasil"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "natural_coverage",
+      "territory": "pais_brasil"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_natural_coverage",
+      "territory": "pais_brasil"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_at_least_once",
+      "territory": "pais_brasil"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "primary_natural_coverage",
+      "territory": "pais_brasil"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_age",
+      "territory": "pais_brasil"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_id",
+      "territory": "pais_brasil"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size",
+      "territory": "pais_brasil"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_fragments",
+      "territory": "pais_brasil"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_massifs",
+      "territory": "pais_brasil"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_area",
+      "territory": "pais_brasil"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_age",
+      "territory": "pais_brasil"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "landscape_morphology",
+      "territory": "pais_brasil"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_age",
+      "territory": "pais_brasil"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_coverage",
+      "territory": "pais_brasil"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "canopy_disturbance_frequency",
+      "territory": "pais_brasil"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "logging",
+      "territory": "pais_brasil"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_frequency",
+      "territory": "biomas_todos"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "natural_coverage",
+      "territory": "biomas_todos"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_natural_coverage",
+      "territory": "biomas_todos"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_at_least_once",
+      "territory": "biomas_todos"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "primary_natural_coverage",
+      "territory": "biomas_todos"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_age",
+      "territory": "biomas_todos"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_id",
+      "territory": "biomas_todos"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size",
+      "territory": "biomas_todos"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_fragments",
+      "territory": "biomas_todos"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_massifs",
+      "territory": "biomas_todos"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_area",
+      "territory": "biomas_todos"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_age",
+      "territory": "biomas_todos"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "landscape_morphology",
+      "territory": "biomas_todos"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_age",
+      "territory": "biomas_todos"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_coverage",
+      "territory": "biomas_todos"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "canopy_disturbance_frequency",
+      "territory": "biomas_todos"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "logging",
+      "territory": "biomas_todos"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_frequency",
+      "territory": "bioma_amazonia"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "natural_coverage",
+      "territory": "bioma_amazonia"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_natural_coverage",
+      "territory": "bioma_amazonia"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_at_least_once",
+      "territory": "bioma_amazonia"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "primary_natural_coverage",
+      "territory": "bioma_amazonia"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_age",
+      "territory": "bioma_amazonia"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_id",
+      "territory": "bioma_amazonia"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size",
+      "territory": "bioma_amazonia"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_fragments",
+      "territory": "bioma_amazonia"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_massifs",
+      "territory": "bioma_amazonia"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_area",
+      "territory": "bioma_amazonia"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_age",
+      "territory": "bioma_amazonia"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "landscape_morphology",
+      "territory": "bioma_amazonia"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_age",
+      "territory": "bioma_amazonia"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_coverage",
+      "territory": "bioma_amazonia"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "canopy_disturbance_frequency",
+      "territory": "bioma_amazonia"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "logging",
+      "territory": "bioma_amazonia"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_frequency",
+      "territory": "bioma_caatinga"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "natural_coverage",
+      "territory": "bioma_caatinga"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_natural_coverage",
+      "territory": "bioma_caatinga"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_at_least_once",
+      "territory": "bioma_caatinga"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "primary_natural_coverage",
+      "territory": "bioma_caatinga"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_age",
+      "territory": "bioma_caatinga"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_id",
+      "territory": "bioma_caatinga"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size",
+      "territory": "bioma_caatinga"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_fragments",
+      "territory": "bioma_caatinga"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_massifs",
+      "territory": "bioma_caatinga"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_area",
+      "territory": "bioma_caatinga"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_age",
+      "territory": "bioma_caatinga"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "landscape_morphology",
+      "territory": "bioma_caatinga"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_age",
+      "territory": "bioma_caatinga"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_coverage",
+      "territory": "bioma_caatinga"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "canopy_disturbance_frequency",
+      "territory": "bioma_caatinga"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "logging",
+      "territory": "bioma_caatinga"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_frequency",
+      "territory": "bioma_cerrado"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "natural_coverage",
+      "territory": "bioma_cerrado"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_natural_coverage",
+      "territory": "bioma_cerrado"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_at_least_once",
+      "territory": "bioma_cerrado"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "primary_natural_coverage",
+      "territory": "bioma_cerrado"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_age",
+      "territory": "bioma_cerrado"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_id",
+      "territory": "bioma_cerrado"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size",
+      "territory": "bioma_cerrado"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_fragments",
+      "territory": "bioma_cerrado"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_massifs",
+      "territory": "bioma_cerrado"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_area",
+      "territory": "bioma_cerrado"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_age",
+      "territory": "bioma_cerrado"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "landscape_morphology",
+      "territory": "bioma_cerrado"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_age",
+      "territory": "bioma_cerrado"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_coverage",
+      "territory": "bioma_cerrado"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "canopy_disturbance_frequency",
+      "territory": "bioma_cerrado"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "logging",
+      "territory": "bioma_cerrado"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_frequency",
+      "territory": "bioma_mata_atlantica"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "natural_coverage",
+      "territory": "bioma_mata_atlantica"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_natural_coverage",
+      "territory": "bioma_mata_atlantica"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_at_least_once",
+      "territory": "bioma_mata_atlantica"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "primary_natural_coverage",
+      "territory": "bioma_mata_atlantica"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_age",
+      "territory": "bioma_mata_atlantica"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_id",
+      "territory": "bioma_mata_atlantica"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size",
+      "territory": "bioma_mata_atlantica"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_fragments",
+      "territory": "bioma_mata_atlantica"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_massifs",
+      "territory": "bioma_mata_atlantica"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_area",
+      "territory": "bioma_mata_atlantica"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_age",
+      "territory": "bioma_mata_atlantica"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "landscape_morphology",
+      "territory": "bioma_mata_atlantica"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_age",
+      "territory": "bioma_mata_atlantica"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_coverage",
+      "territory": "bioma_mata_atlantica"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "canopy_disturbance_frequency",
+      "territory": "bioma_mata_atlantica"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "logging",
+      "territory": "bioma_mata_atlantica"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_frequency",
+      "territory": "bioma_pampa"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "natural_coverage",
+      "territory": "bioma_pampa"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_natural_coverage",
+      "territory": "bioma_pampa"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_at_least_once",
+      "territory": "bioma_pampa"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "primary_natural_coverage",
+      "territory": "bioma_pampa"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_age",
+      "territory": "bioma_pampa"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_id",
+      "territory": "bioma_pampa"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size",
+      "territory": "bioma_pampa"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_fragments",
+      "territory": "bioma_pampa"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_massifs",
+      "territory": "bioma_pampa"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_area",
+      "territory": "bioma_pampa"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_age",
+      "territory": "bioma_pampa"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "landscape_morphology",
+      "territory": "bioma_pampa"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_age",
+      "territory": "bioma_pampa"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_coverage",
+      "territory": "bioma_pampa"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "canopy_disturbance_frequency",
+      "territory": "bioma_pampa"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "logging",
+      "territory": "bioma_pampa"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_frequency",
+      "territory": "bioma_pantanal"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "natural_coverage",
+      "territory": "bioma_pantanal"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_natural_coverage",
+      "territory": "bioma_pantanal"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_at_least_once",
+      "territory": "bioma_pantanal"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "primary_natural_coverage",
+      "territory": "bioma_pantanal"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_age",
+      "territory": "bioma_pantanal"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_id",
+      "territory": "bioma_pantanal"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size",
+      "territory": "bioma_pantanal"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_fragments",
+      "territory": "bioma_pantanal"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_massifs",
+      "territory": "bioma_pantanal"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_area",
+      "territory": "bioma_pantanal"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_age",
+      "territory": "bioma_pantanal"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "landscape_morphology",
+      "territory": "bioma_pantanal"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_age",
+      "territory": "bioma_pantanal"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_coverage",
+      "territory": "bioma_pantanal"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "canopy_disturbance_frequency",
+      "territory": "bioma_pantanal"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "logging",
+      "territory": "bioma_pantanal"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_frequency",
+      "territory": "regiao_matopiba_cerrado"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "natural_coverage",
+      "territory": "regiao_matopiba_cerrado"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_natural_coverage",
+      "territory": "regiao_matopiba_cerrado"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_at_least_once",
+      "territory": "regiao_matopiba_cerrado"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "primary_natural_coverage",
+      "territory": "regiao_matopiba_cerrado"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_age",
+      "territory": "regiao_matopiba_cerrado"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_id",
+      "territory": "regiao_matopiba_cerrado"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size",
+      "territory": "regiao_matopiba_cerrado"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_fragments",
+      "territory": "regiao_matopiba_cerrado"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_massifs",
+      "territory": "regiao_matopiba_cerrado"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_area",
+      "territory": "regiao_matopiba_cerrado"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_age",
+      "territory": "regiao_matopiba_cerrado"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "landscape_morphology",
+      "territory": "regiao_matopiba_cerrado"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_age",
+      "territory": "regiao_matopiba_cerrado"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_coverage",
+      "territory": "regiao_matopiba_cerrado"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "canopy_disturbance_frequency",
+      "territory": "regiao_matopiba_cerrado"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "logging",
+      "territory": "regiao_matopiba_cerrado"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_frequency",
+      "territory": "regiao_matopiba"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "natural_coverage",
+      "territory": "regiao_matopiba"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_natural_coverage",
+      "territory": "regiao_matopiba"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_at_least_once",
+      "territory": "regiao_matopiba"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "primary_natural_coverage",
+      "territory": "regiao_matopiba"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_age",
+      "territory": "regiao_matopiba"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_id",
+      "territory": "regiao_matopiba"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size",
+      "territory": "regiao_matopiba"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_fragments",
+      "territory": "regiao_matopiba"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_massifs",
+      "territory": "regiao_matopiba"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_area",
+      "territory": "regiao_matopiba"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_age",
+      "territory": "regiao_matopiba"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "landscape_morphology",
+      "territory": "regiao_matopiba"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_age",
+      "territory": "regiao_matopiba"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_coverage",
+      "territory": "regiao_matopiba"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "canopy_disturbance_frequency",
+      "territory": "regiao_matopiba"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "logging",
+      "territory": "regiao_matopiba"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_frequency",
+      "territory": "regiao_centro_oeste"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "natural_coverage",
+      "territory": "regiao_centro_oeste"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_natural_coverage",
+      "territory": "regiao_centro_oeste"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_at_least_once",
+      "territory": "regiao_centro_oeste"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "primary_natural_coverage",
+      "territory": "regiao_centro_oeste"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_age",
+      "territory": "regiao_centro_oeste"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_id",
+      "territory": "regiao_centro_oeste"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size",
+      "territory": "regiao_centro_oeste"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_fragments",
+      "territory": "regiao_centro_oeste"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_massifs",
+      "territory": "regiao_centro_oeste"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_area",
+      "territory": "regiao_centro_oeste"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_age",
+      "territory": "regiao_centro_oeste"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "landscape_morphology",
+      "territory": "regiao_centro_oeste"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_age",
+      "territory": "regiao_centro_oeste"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_coverage",
+      "territory": "regiao_centro_oeste"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "canopy_disturbance_frequency",
+      "territory": "regiao_centro_oeste"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "logging",
+      "territory": "regiao_centro_oeste"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_frequency",
+      "territory": "regiao_nordeste"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "natural_coverage",
+      "territory": "regiao_nordeste"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_natural_coverage",
+      "territory": "regiao_nordeste"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_at_least_once",
+      "territory": "regiao_nordeste"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "primary_natural_coverage",
+      "territory": "regiao_nordeste"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_age",
+      "territory": "regiao_nordeste"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_id",
+      "territory": "regiao_nordeste"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size",
+      "territory": "regiao_nordeste"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_fragments",
+      "territory": "regiao_nordeste"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_massifs",
+      "territory": "regiao_nordeste"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_area",
+      "territory": "regiao_nordeste"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_age",
+      "territory": "regiao_nordeste"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "landscape_morphology",
+      "territory": "regiao_nordeste"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_age",
+      "territory": "regiao_nordeste"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_coverage",
+      "territory": "regiao_nordeste"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "canopy_disturbance_frequency",
+      "territory": "regiao_nordeste"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "logging",
+      "territory": "regiao_nordeste"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_frequency",
+      "territory": "regiao_norte"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "natural_coverage",
+      "territory": "regiao_norte"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_natural_coverage",
+      "territory": "regiao_norte"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_at_least_once",
+      "territory": "regiao_norte"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "primary_natural_coverage",
+      "territory": "regiao_norte"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_age",
+      "territory": "regiao_norte"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_id",
+      "territory": "regiao_norte"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size",
+      "territory": "regiao_norte"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_fragments",
+      "territory": "regiao_norte"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_massifs",
+      "territory": "regiao_norte"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_area",
+      "territory": "regiao_norte"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_age",
+      "territory": "regiao_norte"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "landscape_morphology",
+      "territory": "regiao_norte"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_age",
+      "territory": "regiao_norte"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_coverage",
+      "territory": "regiao_norte"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "canopy_disturbance_frequency",
+      "territory": "regiao_norte"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "logging",
+      "territory": "regiao_norte"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_frequency",
+      "territory": "regiao_sudeste"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "natural_coverage",
+      "territory": "regiao_sudeste"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_natural_coverage",
+      "territory": "regiao_sudeste"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_at_least_once",
+      "territory": "regiao_sudeste"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "primary_natural_coverage",
+      "territory": "regiao_sudeste"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_age",
+      "territory": "regiao_sudeste"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_id",
+      "territory": "regiao_sudeste"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size",
+      "territory": "regiao_sudeste"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_fragments",
+      "territory": "regiao_sudeste"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_massifs",
+      "territory": "regiao_sudeste"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_area",
+      "territory": "regiao_sudeste"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_age",
+      "territory": "regiao_sudeste"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "landscape_morphology",
+      "territory": "regiao_sudeste"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_age",
+      "territory": "regiao_sudeste"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_coverage",
+      "territory": "regiao_sudeste"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "canopy_disturbance_frequency",
+      "territory": "regiao_sudeste"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "logging",
+      "territory": "regiao_sudeste"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_frequency",
+      "territory": "regiao_sul"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "natural_coverage",
+      "territory": "regiao_sul"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_natural_coverage",
+      "territory": "regiao_sul"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_at_least_once",
+      "territory": "regiao_sul"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "primary_natural_coverage",
+      "territory": "regiao_sul"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_age",
+      "territory": "regiao_sul"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_id",
+      "territory": "regiao_sul"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size",
+      "territory": "regiao_sul"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_fragments",
+      "territory": "regiao_sul"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_massifs",
+      "territory": "regiao_sul"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_area",
+      "territory": "regiao_sul"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_age",
+      "territory": "regiao_sul"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "landscape_morphology",
+      "territory": "regiao_sul"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_age",
+      "territory": "regiao_sul"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_coverage",
+      "territory": "regiao_sul"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "canopy_disturbance_frequency",
+      "territory": "regiao_sul"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "logging",
+      "territory": "regiao_sul"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_frequency",
+      "territory": "regiao_bap"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "natural_coverage",
+      "territory": "regiao_bap"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_natural_coverage",
+      "territory": "regiao_bap"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_at_least_once",
+      "territory": "regiao_bap"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "primary_natural_coverage",
+      "territory": "regiao_bap"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_age",
+      "territory": "regiao_bap"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_id",
+      "territory": "regiao_bap"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size",
+      "territory": "regiao_bap"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_fragments",
+      "territory": "regiao_bap"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_massifs",
+      "territory": "regiao_bap"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_area",
+      "territory": "regiao_bap"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_age",
+      "territory": "regiao_bap"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "landscape_morphology",
+      "territory": "regiao_bap"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_age",
+      "territory": "regiao_bap"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_coverage",
+      "territory": "regiao_bap"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "canopy_disturbance_frequency",
+      "territory": "regiao_bap"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "logging",
+      "territory": "regiao_bap"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_frequency",
+      "territory": "regiao_bap_planalto"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "natural_coverage",
+      "territory": "regiao_bap_planalto"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_natural_coverage",
+      "territory": "regiao_bap_planalto"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_at_least_once",
+      "territory": "regiao_bap_planalto"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "primary_natural_coverage",
+      "territory": "regiao_bap_planalto"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_age",
+      "territory": "regiao_bap_planalto"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_id",
+      "territory": "regiao_bap_planalto"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size",
+      "territory": "regiao_bap_planalto"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_fragments",
+      "territory": "regiao_bap_planalto"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_massifs",
+      "territory": "regiao_bap_planalto"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_area",
+      "territory": "regiao_bap_planalto"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_age",
+      "territory": "regiao_bap_planalto"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "landscape_morphology",
+      "territory": "regiao_bap_planalto"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_age",
+      "territory": "regiao_bap_planalto"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_coverage",
+      "territory": "regiao_bap_planalto"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "canopy_disturbance_frequency",
+      "territory": "regiao_bap_planalto"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "logging",
+      "territory": "regiao_bap_planalto"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_frequency",
+      "territory": "uf_df"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "natural_coverage",
+      "territory": "uf_df"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_natural_coverage",
+      "territory": "uf_df"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_at_least_once",
+      "territory": "uf_df"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "primary_natural_coverage",
+      "territory": "uf_df"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_age",
+      "territory": "uf_df"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_id",
+      "territory": "uf_df"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size",
+      "territory": "uf_df"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_fragments",
+      "territory": "uf_df"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_massifs",
+      "territory": "uf_df"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_area",
+      "territory": "uf_df"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_age",
+      "territory": "uf_df"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "landscape_morphology",
+      "territory": "uf_df"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_age",
+      "territory": "uf_df"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_coverage",
+      "territory": "uf_df"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "canopy_disturbance_frequency",
+      "territory": "uf_df"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "logging",
+      "territory": "uf_df"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_frequency",
+      "territory": "uf_acre"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "natural_coverage",
+      "territory": "uf_acre"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_natural_coverage",
+      "territory": "uf_acre"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_at_least_once",
+      "territory": "uf_acre"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "primary_natural_coverage",
+      "territory": "uf_acre"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_age",
+      "territory": "uf_acre"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_id",
+      "territory": "uf_acre"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size",
+      "territory": "uf_acre"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_fragments",
+      "territory": "uf_acre"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_massifs",
+      "territory": "uf_acre"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_area",
+      "territory": "uf_acre"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_age",
+      "territory": "uf_acre"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "landscape_morphology",
+      "territory": "uf_acre"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_age",
+      "territory": "uf_acre"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_coverage",
+      "territory": "uf_acre"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "canopy_disturbance_frequency",
+      "territory": "uf_acre"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "logging",
+      "territory": "uf_acre"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_frequency",
+      "territory": "uf_alagoas"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "natural_coverage",
+      "territory": "uf_alagoas"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_natural_coverage",
+      "territory": "uf_alagoas"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_at_least_once",
+      "territory": "uf_alagoas"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "primary_natural_coverage",
+      "territory": "uf_alagoas"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_age",
+      "territory": "uf_alagoas"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_id",
+      "territory": "uf_alagoas"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size",
+      "territory": "uf_alagoas"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_fragments",
+      "territory": "uf_alagoas"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_massifs",
+      "territory": "uf_alagoas"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_area",
+      "territory": "uf_alagoas"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_age",
+      "territory": "uf_alagoas"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "landscape_morphology",
+      "territory": "uf_alagoas"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_age",
+      "territory": "uf_alagoas"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_coverage",
+      "territory": "uf_alagoas"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "canopy_disturbance_frequency",
+      "territory": "uf_alagoas"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "logging",
+      "territory": "uf_alagoas"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_frequency",
+      "territory": "uf_amapa"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "natural_coverage",
+      "territory": "uf_amapa"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_natural_coverage",
+      "territory": "uf_amapa"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_at_least_once",
+      "territory": "uf_amapa"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "primary_natural_coverage",
+      "territory": "uf_amapa"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_age",
+      "territory": "uf_amapa"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_id",
+      "territory": "uf_amapa"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size",
+      "territory": "uf_amapa"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_fragments",
+      "territory": "uf_amapa"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_massifs",
+      "territory": "uf_amapa"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_area",
+      "territory": "uf_amapa"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_age",
+      "territory": "uf_amapa"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "landscape_morphology",
+      "territory": "uf_amapa"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_age",
+      "territory": "uf_amapa"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_coverage",
+      "territory": "uf_amapa"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "canopy_disturbance_frequency",
+      "territory": "uf_amapa"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "logging",
+      "territory": "uf_amapa"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_frequency",
+      "territory": "uf_amazonas"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "natural_coverage",
+      "territory": "uf_amazonas"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_natural_coverage",
+      "territory": "uf_amazonas"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_at_least_once",
+      "territory": "uf_amazonas"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "primary_natural_coverage",
+      "territory": "uf_amazonas"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_age",
+      "territory": "uf_amazonas"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_id",
+      "territory": "uf_amazonas"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size",
+      "territory": "uf_amazonas"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_fragments",
+      "territory": "uf_amazonas"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_massifs",
+      "territory": "uf_amazonas"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_area",
+      "territory": "uf_amazonas"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_age",
+      "territory": "uf_amazonas"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "landscape_morphology",
+      "territory": "uf_amazonas"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_age",
+      "territory": "uf_amazonas"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_coverage",
+      "territory": "uf_amazonas"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "canopy_disturbance_frequency",
+      "territory": "uf_amazonas"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "logging",
+      "territory": "uf_amazonas"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_frequency",
+      "territory": "uf_bahia"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "natural_coverage",
+      "territory": "uf_bahia"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_natural_coverage",
+      "territory": "uf_bahia"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_at_least_once",
+      "territory": "uf_bahia"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "primary_natural_coverage",
+      "territory": "uf_bahia"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_age",
+      "territory": "uf_bahia"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_id",
+      "territory": "uf_bahia"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size",
+      "territory": "uf_bahia"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_fragments",
+      "territory": "uf_bahia"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_massifs",
+      "territory": "uf_bahia"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_area",
+      "territory": "uf_bahia"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_age",
+      "territory": "uf_bahia"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "landscape_morphology",
+      "territory": "uf_bahia"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_age",
+      "territory": "uf_bahia"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_coverage",
+      "territory": "uf_bahia"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "canopy_disturbance_frequency",
+      "territory": "uf_bahia"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "logging",
+      "territory": "uf_bahia"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_frequency",
+      "territory": "uf_ceara"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "natural_coverage",
+      "territory": "uf_ceara"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_natural_coverage",
+      "territory": "uf_ceara"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_at_least_once",
+      "territory": "uf_ceara"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "primary_natural_coverage",
+      "territory": "uf_ceara"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_age",
+      "territory": "uf_ceara"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_id",
+      "territory": "uf_ceara"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size",
+      "territory": "uf_ceara"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_fragments",
+      "territory": "uf_ceara"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_massifs",
+      "territory": "uf_ceara"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_area",
+      "territory": "uf_ceara"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_age",
+      "territory": "uf_ceara"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "landscape_morphology",
+      "territory": "uf_ceara"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_age",
+      "territory": "uf_ceara"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_coverage",
+      "territory": "uf_ceara"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "canopy_disturbance_frequency",
+      "territory": "uf_ceara"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "logging",
+      "territory": "uf_ceara"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_frequency",
+      "territory": "uf_espirito_santo"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "natural_coverage",
+      "territory": "uf_espirito_santo"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_natural_coverage",
+      "territory": "uf_espirito_santo"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_at_least_once",
+      "territory": "uf_espirito_santo"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "primary_natural_coverage",
+      "territory": "uf_espirito_santo"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_age",
+      "territory": "uf_espirito_santo"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_id",
+      "territory": "uf_espirito_santo"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size",
+      "territory": "uf_espirito_santo"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_fragments",
+      "territory": "uf_espirito_santo"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_massifs",
+      "territory": "uf_espirito_santo"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_area",
+      "territory": "uf_espirito_santo"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_age",
+      "territory": "uf_espirito_santo"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "landscape_morphology",
+      "territory": "uf_espirito_santo"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_age",
+      "territory": "uf_espirito_santo"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_coverage",
+      "territory": "uf_espirito_santo"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "canopy_disturbance_frequency",
+      "territory": "uf_espirito_santo"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "logging",
+      "territory": "uf_espirito_santo"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_frequency",
+      "territory": "uf_goias"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "natural_coverage",
+      "territory": "uf_goias"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_natural_coverage",
+      "territory": "uf_goias"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_at_least_once",
+      "territory": "uf_goias"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "primary_natural_coverage",
+      "territory": "uf_goias"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_age",
+      "territory": "uf_goias"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_id",
+      "territory": "uf_goias"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size",
+      "territory": "uf_goias"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_fragments",
+      "territory": "uf_goias"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_massifs",
+      "territory": "uf_goias"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_area",
+      "territory": "uf_goias"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_age",
+      "territory": "uf_goias"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "landscape_morphology",
+      "territory": "uf_goias"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_age",
+      "territory": "uf_goias"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_coverage",
+      "territory": "uf_goias"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "canopy_disturbance_frequency",
+      "territory": "uf_goias"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "logging",
+      "territory": "uf_goias"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_frequency",
+      "territory": "uf_maranhao"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "natural_coverage",
+      "territory": "uf_maranhao"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_natural_coverage",
+      "territory": "uf_maranhao"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_at_least_once",
+      "territory": "uf_maranhao"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "primary_natural_coverage",
+      "territory": "uf_maranhao"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_age",
+      "territory": "uf_maranhao"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_id",
+      "territory": "uf_maranhao"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size",
+      "territory": "uf_maranhao"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_fragments",
+      "territory": "uf_maranhao"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_massifs",
+      "territory": "uf_maranhao"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_area",
+      "territory": "uf_maranhao"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_age",
+      "territory": "uf_maranhao"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "landscape_morphology",
+      "territory": "uf_maranhao"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_age",
+      "territory": "uf_maranhao"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_coverage",
+      "territory": "uf_maranhao"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "canopy_disturbance_frequency",
+      "territory": "uf_maranhao"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "logging",
+      "territory": "uf_maranhao"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_frequency",
+      "territory": "uf_mato_grosso"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "natural_coverage",
+      "territory": "uf_mato_grosso"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_natural_coverage",
+      "territory": "uf_mato_grosso"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_at_least_once",
+      "territory": "uf_mato_grosso"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "primary_natural_coverage",
+      "territory": "uf_mato_grosso"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_age",
+      "territory": "uf_mato_grosso"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_id",
+      "territory": "uf_mato_grosso"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size",
+      "territory": "uf_mato_grosso"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_fragments",
+      "territory": "uf_mato_grosso"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_massifs",
+      "territory": "uf_mato_grosso"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_area",
+      "territory": "uf_mato_grosso"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_age",
+      "territory": "uf_mato_grosso"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "landscape_morphology",
+      "territory": "uf_mato_grosso"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_age",
+      "territory": "uf_mato_grosso"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_coverage",
+      "territory": "uf_mato_grosso"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "canopy_disturbance_frequency",
+      "territory": "uf_mato_grosso"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "logging",
+      "territory": "uf_mato_grosso"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_frequency",
+      "territory": "uf_mato_grosso_do_sul"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "natural_coverage",
+      "territory": "uf_mato_grosso_do_sul"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_natural_coverage",
+      "territory": "uf_mato_grosso_do_sul"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_at_least_once",
+      "territory": "uf_mato_grosso_do_sul"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "primary_natural_coverage",
+      "territory": "uf_mato_grosso_do_sul"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_age",
+      "territory": "uf_mato_grosso_do_sul"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_id",
+      "territory": "uf_mato_grosso_do_sul"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size",
+      "territory": "uf_mato_grosso_do_sul"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_fragments",
+      "territory": "uf_mato_grosso_do_sul"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_massifs",
+      "territory": "uf_mato_grosso_do_sul"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_area",
+      "territory": "uf_mato_grosso_do_sul"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_age",
+      "territory": "uf_mato_grosso_do_sul"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "landscape_morphology",
+      "territory": "uf_mato_grosso_do_sul"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_age",
+      "territory": "uf_mato_grosso_do_sul"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_coverage",
+      "territory": "uf_mato_grosso_do_sul"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "canopy_disturbance_frequency",
+      "territory": "uf_mato_grosso_do_sul"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "logging",
+      "territory": "uf_mato_grosso_do_sul"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_frequency",
+      "territory": "uf_minas_gerais"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "natural_coverage",
+      "territory": "uf_minas_gerais"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_natural_coverage",
+      "territory": "uf_minas_gerais"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_at_least_once",
+      "territory": "uf_minas_gerais"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "primary_natural_coverage",
+      "territory": "uf_minas_gerais"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_age",
+      "territory": "uf_minas_gerais"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_id",
+      "territory": "uf_minas_gerais"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size",
+      "territory": "uf_minas_gerais"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_fragments",
+      "territory": "uf_minas_gerais"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_massifs",
+      "territory": "uf_minas_gerais"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_area",
+      "territory": "uf_minas_gerais"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_age",
+      "territory": "uf_minas_gerais"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "landscape_morphology",
+      "territory": "uf_minas_gerais"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_age",
+      "territory": "uf_minas_gerais"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_coverage",
+      "territory": "uf_minas_gerais"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "canopy_disturbance_frequency",
+      "territory": "uf_minas_gerais"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "logging",
+      "territory": "uf_minas_gerais"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_frequency",
+      "territory": "uf_para"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "natural_coverage",
+      "territory": "uf_para"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_natural_coverage",
+      "territory": "uf_para"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_at_least_once",
+      "territory": "uf_para"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "primary_natural_coverage",
+      "territory": "uf_para"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_age",
+      "territory": "uf_para"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_id",
+      "territory": "uf_para"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size",
+      "territory": "uf_para"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_fragments",
+      "territory": "uf_para"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_massifs",
+      "territory": "uf_para"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_area",
+      "territory": "uf_para"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_age",
+      "territory": "uf_para"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "landscape_morphology",
+      "territory": "uf_para"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_age",
+      "territory": "uf_para"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_coverage",
+      "territory": "uf_para"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "canopy_disturbance_frequency",
+      "territory": "uf_para"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "logging",
+      "territory": "uf_para"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_frequency",
+      "territory": "uf_paraiba"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "natural_coverage",
+      "territory": "uf_paraiba"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_natural_coverage",
+      "territory": "uf_paraiba"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_at_least_once",
+      "territory": "uf_paraiba"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "primary_natural_coverage",
+      "territory": "uf_paraiba"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_age",
+      "territory": "uf_paraiba"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_id",
+      "territory": "uf_paraiba"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size",
+      "territory": "uf_paraiba"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_fragments",
+      "territory": "uf_paraiba"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_massifs",
+      "territory": "uf_paraiba"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_area",
+      "territory": "uf_paraiba"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_age",
+      "territory": "uf_paraiba"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "landscape_morphology",
+      "territory": "uf_paraiba"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_age",
+      "territory": "uf_paraiba"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_coverage",
+      "territory": "uf_paraiba"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "canopy_disturbance_frequency",
+      "territory": "uf_paraiba"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "logging",
+      "territory": "uf_paraiba"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_frequency",
+      "territory": "uf_parana"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "natural_coverage",
+      "territory": "uf_parana"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_natural_coverage",
+      "territory": "uf_parana"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_at_least_once",
+      "territory": "uf_parana"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "primary_natural_coverage",
+      "territory": "uf_parana"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_age",
+      "territory": "uf_parana"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_id",
+      "territory": "uf_parana"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size",
+      "territory": "uf_parana"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_fragments",
+      "territory": "uf_parana"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_massifs",
+      "territory": "uf_parana"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_area",
+      "territory": "uf_parana"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_age",
+      "territory": "uf_parana"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "landscape_morphology",
+      "territory": "uf_parana"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_age",
+      "territory": "uf_parana"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_coverage",
+      "territory": "uf_parana"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "canopy_disturbance_frequency",
+      "territory": "uf_parana"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "logging",
+      "territory": "uf_parana"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_frequency",
+      "territory": "uf_pernambuco"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "natural_coverage",
+      "territory": "uf_pernambuco"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_natural_coverage",
+      "territory": "uf_pernambuco"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_at_least_once",
+      "territory": "uf_pernambuco"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "primary_natural_coverage",
+      "territory": "uf_pernambuco"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_age",
+      "territory": "uf_pernambuco"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_id",
+      "territory": "uf_pernambuco"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size",
+      "territory": "uf_pernambuco"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_fragments",
+      "territory": "uf_pernambuco"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_massifs",
+      "territory": "uf_pernambuco"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_area",
+      "territory": "uf_pernambuco"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_age",
+      "territory": "uf_pernambuco"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "landscape_morphology",
+      "territory": "uf_pernambuco"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_age",
+      "territory": "uf_pernambuco"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_coverage",
+      "territory": "uf_pernambuco"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "canopy_disturbance_frequency",
+      "territory": "uf_pernambuco"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "logging",
+      "territory": "uf_pernambuco"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_frequency",
+      "territory": "uf_piaui"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "natural_coverage",
+      "territory": "uf_piaui"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_natural_coverage",
+      "territory": "uf_piaui"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_at_least_once",
+      "territory": "uf_piaui"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "primary_natural_coverage",
+      "territory": "uf_piaui"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_age",
+      "territory": "uf_piaui"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_id",
+      "territory": "uf_piaui"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size",
+      "territory": "uf_piaui"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_fragments",
+      "territory": "uf_piaui"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_massifs",
+      "territory": "uf_piaui"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_area",
+      "territory": "uf_piaui"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_age",
+      "territory": "uf_piaui"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "landscape_morphology",
+      "territory": "uf_piaui"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_age",
+      "territory": "uf_piaui"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_coverage",
+      "territory": "uf_piaui"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "canopy_disturbance_frequency",
+      "territory": "uf_piaui"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "logging",
+      "territory": "uf_piaui"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_frequency",
+      "territory": "uf_rio_de_janeiro"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "natural_coverage",
+      "territory": "uf_rio_de_janeiro"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_natural_coverage",
+      "territory": "uf_rio_de_janeiro"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_at_least_once",
+      "territory": "uf_rio_de_janeiro"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "primary_natural_coverage",
+      "territory": "uf_rio_de_janeiro"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_age",
+      "territory": "uf_rio_de_janeiro"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_id",
+      "territory": "uf_rio_de_janeiro"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size",
+      "territory": "uf_rio_de_janeiro"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_fragments",
+      "territory": "uf_rio_de_janeiro"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_massifs",
+      "territory": "uf_rio_de_janeiro"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_area",
+      "territory": "uf_rio_de_janeiro"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_age",
+      "territory": "uf_rio_de_janeiro"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "landscape_morphology",
+      "territory": "uf_rio_de_janeiro"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_age",
+      "territory": "uf_rio_de_janeiro"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_coverage",
+      "territory": "uf_rio_de_janeiro"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "canopy_disturbance_frequency",
+      "territory": "uf_rio_de_janeiro"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "logging",
+      "territory": "uf_rio_de_janeiro"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_frequency",
+      "territory": "uf_rio_grande_do_norte"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "natural_coverage",
+      "territory": "uf_rio_grande_do_norte"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_natural_coverage",
+      "territory": "uf_rio_grande_do_norte"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_at_least_once",
+      "territory": "uf_rio_grande_do_norte"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "primary_natural_coverage",
+      "territory": "uf_rio_grande_do_norte"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_age",
+      "territory": "uf_rio_grande_do_norte"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_id",
+      "territory": "uf_rio_grande_do_norte"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size",
+      "territory": "uf_rio_grande_do_norte"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_fragments",
+      "territory": "uf_rio_grande_do_norte"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_massifs",
+      "territory": "uf_rio_grande_do_norte"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_area",
+      "territory": "uf_rio_grande_do_norte"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_age",
+      "territory": "uf_rio_grande_do_norte"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "landscape_morphology",
+      "territory": "uf_rio_grande_do_norte"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_age",
+      "territory": "uf_rio_grande_do_norte"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_coverage",
+      "territory": "uf_rio_grande_do_norte"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "canopy_disturbance_frequency",
+      "territory": "uf_rio_grande_do_norte"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "logging",
+      "territory": "uf_rio_grande_do_norte"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_frequency",
+      "territory": "uf_rio_grande_do_sul"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "natural_coverage",
+      "territory": "uf_rio_grande_do_sul"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_natural_coverage",
+      "territory": "uf_rio_grande_do_sul"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_at_least_once",
+      "territory": "uf_rio_grande_do_sul"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "primary_natural_coverage",
+      "territory": "uf_rio_grande_do_sul"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_age",
+      "territory": "uf_rio_grande_do_sul"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_id",
+      "territory": "uf_rio_grande_do_sul"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size",
+      "territory": "uf_rio_grande_do_sul"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_fragments",
+      "territory": "uf_rio_grande_do_sul"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_massifs",
+      "territory": "uf_rio_grande_do_sul"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_area",
+      "territory": "uf_rio_grande_do_sul"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_age",
+      "territory": "uf_rio_grande_do_sul"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "landscape_morphology",
+      "territory": "uf_rio_grande_do_sul"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_age",
+      "territory": "uf_rio_grande_do_sul"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_coverage",
+      "territory": "uf_rio_grande_do_sul"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "canopy_disturbance_frequency",
+      "territory": "uf_rio_grande_do_sul"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "logging",
+      "territory": "uf_rio_grande_do_sul"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_frequency",
+      "territory": "uf_rondonia"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "natural_coverage",
+      "territory": "uf_rondonia"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_natural_coverage",
+      "territory": "uf_rondonia"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_at_least_once",
+      "territory": "uf_rondonia"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "primary_natural_coverage",
+      "territory": "uf_rondonia"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_age",
+      "territory": "uf_rondonia"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_id",
+      "territory": "uf_rondonia"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size",
+      "territory": "uf_rondonia"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_fragments",
+      "territory": "uf_rondonia"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_massifs",
+      "territory": "uf_rondonia"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_area",
+      "territory": "uf_rondonia"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_age",
+      "territory": "uf_rondonia"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "landscape_morphology",
+      "territory": "uf_rondonia"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_age",
+      "territory": "uf_rondonia"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_coverage",
+      "territory": "uf_rondonia"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "canopy_disturbance_frequency",
+      "territory": "uf_rondonia"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "logging",
+      "territory": "uf_rondonia"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_frequency",
+      "territory": "uf_roraima"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "natural_coverage",
+      "territory": "uf_roraima"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_natural_coverage",
+      "territory": "uf_roraima"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_at_least_once",
+      "territory": "uf_roraima"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "primary_natural_coverage",
+      "territory": "uf_roraima"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_age",
+      "territory": "uf_roraima"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_id",
+      "territory": "uf_roraima"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size",
+      "territory": "uf_roraima"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_fragments",
+      "territory": "uf_roraima"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_massifs",
+      "territory": "uf_roraima"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_area",
+      "territory": "uf_roraima"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_age",
+      "territory": "uf_roraima"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "landscape_morphology",
+      "territory": "uf_roraima"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_age",
+      "territory": "uf_roraima"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_coverage",
+      "territory": "uf_roraima"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "canopy_disturbance_frequency",
+      "territory": "uf_roraima"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "logging",
+      "territory": "uf_roraima"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_frequency",
+      "territory": "uf_santa_catarina"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "natural_coverage",
+      "territory": "uf_santa_catarina"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_natural_coverage",
+      "territory": "uf_santa_catarina"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_at_least_once",
+      "territory": "uf_santa_catarina"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "primary_natural_coverage",
+      "territory": "uf_santa_catarina"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_age",
+      "territory": "uf_santa_catarina"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_id",
+      "territory": "uf_santa_catarina"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size",
+      "territory": "uf_santa_catarina"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_fragments",
+      "territory": "uf_santa_catarina"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_massifs",
+      "territory": "uf_santa_catarina"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_area",
+      "territory": "uf_santa_catarina"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_age",
+      "territory": "uf_santa_catarina"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "landscape_morphology",
+      "territory": "uf_santa_catarina"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_age",
+      "territory": "uf_santa_catarina"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_coverage",
+      "territory": "uf_santa_catarina"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "canopy_disturbance_frequency",
+      "territory": "uf_santa_catarina"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "logging",
+      "territory": "uf_santa_catarina"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_frequency",
+      "territory": "uf_sao_paulo"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "natural_coverage",
+      "territory": "uf_sao_paulo"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_natural_coverage",
+      "territory": "uf_sao_paulo"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_at_least_once",
+      "territory": "uf_sao_paulo"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "primary_natural_coverage",
+      "territory": "uf_sao_paulo"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_age",
+      "territory": "uf_sao_paulo"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_id",
+      "territory": "uf_sao_paulo"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size",
+      "territory": "uf_sao_paulo"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_fragments",
+      "territory": "uf_sao_paulo"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_massifs",
+      "territory": "uf_sao_paulo"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_area",
+      "territory": "uf_sao_paulo"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_age",
+      "territory": "uf_sao_paulo"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "landscape_morphology",
+      "territory": "uf_sao_paulo"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_age",
+      "territory": "uf_sao_paulo"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_coverage",
+      "territory": "uf_sao_paulo"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "canopy_disturbance_frequency",
+      "territory": "uf_sao_paulo"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "logging",
+      "territory": "uf_sao_paulo"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_frequency",
+      "territory": "uf_sergipe"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "natural_coverage",
+      "territory": "uf_sergipe"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_natural_coverage",
+      "territory": "uf_sergipe"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_at_least_once",
+      "territory": "uf_sergipe"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "primary_natural_coverage",
+      "territory": "uf_sergipe"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_age",
+      "territory": "uf_sergipe"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_id",
+      "territory": "uf_sergipe"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size",
+      "territory": "uf_sergipe"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_fragments",
+      "territory": "uf_sergipe"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_massifs",
+      "territory": "uf_sergipe"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_area",
+      "territory": "uf_sergipe"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_age",
+      "territory": "uf_sergipe"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "landscape_morphology",
+      "territory": "uf_sergipe"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_age",
+      "territory": "uf_sergipe"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_coverage",
+      "territory": "uf_sergipe"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "canopy_disturbance_frequency",
+      "territory": "uf_sergipe"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "logging",
+      "territory": "uf_sergipe"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_frequency",
+      "territory": "uf_tocantins"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "natural_coverage",
+      "territory": "uf_tocantins"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_natural_coverage",
+      "territory": "uf_tocantins"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_at_least_once",
+      "territory": "uf_tocantins"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "primary_natural_coverage",
+      "territory": "uf_tocantins"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_age",
+      "territory": "uf_tocantins"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_id",
+      "territory": "uf_tocantins"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size",
+      "territory": "uf_tocantins"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_fragments",
+      "territory": "uf_tocantins"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_massifs",
+      "territory": "uf_tocantins"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_area",
+      "territory": "uf_tocantins"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_age",
+      "territory": "uf_tocantins"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "landscape_morphology",
+      "territory": "uf_tocantins"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_age",
+      "territory": "uf_tocantins"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_coverage",
+      "territory": "uf_tocantins"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "canopy_disturbance_frequency",
+      "territory": "uf_tocantins"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "logging",
+      "territory": "uf_tocantins"
+    }
+  ]
+}

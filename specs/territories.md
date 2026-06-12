@@ -66,7 +66,7 @@ custom_regions/    (7)  ── Regiões customizadas
 
 ## TerritoryManager
 
-Classe em `src/ipam_gif_factory/core/territory_manager.py`.
+Classe em `src/mapbiomas_data/core/territory_manager.py`.
 
 Métodos principais:
 - `get_territory(id)` — Retorna metadados do território
@@ -82,3 +82,4 @@ O TerritoryManager usa `ee_utils.parse_filter_expression()` para converter strin
 2. O overlay é desenhado como **borda** nos frames
 3. Os bounds do território definem a **escala** e **seta norte**
 4. O nome aparece nos **títulos** dos frames e collages
+

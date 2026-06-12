@@ -25,25 +25,25 @@ if not os.path.exists(os.path.join(cwd, 'src')):
 
 sys.path.insert(0, os.getcwd())
 
-from src.ipam_gif_factory.config import ConfigLoader
-from src.ipam_gif_factory.core.pipeline import Pipeline
+from src.mapbiomas_data.config import ConfigLoader
+from src.mapbiomas_data.core.pipeline import Pipeline
 
 DATASET_ID = "brasil_fire_col5"
 PRODUCT_ID = "time_after_fire"
 
 TERRITORIES = [
-    "brasil",
-    "acre", "alagoas", "amapa", "amazonas", "bahia", "ceara",
-    "espirito_santo", "goias", "maranhao", "mato_grosso", "mato_grosso_do_sul",
-    "minas_gerais", "para", "paraiba", "parana", "pernambuco", "piaui",
-    "rio_de_janeiro", "rio_grande_do_norte", "rio_grande_do_sul",
-    "rondonia", "roraima", "santa_catarina", "sao_paulo", "sergipe", "tocantins",
-    "df",
-    "amazonia", "caatinga", "cerrado", "mata_atlantica", "pampa", "pantanal",
-    "biomas",
-    "bap", "bap_planalto",
-    "matopiba", "matopiba_cerrado",
-    "centro_oeste", "nordeste", "norte", "sudeste", "sul",
+    "pais_brasil",
+    "uf_acre", "uf_alagoas", "uf_amapa", "uf_amazonas", "uf_bahia", "uf_ceara",
+    "uf_espirito_santo", "uf_goias", "uf_maranhao", "uf_mato_grosso", "uf_mato_grosso_do_sul",
+    "uf_minas_gerais", "uf_para", "uf_paraiba", "uf_parana", "uf_pernambuco", "uf_piaui",
+    "uf_rio_de_janeiro", "uf_rio_grande_do_norte", "uf_rio_grande_do_sul",
+    "uf_rondonia", "uf_roraima", "uf_santa_catarina", "uf_sao_paulo", "uf_sergipe", "uf_tocantins",
+    "uf_df",
+    "bioma_amazonia", "bioma_caatinga", "bioma_cerrado", "bioma_mata_atlantica", "bioma_pampa", "bioma_pantanal",
+    "biomas_todos",
+    "regiao_bap", "regiao_bap_planalto",
+    "regiao_matopiba", "regiao_matopiba_cerrado",
+    "regiao_centro_oeste", "regiao_nordeste", "regiao_norte", "regiao_sudeste", "regiao_sul",
 ]
 
 print_lock = threading.Lock()

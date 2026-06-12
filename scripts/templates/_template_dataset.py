@@ -86,7 +86,7 @@ Edite config/visualization.yaml:
 ADICIONANDO EE PROCESSOR:
 ==========================
 
-Edite src/ipam_gif_factory/core/ee_transforms.py:
+Edite src/mapbiomas_data/core/ee_transforms.py:
 
   def meu_processor():
       asset = "projects/..."

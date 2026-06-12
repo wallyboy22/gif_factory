@@ -1,8 +1,8 @@
 import sys
 sys.path.insert(0, "src")
 
-from ipam_gif_factory.config import ConfigLoader
-from ipam_gif_factory.core.pipeline import Pipeline
+from mapbiomas_data.config import ConfigLoader
+from mapbiomas_data.core.pipeline import Pipeline
 
 config = ConfigLoader().load_all()
 pipeline = Pipeline(config)

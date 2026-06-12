@@ -25,8 +25,6 @@ from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
 
-import yaml
-
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 warnings.filterwarnings("ignore", message="Your application has authenticated using end user credentials")
 
@@ -46,15 +44,17 @@ _viz_config = None
 def _load_datasets():
     global _datasets_config
     if _datasets_config is None:
-        with open("config/datasets.yaml", encoding="utf-8") as f:
-            _datasets_config = yaml.safe_load(f).get("datasets", {})
+        from mapbiomas_data.config import ConfigLoader
+        loader = ConfigLoader()
+        loader.load_all()
+        _datasets_config = loader.datasets
     return _datasets_config
 
 
 def _load_territories():
     global _territories_config
     if _territories_config is None:
-        from ipam_gif_factory.config import ConfigLoader
+        from mapbiomas_data.config import ConfigLoader
         loader = ConfigLoader()
         loader.load_all()
         _territories_config = loader.territories
@@ -64,7 +64,7 @@ def _load_territories():
 def _load_visualizations():
     global _viz_config
     if _viz_config is None:
-        from ipam_gif_factory.config import ConfigLoader
+        from mapbiomas_data.config import ConfigLoader
         loader = ConfigLoader()
         loader.load_all()
         _viz_config = loader.visualizations

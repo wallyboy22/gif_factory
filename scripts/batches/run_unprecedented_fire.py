@@ -33,23 +33,23 @@ DATASET_ID = "brasil_fire_col5"
 PRODUCT = "unprecedented_fire"
 
 TERRITORIES = [
-    "brasil",
-    "biomas",
-    "amazonia",
-    "caatinga",
-    "cerrado",
-    "mata_atlantica",
-    "pampa",
-    "pantanal",
-    "matopiba_cerrado",
-    "matopiba",
-    "centro_oeste",
-    "nordeste",
-    "norte",
-    "sudeste",
-    "sul",
-    "bap",
-    "bap_planalto",
+    "pais_brasil",
+    "biomas_todos",
+    "bioma_amazonia",
+    "bioma_caatinga",
+    "bioma_cerrado",
+    "bioma_mata_atlantica",
+    "bioma_pampa",
+    "bioma_pantanal",
+    "regiao_matopiba_cerrado",
+    "regiao_matopiba",
+    "regiao_centro_oeste",
+    "regiao_nordeste",
+    "regiao_norte",
+    "regiao_sudeste",
+    "regiao_sul",
+    "regiao_bap",
+    "regiao_bap_planalto",
 ]
 
 CREATE_COLLAGE = True
@@ -69,7 +69,7 @@ def detect_workers():
 def process_one(config, territory, resume, upload, font_scale=1.0):
     from pathlib import Path
     from scripts.upload_to_gcs import upload_combo
-    from src.ipam_gif_factory.core.pipeline import Pipeline
+    from src.mapbiomas_data.core.pipeline import Pipeline
 
     pipeline = Pipeline(config)
 
@@ -109,7 +109,7 @@ def process_one(config, territory, resume, upload, font_scale=1.0):
 
 
 def main():
-    from src.ipam_gif_factory.config import ConfigLoader
+    from src.mapbiomas_data.config import ConfigLoader
 
     parser = argparse.ArgumentParser(
         description="Batch unprecedented_fire — 17 territórios"

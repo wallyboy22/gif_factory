@@ -1,9 +1,0 @@
-# Hub de territórios — carrega arquivos individuais por tipo
-# Para adicionar um novo território, edite o arquivo correspondente
-# ou crie um novo arquivo e adicione o include aqui.
-includes:
-  - territories_countries.yaml
-  - territories_biomes.yaml
-  - territories_states.yaml
-  - territories_custom.yaml
-  - territories_paraguay.yaml

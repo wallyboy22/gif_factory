@@ -4,7 +4,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 import pytest
-from ipam_gif_factory.interfaces.cli import CLI
+from mapbiomas_data.interfaces.cli import CLI
 
 
 @pytest.fixture
@@ -38,9 +38,9 @@ class TestCLI:
         cli.run(["--list-territories"])
         captured = capsys.readouterr()
         assert "Distrito Federal" in captured.out
-        assert "df" in captured.out
+        assert "uf_df" in captured.out
 
-    def test_list_territories_states(self, cli, capsys):
+    def test_list_territories_ufs(self, cli, capsys):
         cli.run(["--list-territories", "states"])
         captured = capsys.readouterr()
         assert "Distrito Federal" in captured.out

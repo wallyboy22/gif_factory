@@ -1,0 +1,89 @@
+{
+  "items": [
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_frequency",
+      "territory": "pais_brasil"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "natural_coverage",
+      "territory": "pais_brasil"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_natural_coverage",
+      "territory": "pais_brasil"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "burned_at_least_once",
+      "territory": "pais_brasil"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "primary_natural_coverage",
+      "territory": "pais_brasil"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "fire_age",
+      "territory": "pais_brasil"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_id",
+      "territory": "pais_brasil"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size",
+      "territory": "pais_brasil"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_fragments",
+      "territory": "pais_brasil"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "patch_size_massifs",
+      "territory": "pais_brasil"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_area",
+      "territory": "pais_brasil"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "edge_age",
+      "territory": "pais_brasil"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "landscape_morphology",
+      "territory": "pais_brasil"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_age",
+      "territory": "pais_brasil"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "secondary_vegetation_coverage",
+      "territory": "pais_brasil"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "canopy_disturbance_frequency",
+      "territory": "pais_brasil"
+    },
+    {
+      "dataset": "brasil_degradation_col10_1",
+      "product": "logging",
+      "territory": "pais_brasil"
+    }
+  ]
+}

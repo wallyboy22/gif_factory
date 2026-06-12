@@ -35,14 +35,14 @@ Arquivo JSON com array de objetos, cada um com 3 campos:
 ### Via CLI (PowerShell)
 
 ```powershell
-python -m src.ipam_gif_factory.interfaces.cli --generate --batch config/batches/v001.json --workers 6 --resume
+python -m src.mapbiomas_data.interfaces.cli --generate --batch config/batches/v001.json --workers 6 --resume
 ```
 
 ### Via Python script
 
 ```python
-from src.ipam_gif_factory.core.pipeline import Pipeline
-from src.ipam_gif_factory.config import ConfigLoader
+from src.mapbiomas_data.core.pipeline import Pipeline
+from src.mapbiomas_data.config import ConfigLoader
 from concurrent.futures import ThreadPoolExecutor
 
 config = ConfigLoader()
@@ -124,3 +124,4 @@ print(f"Total: {len(batch)} combinações")
 - Com 6 workers: ~150 combos ≈ 30-60 minutos
 - Tamanho por GIF: ~2-10 MB
 - Armazenamento: ~150 combos × ~5 MB ≈ 750 MB
+

@@ -73,21 +73,21 @@ PRODUCTS = [
 ]
 
 STAGES = [
-    {"name": "Brasil",               "territories": ["brasil"]},
-    {"name": "Biomas (agregado)",    "territories": ["biomas"]},
+    {"name": "Brasil",               "territories": ["pais_brasil"]},
+    {"name": "Biomas (agregado)",    "territories": ["biomas_todos"]},
     {"name": "Biomas (individual)",  "territories": [
-        "amazonia", "caatinga", "cerrado", "mata_atlantica", "pampa", "pantanal",
+        "bioma_amazonia", "bioma_caatinga", "bioma_cerrado", "bioma_mata_atlantica", "bioma_pampa", "bioma_pantanal",
     ]},
     {"name": "Regiões",              "territories": [
-        "bap", "bap_planalto", "matopiba", "matopiba_cerrado",
-        "centro_oeste", "nordeste", "norte", "sudeste", "sul",
+        "regiao_bap", "regiao_bap_planalto", "regiao_matopiba", "regiao_matopiba_cerrado",
+        "regiao_centro_oeste", "regiao_nordeste", "regiao_norte", "regiao_sudeste", "regiao_sul",
     ]},
     {"name": "UFs",                  "territories": [
-        "df", "acre", "alagoas", "amapa", "amazonas", "bahia", "ceara",
-        "espirito_santo", "goias", "maranhao", "mato_grosso", "mato_grosso_do_sul",
-        "minas_gerais", "para", "paraiba", "parana", "pernambuco", "piaui",
-        "rio_de_janeiro", "rio_grande_do_norte", "rio_grande_do_sul",
-        "rondonia", "roraima", "santa_catarina", "sao_paulo", "sergipe", "tocantins",
+        "uf_df", "uf_acre", "uf_alagoas", "uf_amapa", "uf_amazonas", "uf_bahia", "uf_ceara",
+        "uf_espirito_santo", "uf_goias", "uf_maranhao", "uf_mato_grosso", "uf_mato_grosso_do_sul",
+        "uf_minas_gerais", "uf_para", "uf_paraiba", "uf_parana", "uf_pernambuco", "uf_piaui",
+        "uf_rio_de_janeiro", "uf_rio_grande_do_norte", "uf_rio_grande_do_sul",
+        "uf_rondonia", "uf_roraima", "uf_santa_catarina", "uf_sao_paulo", "uf_sergipe", "uf_tocantins",
     ]},
 ]
 
@@ -225,7 +225,7 @@ def process_one(config, territory, prod, resume, skip_upload):
             print(f"  [PULA] {prod} / {territory} (ja no GCS)")
         return {"status": "skipped", "product": prod, "territory": territory}
 
-    from src.ipam_gif_factory.core.pipeline import Pipeline
+    from src.mapbiomas_data.core.pipeline import Pipeline
 
     pipeline = Pipeline(config)
 
@@ -298,7 +298,7 @@ def run_stage(stage_name, territories, config, workers, resume, skip_upload):
 
 
 def main():
-    from src.ipam_gif_factory.config import ConfigLoader
+    from src.mapbiomas_data.config import ConfigLoader
 
     parser = argparse.ArgumentParser(description="Fire Col5 Export Pipeline — 5 estagios + GCS")
     parser.add_argument("--workers", type=int, default=None, help="Workers (padrao: auto-detect)")

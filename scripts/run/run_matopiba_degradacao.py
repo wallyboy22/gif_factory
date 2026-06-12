@@ -2,8 +2,8 @@ import argparse
 import sys
 sys.path.insert(0, "src")
 
-from ipam_gif_factory.config import ConfigLoader
-from ipam_gif_factory.core.pipeline import Pipeline
+from mapbiomas_data.config import ConfigLoader
+from mapbiomas_data.core.pipeline import Pipeline
 
 parser = argparse.ArgumentParser(description="GIFs de degradacao para MATOPIBA + Cerrado + DF")
 parser.add_argument("--font-scale", type=float, default=1.0, help="Escala das fontes (padrao: 1.0)")
@@ -15,10 +15,10 @@ pipeline = Pipeline(config)
 DATASET = "brasil_degradation_col10_1"
 
 territory_products = {
-    "matopiba_cerrado": [
+    "regiao_matopiba_cerrado": [
         "burned_at_least_once",
     ],
-    "df": [
+    "uf_df": [
         "burned_at_least_once",
         "primary_natural_coverage",
         "fire_age",
@@ -30,7 +30,7 @@ territory_products = {
         "secondary_vegetation_age",
         "secondary_vegetation_coverage",
     ],
-    "cerrado": [
+    "bioma_cerrado": [
         "fire_frequency",
         "natural_coverage",
         "burned_natural_coverage",

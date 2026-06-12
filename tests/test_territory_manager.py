@@ -4,8 +4,8 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 import pytest
-from ipam_gif_factory.config import ConfigLoader
-from ipam_gif_factory.core import TerritoryManager
+from mapbiomas_data.config import ConfigLoader
+from mapbiomas_data.core import TerritoryManager
 
 
 @pytest.fixture
@@ -17,35 +17,35 @@ def manager():
 class TestTerritoryManager:
     def test_list_types(self, manager):
         types = manager.list_types()
-        assert "custom_regions" in types
+        assert "regions" in types
 
     def test_list_all_territories(self, manager):
         territories = manager.list_territories()
         assert len(territories) > 30
 
-    def test_list_states(self, manager):
+    def test_list_ufs(self, manager):
         states = manager.list_territories("states")
-        assert any(t["id"] == "df" for t in states)
+        assert any(t["id"] == "uf_df" for t in states)
 
-    def test_df_exists_and_is_test_default(self, manager):
-        df = manager.get_territory("df")
+    def test_uf_df_exists(self, manager):
+        df = manager.get_territory("uf_df")
         assert df["name"] == "Distrito Federal"
         assert df["type"] == "states"
         assert df["source"] == "projects/mapbiomas-workspace/AUXILIAR/estados-2017"
         assert df["filter"] == "NM_ESTADO == 'DISTRITO FEDERAL'"
 
-    def test_df_has_bbox(self, manager):
-        df = manager.get_territory("df")
+    def test_uf_df_has_bbox(self, manager):
+        df = manager.get_territory("uf_df")
         assert df["bbox"] is not None
         assert len(df["bbox"]) == 4
         assert df["bbox"][0] < df["bbox"][2]
 
     def test_get_territory_by_type(self, manager):
-        info = manager.get_territory_info("states", "df")
+        info = manager.get_territory_info("states", "uf_df")
         assert info["name"] == "Distrito Federal"
 
     def test_get_territory_name(self, manager):
-        name = manager.get_territory_name("states", "df")
+        name = manager.get_territory_name("states", "uf_df")
         assert name == "Distrito Federal"
 
     def test_get_territory_invalid(self, manager):
@@ -69,11 +69,11 @@ class TestTerritoryManager:
         assert "Brasil" in country_names
         assert "Paraguai" in country_names
 
-    def test_validate_df(self, manager):
-        valid, msg = manager.validate_territory("df")
+    def test_validate_uf_df(self, manager):
+        valid, msg = manager.validate_territory("uf_df")
         assert valid == True
 
     def test_get_bbox(self, manager):
-        bbox = manager.get_bbox("df")
+        bbox = manager.get_bbox("uf_df")
         assert bbox is not None
         assert len(bbox) == 4

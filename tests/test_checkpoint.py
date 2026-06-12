@@ -1,15 +1,15 @@
 import sys, os, time
 sys.path.insert(0, "src")
-from ipam_gif_factory.config import ConfigLoader
-from ipam_gif_factory.core.pipeline import Pipeline
-from ipam_gif_factory.core.state_manager import StateManager
+from mapbiomas_data.config import ConfigLoader
+from mapbiomas_data.core.pipeline import Pipeline
+from mapbiomas_data.core.state_manager import StateManager
 
 config = ConfigLoader().load_all()
 pipeline = Pipeline(config)
 
 DATASET = "brasil_degradation_col10_1"
 PROD = "fire_frequency"
-TERR = "cerrado"
+TERR = "bioma_cerrado"
 
 output_dir = os.path.join(config.get_output_dir(), DATASET, PROD, TERR)
 

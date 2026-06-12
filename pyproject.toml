@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mapbiomas-data"
+version = "2.0.0"
+description = "Automated pipeline for generating animated GIF visualizations from Google Earth Engine satellite imagery"
+readme = "README.md"
+license = { text = "MIT" }
+authors = [
+    { name = "Wallace Vieira da Silva", email = "wallace.silva@ipam.org.br" },
+]
+requires-python = ">=3.11"
+dependencies = [
+    "click>=8.0",
+    "earthengine-api>=1.4.0",
+    "google-cloud-storage>=2.0.0",
+    "matplotlib>=3.7.0",
+    "numpy>=1.24.0",
+    "pillow>=9.5.0",
+    "pyyaml>=6.0",
+    "rasterio>=1.3.0",
+    "requests>=2.28.0",
+]
+
+[project.urls]
+Home = "https://ipam.org.br"
+Source = "https://github.com/wallace-silva/fabrica-de-gifs"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[project.scripts]
+mapbiomas-data = "mapbiomas_data.interfaces.cli:main"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]

@@ -2,8 +2,8 @@ import argparse
 import sys
 sys.path.insert(0, "src")
 
-from ipam_gif_factory.config import ConfigLoader
-from ipam_gif_factory.core.pipeline import Pipeline
+from mapbiomas_data.config import ConfigLoader
+from mapbiomas_data.core.pipeline import Pipeline
 
 parser = argparse.ArgumentParser(description="Teste rápido do pipeline (DF)")
 parser.add_argument("--dataset", type=str, default="brasil_fire_col5", help="ID do dataset")
@@ -18,7 +18,7 @@ pipeline = Pipeline(config)
 result = pipeline.run(
     dataset_id=args.dataset,
     product_id=args.product,
-    territory_id="df",
+    territory_id="uf_df",
     viz_key=args.viz,
     create_collage=True,
     add_labels=True,

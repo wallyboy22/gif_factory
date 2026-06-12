@@ -27,7 +27,6 @@ from pathlib import Path
 from collections import OrderedDict
 
 import csv as _csvmod
-import yaml
 
 # GCS Config
 BUCKET_NAME = "mapbiomas-fire"
@@ -103,31 +102,38 @@ def load_dataset_metadata(dataset_ids=None):
 
 
 def parse_metadata_dir(dataset_id, base_dir):
-    # Territory type detection
-    def load_ids(yaml_file, key):
-        if not os.path.exists(yaml_file):
-            return set()
-        with open(yaml_file, encoding="utf-8") as f:
-            return set(yaml.safe_load(f)["territories"].get(key, {}).keys())
+    from mapbiomas_data.config import ConfigLoader
+    from mapbiomas_data.core import TerritoryManager
 
-    biome_ids = load_ids("config/territories_biomes.yaml", "biomes")
-    custom_ids = load_ids("config/territories_custom.yaml", "custom_regions")
-    state_ids = load_ids("config/territories_states.yaml", "ufs")
-    country_ids = load_ids("config/territories_countries.yaml", "countries")
+    cfg = ConfigLoader()
+    cfg.load_all()
+    tm = TerritoryManager(cfg)
+
+    states_set = set()
+    biomes_set = set()
+    regions_set = set()
+    countries_set = set()
+    for t in tm.list_territories():
+        if t["type"] == "states":
+            states_set.add(t["id"])
+        elif t["type"] == "biomes":
+            biomes_set.add(t["id"])
+        elif t["type"] == "regions":
+            regions_set.add(t["id"])
+        elif t["type"] == "countries":
+            countries_set.add(t["id"])
 
     def get_type(tid):
-        if tid in biome_ids: return "biome"
-        if tid in custom_ids: return "custom_region"
-        if tid in state_ids: return "state"
-        if tid in country_ids: return "country"
+        if tid in biomes_set: return "biome"
+        if tid in regions_set: return "custom_region"
+        if tid in states_set: return "state"
+        if tid in countries_set: return "country"
         return "unknown"
 
     collection = "?"
     try:
-        with open("config/datasets.yaml", encoding="utf-8") as f:
-            datasets = yaml.safe_load(f).get("datasets", {})
-            ds = datasets.get(dataset_id, {})
-            collection = str(ds.get("collection", "?"))
+        ds = cfg.datasets.get(dataset_id, {})
+        collection = str(ds.get("collection", "?"))
     except Exception:
         pass
 

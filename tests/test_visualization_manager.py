@@ -4,8 +4,8 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 import pytest
-from ipam_gif_factory.config import ConfigLoader
-from ipam_gif_factory.core import VisualizationManager
+from mapbiomas_data.config import ConfigLoader
+from mapbiomas_data.core import VisualizationManager
 
 
 @pytest.fixture

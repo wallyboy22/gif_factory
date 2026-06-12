@@ -21,7 +21,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
 warnings.filterwarnings("ignore", message="Your application has authenticated using end user credentials")
 
-from ipam_gif_factory.config import ConfigLoader
+from mapbiomas_data.config import ConfigLoader
 
 GCS_BUCKET = "mapbiomas-fire"
 GCS_HUB_ROOT = "data-container"

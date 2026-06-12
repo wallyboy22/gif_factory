@@ -26,7 +26,7 @@ date: 2026-06-01
 
 ## ConfigLoader
 
-Classe em `src/ipam_gif_factory/config/config_loader.py`.
+Classe em `src/mapbiomas_data/config/config_loader.py`.
 
 Características:
 - Carrega todos os YAMLs no init
@@ -83,3 +83,4 @@ Controla quais produtos aparecem nas interfaces:
 
 Produtos sem entrada = visíveis por padrão.
 Atualmente só tem overrides para `brasil_degradation_col10_1` (ocultando `natural_coverage` e `primary_natural_coverage`).
+

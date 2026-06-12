@@ -31,7 +31,7 @@ Poll status via SSE ou polling
 ## Tecnologias
 
 - **Frontend:** HTML + CSS + JavaScript vanilla (sem framework)
-- **Backend:** Flask API existente (`src/ipam_gif_factory/interfaces/api.py`)
+- **Backend:** Flask API existente (`src/mapbiomas_data/interfaces/api.py`)
 - **Dados:** CSV index no GCS (lido via fetch CORS ou servido pelo Flask)
 
 ## Funcionalidades da Galeria
@@ -83,7 +83,7 @@ Precisa adicionar/ajustar:
 
 ```powershell
 # Subir API Flask
-python -m src.ipam_gif_factory.interfaces.api
+python -m src.mapbiomas_data.interfaces.api
 
 # Servir HTML (pode ser a própria Flask servindo estáticos)
 # Ou: servidor HTTP simples
@@ -108,3 +108,4 @@ html/
 ## Prioridade
 
 Baixa — implementar após Fire Col 5 estar gerando GIFs consistentemente.
+

@@ -37,7 +37,7 @@ FABRICA DE GIFS/
 │   ├── visualization_reference.yaml  # Referência mestra de legendas
 │   ├── paths.yaml              # Caminhos, dimensões, durações
 │   └── visibility.json         # Toggles de visibilidade
-├── src/ipam_gif_factory/       # Pacote Python principal
+├── src/mapbiomas_data/       # Pacote Python principal
 │   ├── config/                 # ConfigLoader
 │   ├── core/                   # Pipeline, managers, processors
 │   ├── interfaces/             # CLI, Dashboard, API (Flask), Colab
@@ -79,3 +79,4 @@ FABRICA DE GIFS/
 - 386 GIFs de degradação Col 10.1 gerados (27 estados + 9 biomas)
 - Fire Col 5 totalmente configurado, aguardando ajuste visual e geração
 - Foco atual: **ajustar visualização Fire Col 5** → gerar → expandir
+

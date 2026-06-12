@@ -85,21 +85,21 @@ PRODUCTS = [
 # ============================================================
 # IDs dos territórios (do config/territories_*.yaml)
 TERRITORIES = [
-    "df",
-    "brasil",
-    "amazonia",
-    "caatinga",
-    "cerrado",
-    "mata_atlantica",
-    "pampa",
-    "pantanal",
-    # estados (descomente os que quiser)
-    # "acre", "alagoas", "amapa", "amazonas", "bahia", "ceara",
-    # "espirito_santo", "goias", "maranhao", "mato_grosso",
-    # "mato_grosso_do_sul", "minas_gerais", "para", "paraiba",
-    # "parana", "pernambuco", "piaui", "rio_de_janeiro",
-    # "rio_grande_do_norte", "rio_grande_do_sul", "rondonia",
-    # "roraima", "santa_catarina", "sao_paulo", "sergipe", "tocantins",
+    "uf_df",
+    "pais_brasil",
+    "bioma_amazonia",
+    "bioma_caatinga",
+    "bioma_cerrado",
+    "bioma_mata_atlantica",
+    "bioma_pampa",
+    "bioma_pantanal",
+    # UFs (descomente os que quiser)
+    # "uf_acre", "uf_alagoas", "uf_amapa", "uf_amazonas", "uf_bahia", "uf_ceara",
+    # "uf_espirito_santo", "uf_goias", "uf_maranhao", "uf_mato_grosso",
+    # "uf_mato_grosso_do_sul", "uf_minas_gerais", "uf_para", "uf_paraiba",
+    # "uf_parana", "uf_pernambuco", "uf_piaui", "uf_rio_de_janeiro",
+    # "uf_rio_grande_do_norte", "uf_rio_grande_do_sul", "uf_rondonia",
+    # "uf_roraima", "uf_santa_catarina", "uf_sao_paulo", "uf_sergipe", "uf_tocantins",
 ]
 
 # ============================================================
@@ -130,7 +130,7 @@ def detect_workers():
 
 def process_one(config, territory, prod, resume, workers_count, font_scale=1.0):
     """Executa um combo dataset+produto+territorio."""
-    from src.ipam_gif_factory.core.pipeline import Pipeline
+    from src.mapbiomas_data.core.pipeline import Pipeline
 
     pipeline = Pipeline(config)
 
@@ -170,7 +170,7 @@ def process_one(config, territory, prod, resume, workers_count, font_scale=1.0):
 
 def main():
     global total_combos
-    from src.ipam_gif_factory.config import ConfigLoader
+    from src.mapbiomas_data.config import ConfigLoader
 
     parser = argparse.ArgumentParser(description="Fábrica de GIFs — Batch")
     parser.add_argument("--workers", type=int, default=None,

@@ -131,7 +131,7 @@ def detect_workers():
 
 
 def process_one(config, territory, prod, resume):
-    from src.ipam_gif_factory.core.pipeline import Pipeline
+    from src.mapbiomas_data.core.pipeline import Pipeline
 
     pipeline = Pipeline(config)
 
@@ -166,7 +166,7 @@ def process_one(config, territory, prod, resume):
 
 
 def main():
-    from src.ipam_gif_factory.config import ConfigLoader
+    from src.mapbiomas_data.config import ConfigLoader
 
     parser = argparse.ArgumentParser(
         description="Batch Fire Col5 — 35 territórios × 23 produtos"

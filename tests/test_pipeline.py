@@ -4,8 +4,8 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 import pytest
-from ipam_gif_factory.config import ConfigLoader
-from ipam_gif_factory.core import Pipeline
+from mapbiomas_data.config import ConfigLoader
+from mapbiomas_data.core import Pipeline
 
 
 @pytest.fixture
@@ -38,12 +38,12 @@ class TestPipeline:
 
     def test_validate_combinations(self, pipeline):
         combinations = [
-            ("brasil_fire_col3", "annual_burned", "df", "fire"),
-            ("brasil_fire_col3", "monthly_burned", "df", "monthly"),
-            ("brasil_lulc_col9", "integration", "df", "lulc"),
-            ("brasil_soil", "soc", "df", "soc"),
-            ("brasil_degradation_col9", "edge_area", "df", "edge_area"),
-            ("brasil_degradation_col9", "fragment_size", "df", "patch_size"),
+            ("brasil_fire_col3", "annual_burned", "uf_df", "fire"),
+            ("brasil_fire_col3", "monthly_burned", "uf_df", "monthly"),
+            ("brasil_lulc_col9", "integration", "uf_df", "lulc"),
+            ("brasil_soil", "soc", "uf_df", "soc"),
+            ("brasil_degradation_col9", "edge_area", "uf_df", "edge_area"),
+            ("brasil_degradation_col9", "fragment_size", "uf_df", "patch_size"),
         ]
         for combo in combinations:
             try:

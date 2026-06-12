@@ -23,10 +23,9 @@ cache/
 queue.json
 status.json
 
-# Colab notebooks (only allow factory notebooks)
-notebooks/*
-!notebooks/fabrica_*.ipynb
-!notebooks/Colab_*.ipynb
+# Test artifacts
+test_*.png
+test_*.jpg
 
 # Legacy / archived files
 legacy/
@@ -43,11 +42,9 @@ legacy/
 logs/
 *.log
 
-# Agent context (internal)
-.agents/
-
 # Scripts (ignore compiled cache)
 scripts/__pycache__/
+tests/__pycache__/
 
 # Extra reference files (logos kept separately)
 references/*.pdf
@@ -69,3 +66,14 @@ references/mbfire_col5/
 
 # Reference data (binary/large)
 references/toolkit_fogo_1.js
+
+# Temp / debug
+.opencode/
+_list_prods.py
+config/batches/test_df.json
+
+# Test outputs (generated during testing)
+tests/test_outputs/
+
+# OpenDocument / binary references
+references/*.odt

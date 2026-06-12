@@ -25,21 +25,21 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 
 warnings.filterwarnings("ignore", message="Your application has authenticated using end user credentials")
 
-from ipam_gif_factory.config import ConfigLoader
-from ipam_gif_factory.core import DatasetManager
+from mapbiomas_data.config import ConfigLoader
+from mapbiomas_data.core import DatasetManager
 
 GCS_BUCKET = "mapbiomas-fire"
 GCS_HUB_ROOT = "data-container"
 GCS_PROJECT = "mapbiomas-fire-485203"
 
 UFS = [
-    "acre", "alagoas", "amapa", "amazonas",
-    "bahia", "ceara", "df", "espirito_santo",
-    "goias", "maranhao", "mato_grosso", "mato_grosso_sul",
-    "minas_gerais", "para", "paraiba", "parana",
-    "pernambuco", "piaui", "rio_de_janeiro", "rio_grande_norte",
-    "rio_grande_sul", "rondonia", "roraima", "santa_catarina",
-    "sao_paulo", "sergipe", "tocantins",
+    "uf_acre", "uf_alagoas", "uf_amapa", "uf_amazonas",
+    "uf_bahia", "uf_ceara", "uf_df", "uf_espirito_santo",
+    "uf_goias", "uf_maranhao", "uf_mato_grosso", "uf_mato_grosso_do_sul",
+    "uf_minas_gerais", "uf_para", "uf_paraiba", "uf_parana",
+    "uf_pernambuco", "uf_piaui", "uf_rio_de_janeiro", "uf_rio_grande_do_norte",
+    "uf_rio_grande_do_sul", "uf_rondonia", "uf_roraima", "uf_santa_catarina",
+    "uf_sao_paulo", "uf_sergipe", "uf_tocantins",
 ]
 
 
@@ -141,7 +141,7 @@ def main():
 
     root = Path(__file__).resolve().parent.parent
     cmd = [
-        sys.executable, "-m", "src.ipam_gif_factory.interfaces.cli",
+        sys.executable, "-m", "src.mapbiomas_data.interfaces.cli",
         "--generate", "--batch", batch_path,
         "--workers", str(args.workers),
         "--font-scale", str(args.font_scale),
