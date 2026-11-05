@@ -10,58 +10,28 @@ products:
     processor: "build_lulc_col11_nivel0"
     temporal_range: [1985, 2025]
     visualization: "lulc_nivel0"
-  lulc_nivel0_black:
-    name: "Uso e Cobertura - Nível 0"
-    processor: "build_lulc_col11_nivel0"
-    temporal_range: [1985, 2025]
-    visualization: "lulc_nivel0_black"
   lulc_nivel1:
     name: "Uso e Cobertura - Nível 1"
     processor: "build_lulc_col11_nivel1"
     temporal_range: [1985, 2025]
     visualization: "lulc_nivel1"
-  lulc_nivel1_black:
-    name: "Uso e Cobertura - Nível 1"
-    processor: "build_lulc_col11_nivel1"
-    temporal_range: [1985, 2025]
-    visualization: "lulc_nivel1_black"
   lulc_nivel1_1:
     name: "Uso e Cobertura - Nível 1.1"
     processor: "build_lulc_col11_nivel1_1"
     temporal_range: [1985, 2025]
     visualization: "lulc_nivel1_1"
-  lulc_nivel1_1_black:
-    name: "Uso e Cobertura - Nível 1.1"
-    processor: "build_lulc_col11_nivel1_1"
-    temporal_range: [1985, 2025]
-    visualization: "lulc_nivel1_1_black"
   lulc_nivel2:
     name: "Uso e Cobertura - Nível 2"
     processor: "build_lulc_col11_nivel2"
     temporal_range: [1985, 2025]
     visualization: "lulc_nivel2"
-  lulc_nivel2_black:
-    name: "Uso e Cobertura - Nível 2"
-    processor: "build_lulc_col11_nivel2"
-    temporal_range: [1985, 2025]
-    visualization: "lulc_nivel2_black"
   lulc_nivel3:
     name: "Uso e Cobertura - Nível 3"
     processor: "build_lulc_col11_nivel3"
     temporal_range: [1985, 2025]
     visualization: "lulc"
-  lulc_nivel3_black:
-    name: "Uso e Cobertura - Nível 3"
-    processor: "build_lulc_col11_nivel3"
-    temporal_range: [1985, 2025]
-    visualization: "lulc_black"
   lulc_nivel4:
     name: "Uso e Cobertura - Nível 4"
     processor: "build_lulc_col11_nivel4"
     temporal_range: [1985, 2025]
     visualization: "lulc"
-  lulc_nivel4_black:
-    name: "Uso e Cobertura - Nível 4"
-    processor: "build_lulc_col11_nivel4"
-    temporal_range: [1985, 2025]
-    visualization: "lulc_black"

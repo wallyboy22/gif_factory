@@ -4,6 +4,7 @@ from .visualization_manager import VisualizationManager
 from .gif_generator import GIFGenerator
 from .frame_processor import FrameProcessor
 from .initiative_manager import InitiativeManager
+from . import theme
 
 __all__ = [
     "DatasetManager",
@@ -12,4 +13,5 @@ __all__ = [
     "GIFGenerator",
     "FrameProcessor",
     "InitiativeManager",
+    "theme",
 ]

@@ -3,37 +3,23 @@ import os
 import subprocess
 import sys
 import tempfile
-import threading
 from typing import Any, Dict, List, Optional, Tuple
 from PIL import Image as PILImage, ImageDraw, ImageFont
 
 
 # --- Tema (claro/escuro) ---------------------------------------------------
-# Guardado em thread-local: o modo batch roda varios produtos em threads no
-# mesmo processo, entao um global vazaria a configuracao entre produtos.
-LIGHT_THEME = {
-    "bg": (255, 255, 255),
-    "fg": (0, 0, 0),
-    "sep": (200, 200, 200),
-    "box": (100, 100, 100),
-}
-DARK_THEME = {
-    "bg": (0, 0, 0),
-    "fg": (240, 240, 240),
-    "sep": (70, 70, 70),
-    "box": (150, 150, 150),
-}
-THEMES = {"light": LIGHT_THEME, "dark": DARK_THEME}
-
-_THEME = threading.local()
-
-
-def set_theme(name: Optional[str]) -> None:
-    _THEME.value = THEMES.get(name or "light", LIGHT_THEME)
-
-
-def get_theme() -> Dict[str, Tuple[int, int, int]]:
-    return getattr(_THEME, "value", None) or LIGHT_THEME
+# Implementação em core/theme.py; reexportado aqui por compatibilidade
+# (`FrameProcessor.set_theme`, `gif_generator.get_theme`).
+from .theme import (  # noqa: E402
+    LIGHT_THEME,
+    DARK_THEME,
+    THEMES,
+    get_style,
+    get_theme,
+    resolve_color,
+    resolve_theme,
+    set_theme,
+)
 
 
 def _parse_color(hex_color: str) -> Tuple[int, int, int]:

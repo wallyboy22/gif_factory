@@ -20,6 +20,7 @@ from ..core import (
 from ..core.ee_downloader import EEDownloader
 from ..core.ee_transforms import run_processor, PROCESSOR_REGISTRY, only_coverage
 from ..core.state_manager import StateManager
+from ..core import theme as theme_mod
 from ..utils.file_utils import ensure_dir
 
 
@@ -54,6 +55,7 @@ class Pipeline:
         cell_height: int = 300,
         resume: bool = False,
         font_scale: float = 1.0,
+        theme: Optional[str] = None,
     ) -> Dict[str, Any]:
         fs = lambda n: int(n * font_scale)
         result = {
@@ -74,6 +76,13 @@ class Pipeline:
             except Exception:
                 pass
             product_info = self.datasets.get_product(dataset_id, product_id)
+            # Alias depreciado (`produto_black`) -> produto base + tema escuro
+            product_id = product_info["id"]
+            alias_theme = product_info.get("alias_theme")
+            if product_info.get("alias_of"):
+                print(f"  [DEPRECATED] '{product_info['requested_id']}' é alias de "
+                      f"'{product_id}' + theme=dark")
+            result["product"] = product_id
             territory_info = self.territories.get_territory(territory_id)
             region_fc = self.territories.get_feature_collection(territory_id)
             overlay_fc = self.territories.get_overlay_fc(territory_id)
@@ -94,14 +103,17 @@ class Pipeline:
                 viz_key = product_info.get("visualization")
             if not viz_key:
                 viz_key = "fire"
-            viz_params = self.visualizations.get_viz_params(viz_key)
+            viz_default = self.visualizations.get_viz_params(viz_key)
+            theme = theme_mod.resolve_theme(
+                theme, alias_theme or viz_default.get("theme")
+            )
+            viz_params = self.visualizations.get_viz_params(viz_key, theme)
+            result["theme"] = theme
 
             if not output_dir:
-                output_dir = os.path.join(
+                output_dir = theme_mod.combo_dir(
                     self.config.get_output_dir(),
-                    dataset_id,
-                    product_id,
-                    territory_id,
+                    dataset_id, product_id, territory_id, theme,
                 )
             ensure_dir(output_dir)
 
@@ -131,10 +143,8 @@ class Pipeline:
                 print(f"Modo: resume (pulando etapas ja concluidas)")
             print(f"{'='*60}")
 
-            theme = viz_params.get("theme", "light")
             FrameProcessor.set_theme(theme)
-            if theme and theme != "light":
-                print(f"Tema: {theme}")
+            print(f"Tema: {theme}")
 
             image = self._load_product_image(product_info)
 
@@ -250,7 +260,8 @@ class Pipeline:
                     state.clear_all()
                     return self.run(dataset_id, product_id, territory_id, viz_key, output_dir,
                                     create_collage, add_labels, vertical_dimension, max_bands,
-                                    band_names_filter, cell_height, resume=False)
+                                    band_names_filter, cell_height, resume=False,
+                                    font_scale=font_scale, theme=theme)
                 result["frames"] = frame_paths
                 timings["download"] = 0
 

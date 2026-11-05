@@ -216,6 +216,9 @@ class ConfigLoader:
                 color = color.strip()
                 if color.startswith("#"):
                     color = color[1:]
+                if color.lower() in {"auto_bg", "auto", "theme_bg", "background"}:
+                    normalized.append(color)
+                    continue
                 if len(color) not in (3, 6) or any(
                     ch not in "0123456789abcdefABCDEF" for ch in color
                 ):

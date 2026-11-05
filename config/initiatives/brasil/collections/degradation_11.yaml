@@ -19,18 +19,3 @@ products:
     processor: "decode_edge_area_1000m_col11"
     temporal_range: [1985, 2025]
     visualization: "edge_area_1000m"
-
-  edge_area_black:
-    name: "Distância até a Borda"
-    description: "Versão contínua (0–7000 m) com fundo preto e textos claros"
-    asset: "projects/mapbiomas-brazil/assets/DEGRADATION/COLLECTION-11/public/degradation_edge_area_col11_v1"
-    temporal_range: [1985, 2025]
-    visualization: "edge_area_black"
-
-  edge_area_1000m_black:
-    name: "Distância até a Borda (até 1000 m)"
-    description: "Versão categórica (8 classes, até 1000 m) com fundo preto e textos claros"
-    asset: "projects/mapbiomas-brazil/assets/DEGRADATION/COLLECTION-11/public/degradation_edge_area_col11_v1"
-    processor: "decode_edge_area_1000m_col11"
-    temporal_range: [1985, 2025]
-    visualization: "edge_area_1000m_black"

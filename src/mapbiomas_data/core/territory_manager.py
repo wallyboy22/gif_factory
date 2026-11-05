@@ -46,6 +46,9 @@ class TerritoryManager:
             "type": ttype,
             "source": tinfo.get("source", ""),
             "filter": tinfo.get("filter", ""),
+            "filter_in": tinfo.get("filter_in"),
+            "union_of": tinfo.get("union_of"),
+            "dissolve": bool(tinfo.get("dissolve", False)),
             "geometry": tinfo.get("geometry"),
             "bbox": tinfo.get("bbox"),
         }
@@ -85,21 +88,67 @@ class TerritoryManager:
     def get_territory_name(self, territory_type: str, territory_id: str) -> str:
         return self.get_territory_info(territory_type, territory_id)["name"]
 
-    def get_feature_collection(self, territory_id: str):
+    def get_feature_collection(self, territory_id: str, _seen: Optional[set] = None):
+        """Resolve um território em uma FeatureCollection do Earth Engine.
+
+        Formas suportadas (mutuamente exclusivas, exceto filtros):
+          source + filter / filter_in : filtra uma FC existente
+          geometry                    : bbox ou center + buffer_m
+          union_of                    : compõe vários territórios em uma única FC
+
+        `union_of` aceita ids de outros territórios ou especificações inline
+        (dicts com `source`, `filter`, `filter_in` ou `geometry`), o que permite
+        combinar recortes de fontes diferentes sem criar um YAML novo por par.
+        """
+        seen = set(_seen or ())
+        if territory_id in seen:
+            chain = " -> ".join(list(seen) + [territory_id])
+            raise ValueError(f"Ciclo em 'union_of': {chain}")
+        seen.add(territory_id)
+
         found = self._find_territory_entry(territory_id)
         info = found['entry']
         try:
             import ee
         except ImportError:
             return None
-        if info.get("geometry"):
-            return self._build_geometry_fc(ee, info["geometry"])
-        fc = ee.FeatureCollection(info["source"])
-        if info.get("filter"):
-            parsed = self._parse_filter(info["filter"])
+
+        union_of = info.get("union_of") or []
+        if union_of:
+            fcs = [self._resolve_union_member(ee, member, seen) for member in union_of]
+            if any(fc is None for fc in fcs):
+                return None
+            fc = fcs[0]
+            for extra in fcs[1:]:
+                fc = fc.merge(extra)
+            if info.get("dissolve", False):
+                fc = fc.union(1)
+            return self._apply_filters(ee, fc, info)
+
+        return self._fc_from_spec(ee, info)
+
+    def _resolve_union_member(self, ee, member, seen: set):
+        """Membro de `union_of`: id de território (str) ou spec inline (dict)."""
+        if isinstance(member, str):
+            return self.get_feature_collection(member, seen)
+        if isinstance(member, dict):
+            return self._fc_from_spec(ee, member)
+        raise ValueError(f"Membro inválido em 'union_of': {member!r}")
+
+    def _fc_from_spec(self, ee, spec: Dict[str, Any]):
+        if spec.get("geometry"):
+            return self._build_geometry_fc(ee, spec["geometry"])
+        source = spec.get("source")
+        if not source:
+            raise ValueError("Território sem 'source', 'geometry' ou 'union_of'")
+        return self._apply_filters(ee, ee.FeatureCollection(source), spec)
+
+    def _apply_filters(self, ee, fc, spec: Dict[str, Any]):
+        if spec.get("filter"):
+            parsed = self._parse_filter(spec["filter"])
             if parsed:
                 fc = fc.filter(ee.Filter.equals(parsed["field"], parsed["value"]))
-        filter_in = info.get("filter_in")
+        filter_in = spec.get("filter_in")
         if filter_in:
             fc = fc.filter(ee.Filter.inList(filter_in["field"], filter_in["values"]))
         return fc
@@ -164,8 +213,11 @@ class TerritoryManager:
     def validate_territory(self, territory_id: str) -> Tuple[bool, str]:
         try:
             info = self.get_territory(territory_id)
-            if not info.get("source") and not info.get("geometry"):
-                return False, "Território sem fonte definida"
+            if not info.get("source") and not info.get("geometry") and not info.get("union_of"):
+                return False, "Território sem 'source', 'geometry' ou 'union_of'"
+            for member in info.get("union_of") or []:
+                if isinstance(member, str) and member != territory_id:
+                    self.get_territory(member)
             return True, "OK"
         except KeyError as e:
             return False, str(e)

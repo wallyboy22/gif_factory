@@ -17,6 +17,7 @@ from ..core import (
     InitiativeManager,
     GIFGenerator,
     FrameProcessor,
+    theme as theme_mod,
 )
 
 
@@ -30,6 +31,11 @@ class CLI:
         self.territories = TerritoryManager(self.config)
         self.visualizations = VisualizationManager(self.config)
         self.initiatives = InitiativeManager(self.config)
+
+    def _product_theme(self, product_info, explicit=None):
+        viz_key = product_info.get("visualization") or "fire"
+        default = self.visualizations.get_viz_params(viz_key).get("theme")
+        return theme_mod.resolve_theme(explicit, product_info.get("alias_theme") or default)
 
     def run(self, args: List[str] = None):
         parser = argparse.ArgumentParser(
@@ -52,6 +58,9 @@ class CLI:
         parser.add_argument("--territory", type=str, default="uf_df", help="ID do território (padrão: uf_df)")
         parser.add_argument("--output", type=str, help="Diretório de saída")
         parser.add_argument("--viz", type=str, help="Chave de visualização (opcional - usa default do produto)")
+        parser.add_argument("--theme", type=str, default=None,
+                            choices=list(theme_mod.VALID_THEMES),
+                            help="Tema visual: light (padrão) ou dark. Alias de produto '*_black' ainda funciona (depreciado)")
         parser.add_argument("--max-bands", type=int, default=0, help="Limitar número de bandas (0=todas)")
         parser.add_argument("--band-names-filter", type=str, nargs="*", help="Filtrar bandas por sufixo (ex: 1986 2024)")
         parser.add_argument("--auth", action="store_true", help="Autenticar Earth Engine")
@@ -123,18 +132,20 @@ class CLI:
         if parsed.charts:
             if parsed.batch:
                 return self._execute_charts_batch(parsed.batch, font_scale=parsed.font_scale,
-                                                   use_gcs=parsed.gcs)
+                                                   use_gcs=parsed.gcs, theme=parsed.theme)
             return self._execute_charts(
                 parsed.dataset, parsed.product, parsed.territory,
                 font_scale=parsed.font_scale, use_gcs=parsed.gcs,
+                theme=parsed.theme,
             )
         if parsed.compose:
             if parsed.batch:
                 return self._execute_compose_batch(parsed.batch, font_scale=parsed.font_scale,
-                                                    use_gcs=parsed.gcs)
+                                                    use_gcs=parsed.gcs, theme=parsed.theme)
             return self._execute_compose(
                 parsed.dataset, parsed.product, parsed.territory,
                 font_scale=parsed.font_scale, use_gcs=parsed.gcs,
+                theme=parsed.theme,
             )
         if parsed.postprocess:
             if parsed.postprocess == "geopdfs":
@@ -172,6 +183,7 @@ class CLI:
                     resume=parsed.resume,
                     frames_only=parsed.frames_only,
                     font_scale=parsed.font_scale,
+                    theme=parsed.theme,
                 )
             if parsed.batch:
                 return self._execute_batch(
@@ -183,6 +195,7 @@ class CLI:
                     parsed.no_upload,
                     resume_from_gcs=parsed.resume_from_gcs,
                     font_scale=parsed.font_scale,
+                    theme=parsed.theme,
                 )
             return self._execute_pipeline(
                 parsed.dataset,
@@ -196,6 +209,7 @@ class CLI:
                 resume=parsed.resume,
                 frames_only=parsed.frames_only,
                 font_scale=parsed.font_scale,
+                theme=parsed.theme,
             )
 
         parser.print_help()
@@ -360,7 +374,8 @@ class CLI:
                                         viz_key: Optional[str] = None, max_bands: int = 0,
                                         band_names_filter: Optional[List[str]] = None,
                                         cell_height: int = 300, resume: bool = False,
-                                        frames_only: bool = False, font_scale: float = 1.0):
+                                        frames_only: bool = False, font_scale: float = 1.0,
+                                        theme: Optional[str] = None):
         try:
             if collection_id:
                 dataset_id = self.initiatives.get_collection_dataset_id(initiative_id, collection_id)
@@ -396,13 +411,15 @@ class CLI:
             resume=resume,
             frames_only=frames_only,
             font_scale=font_scale,
+            theme=theme,
         )
 
     def _execute_pipeline(self, dataset_id: str, product_id: str, territory_id: str,
                           output_dir: Optional[str], viz_key: Optional[str],
                           max_bands: int = 0, band_names_filter: Optional[List[str]] = None,
                           cell_height: int = 300, resume: bool = False,
-                          frames_only: bool = False, font_scale: float = 1.0):
+                          frames_only: bool = False, font_scale: float = 1.0,
+                          theme: Optional[str] = None):
         if not dataset_id or not product_id:
             print("Erro: --dataset e --product são obrigatórios")
             return
@@ -422,6 +439,7 @@ class CLI:
             cell_height=cell_height,
             resume=resume,
             font_scale=font_scale,
+            theme=theme,
         )
 
         if result["status"] == "error":
@@ -436,7 +454,8 @@ class CLI:
                        cell_height: int = 300, resume: bool = False,
                        workers: int = 1, no_upload: bool = False,
                        resume_from_gcs: bool = False,
-                       font_scale: float = 1.0):
+                       font_scale: float = 1.0,
+                       theme: Optional[str] = None):
         try:
             with open(batch_path, encoding="utf-8") as f:
                 batch = json.load(f)
@@ -479,16 +498,24 @@ class CLI:
 
             try:
                 pinfo = self.datasets.get_product(ds, prod)
+                base_prod = pinfo.get("id", prod)
                 pname = pinfo.get("name", prod)
             except Exception:
+                pinfo = {}
+                base_prod = prod
                 pname = prod
+
+            # Precedência: item.theme > --theme > alias *_black > viz.theme
+            item_theme = item.get("theme") or theme
+            resolved_theme = self._product_theme(pinfo, item_theme)
 
             # Resume-from-GCS check
             if resume_from_gcs:
                 from pathlib import Path
-                from scripts.upload_to_gcs import is_combo_complete_on_gcs
+                from scripts.sync.upload_to_gcs import is_combo_complete_on_gcs
                 base = Path(self.config.get_output_dir())
-                if is_combo_complete_on_gcs(ds, prod, terr, base):
+                if is_combo_complete_on_gcs(ds, base_prod, terr, base,
+                                            theme=resolved_theme):
                     with lock:
                         done += 1
                         i = done
@@ -499,7 +526,7 @@ class CLI:
                 done += 1
                 i = done
             print(f"\n[{i:02d}/{total:02d}] {pname}")
-            print(f"  +-> Dataset: {ds}  |  Territorio: {terr}")
+            print(f"  +-> Dataset: {ds}  |  Territorio: {terr}  |  Tema: {resolved_theme}")
 
             item_start = time.time()
             try:
@@ -512,15 +539,22 @@ class CLI:
                     cell_height=cell_height,
                     resume=resume,
                     font_scale=font_scale,
+                    theme=item_theme,
                 )
                 if do_upload:
                     from pathlib import Path
-                    from scripts.upload_to_gcs import upload_combo
+                    from scripts.sync.upload_to_gcs import upload_combo
                     base = Path(self.config.get_output_dir())
-                    upload_combo(ds, prod, terr, base)
+                    upload_combo(ds, base_prod, terr, base, theme=resolved_theme)
             except SystemExit:
                 with lock:
                     errors += 1
+            except Exception as e:
+                import traceback
+                with lock:
+                    errors += 1
+                print(f"  [ERRO] {type(e).__name__}: {e}")
+                traceback.print_exc()
             item_elapsed = time.time() - item_start
             total_elapsed = time.time() - start_all
 
@@ -552,104 +586,10 @@ class CLI:
         print()
 
 
-    def _execute_area_stats(
-        self, dataset_id: str, product_id: str, territory_id: str,
-        use_gcs: bool = False, resume: bool = False
-    ):
-        if not dataset_id or not product_id or not territory_id:
-            print("Erro: --dataset, --product e --territory sao obrigatorios")
-            return
-        try:
-            product_info = self.datasets.get_product(dataset_id, product_id)
-        except KeyError as e:
-            print(f"Erro: {e}")
-            return
-
-        from ..core.area_stats import AreaStatsCalculator
-        calc = AreaStatsCalculator(self.config)
-        paths = calc.compute_and_save(
-            dataset_id, product_id, territory_id, product_info,
-            use_gcs=use_gcs, resume=resume,
-        )
-        if use_gcs:
-            output_dir = calc._get_output_dir(dataset_id, product_id, territory_id)
-            calc.wait_all_tasks(output_dir)
-
-        print(f"\n  [OK] {len(paths)} CSV(s) salvos em {calc._get_output_dir(dataset_id, product_id, territory_id)}/area_stats/")
-
-    def _execute_area_stats_batch(
-        self, batch_path: str, use_gcs: bool = False, resume: bool = False
-    ):
-        try:
-            with open(batch_path, encoding="utf-8") as f:
-                batch = json.load(f)
-        except (FileNotFoundError, json.JSONDecodeError) as e:
-            print(f"Erro ao ler batch '{batch_path}': {e}")
-            sys.exit(1)
-
-        items = batch.get("items", [])
-        total = len(items)
-        if not items:
-            print("Batch vazio.")
-            return
-
-        from ..core.area_stats import AreaStatsCalculator
-        calc = AreaStatsCalculator(self.config)
-
-        print("=" * 52)
-        print(f"  Area Stats  —  {total} itens")
-        print(f"  GCS: {'sim' if use_gcs else 'nao'}  |  Resume: {'sim' if resume else 'nao'}")
-        print("-" * 52)
-
-        ok = 0
-        errors = 0
-        for i, item in enumerate(items, 1):
-            ds = item.get("dataset", "")
-            prod = item.get("product", "")
-            terr = item.get("territory", "")
-            if not all([ds, prod, terr]):
-                print(f"\n[{i:02d}/{total:02d}] [SKIP] Item invalido: {item}")
-                errors += 1
-                continue
-
-            try:
-                pinfo = self.datasets.get_product(ds, prod)
-                pname = pinfo.get("name", prod)
-            except KeyError:
-                print(f"\n[{i:02d}/{total:02d}] [SKIP] Produto '{prod}' nao encontrado")
-                errors += 1
-                continue
-
-            print(f"\n[{i:02d}/{total:02d}] {pname} — {ds}/{prod}/{terr}")
-            try:
-                paths = calc.compute_and_save(
-                    ds, prod, terr, pinfo, use_gcs=use_gcs, resume=resume,
-                )
-                if paths:
-                    ok += 1
-                    print(f"  +-> {len(paths)} CSV(s)")
-                else:
-                    print(f"  +-> Nenhum dado computado")
-            except Exception as e:
-                print(f"  [ERRO] {e}")
-                errors += 1
-
-        if use_gcs:
-            for item in items:
-                ds = item.get("dataset", "")
-                prod = item.get("product", "")
-                terr = item.get("territory", "")
-                if all([ds, prod, terr]):
-                    output_dir = calc._get_output_dir(ds, prod, terr)
-                    calc.wait_all_tasks(output_dir)
-
-        print("-" * 52)
-        print(f"  OK: {ok}  |  Erros: {errors}  |  Total: {total}")
-
-
     def _execute_charts(
         self, dataset_id: str, product_id: str, territory_id: str,
         font_scale: float = 1.0, use_gcs: bool = False,
+        theme: Optional[str] = None,
     ):
         if not dataset_id or not product_id or not territory_id:
             print("Erro: --dataset, --product e --territory sao obrigatorios")
@@ -659,22 +599,30 @@ class CLI:
         except KeyError as e:
             print(f"Erro: {e}")
             return
+
+        base_prod = product_info.get("id", product_id)
+        resolved_theme = theme_mod.resolve_theme(
+            theme, product_info.get("alias_theme")
+        )
 
         from ..core.chart_generator import ChartGenerator
         gen = ChartGenerator(font_scale=font_scale)
         annual, timeseries = gen.generate_all_for_batch(
-            self.config, dataset_id, product_id, territory_id, product_info
+            self.config, dataset_id, product_id, territory_id, product_info,
+            theme=theme,
         )
         print(f"\n  [OK] Annual: {len(annual)}  |  Timeseries: {len(timeseries)}")
-        output_dir = os.path.join(
-            self.config.get_output_dir(), dataset_id, product_id, territory_id
+        output_dir = theme_mod.combo_dir(
+            self.config.get_output_dir(), dataset_id, base_prod, territory_id,
+            resolved_theme,
         )
         self._print_chart_summary(output_dir)
         if use_gcs:
             from scripts.sync.upload_to_gcs import upload_combo
             from pathlib import Path
             root_dir = Path(self.config.get_output_dir())
-            n = upload_combo(dataset_id, product_id, territory_id, root_dir)
+            n = upload_combo(dataset_id, base_prod, territory_id, root_dir,
+                             theme=resolved_theme)
             print(f"    Upload GCS: {n} arquivo(s)")
 
     def _print_chart_summary(self, output_dir: str):
@@ -688,7 +636,8 @@ class CLI:
                     print(f"  +-> {folder}/: {len(files)} arquivo(s)")
 
     def _execute_charts_batch(self, batch_path: str, font_scale: float = 1.0,
-                               use_gcs: bool = False):
+                               use_gcs: bool = False,
+                               theme: Optional[str] = None):
         try:
             with open(batch_path, encoding="utf-8") as f:
                 batch = json.load(f)
@@ -719,26 +668,33 @@ class CLI:
                 continue
             try:
                 pinfo = self.datasets.get_product(ds, prod)
+                base_prod = pinfo.get("id", prod)
                 pname = pinfo.get("name", prod)
             except KeyError:
                 print(f"\n[{i:02d}/{total:02d}] [SKIP] Produto '{prod}' nao encontrado")
                 continue
-            print(f"\n[{i:02d}/{total:02d}] {pname}")
+            item_theme = item.get("theme") or theme
+            resolved_theme = theme_mod.resolve_theme(
+                item_theme, pinfo.get("alias_theme")
+            )
+            print(f"\n[{i:02d}/{total:02d}] {pname}  [{resolved_theme}]")
             try:
                 gen = ChartGenerator(font_scale=font_scale)
                 annual, ts = gen.generate_all_for_batch(
-                    self.config, ds, prod, terr, pinfo
+                    self.config, ds, prod, terr, pinfo, theme=item_theme
                 )
                 if annual or ts:
                     ok += 1
                     print(f"  +-> Annual: {len(annual)}  |  Timeseries: {len(ts)}")
-                    output_dir = os.path.join(
-                        self.config.get_output_dir(), ds, prod, terr
+                    output_dir = theme_mod.combo_dir(
+                        self.config.get_output_dir(), ds, base_prod, terr,
+                        resolved_theme,
                     )
                     self._print_chart_summary(output_dir)
                     if use_gcs:
                         from scripts.sync.upload_to_gcs import upload_combo
-                        n = upload_combo(ds, prod, terr, root_dir)
+                        n = upload_combo(ds, base_prod, terr, root_dir,
+                                         theme=resolved_theme)
                         print(f"    Upload GCS: {n} arquivo(s)")
             except Exception as e:
                 import traceback
@@ -750,17 +706,41 @@ class CLI:
 
     def _resolve_viz_params_for_compose(
         self, dataset_id: str, product_id: str,
+        theme: Optional[str] = None,
     ) -> Dict[str, Any]:
-        """Resolve viz params (classes with colors/labels) for the composer legend."""
+        """Resolve viz params (classes with colors/labels) for the composer legend.
+
+        Aplica o tema: `palette`/`classes` com `auto_bg` ou branco puro viram o
+        fundo do tema no modo escuro (o mapa usa fundo escuro para nodata).
+        """
         from ..core.area_stats import AreaStatsCalculator
         calc = AreaStatsCalculator(self.config)
         try:
             pinfo = self.datasets.get_product(dataset_id, product_id)
             viz_key = pinfo.get("visualization", "")
-            if viz_key:
-                ref_viz = calc.get_viz_reference(viz_key)
-                if ref_viz:
-                    return ref_viz
+            ref_viz = calc.get_viz_reference(viz_key) if viz_key else {}
+            if ref_viz:
+                resolved_theme = theme_mod.resolve_theme(
+                    theme, pinfo.get("alias_theme") or ref_viz.get("theme")
+                )
+                out = dict(ref_viz)
+                out["theme"] = resolved_theme
+                if out.get("palette"):
+                    out["palette"] = theme_mod.resolve_palette(
+                        out["palette"], resolved_theme
+                    )
+                if out.get("classes"):
+                    classes = []
+                    for c in out["classes"]:
+                        cc = dict(c)
+                        color = str(cc.get("color", "")).lower().lstrip("#")
+                        if resolved_theme == "dark" and (
+                            color == "ffffff" or color in theme_mod.AUTO_BG_TOKENS
+                        ):
+                            cc["color"] = theme_mod.background_hex(resolved_theme)
+                        classes.append(cc)
+                    out["classes"] = classes
+                return out
         except Exception:
             pass
         return {}
@@ -768,6 +748,7 @@ class CLI:
     def _execute_compose(
         self, dataset_id: str, product_id: str, territory_id: str,
         font_scale: float = 1.0, use_gcs: bool = False,
+        theme: Optional[str] = None,
     ):
         if not dataset_id or not product_id or not territory_id:
             print("Erro: --dataset, --product e --territory sao obrigatorios")
@@ -779,19 +760,26 @@ class CLI:
             print(f"Erro: {e}")
             return
 
+        base_prod = pinfo.get("id", product_id)
         pname = pinfo.get("name", product_id)
+        resolved_theme = theme_mod.resolve_theme(
+            theme, pinfo.get("alias_theme")
+        )
         try:
             tinfo = self.territories.get_territory(territory_id)
             tname = tinfo.get("name", territory_id)
         except KeyError:
             tname = territory_id
 
-        viz_params = self._resolve_viz_params_for_compose(dataset_id, product_id)
+        viz_params = self._resolve_viz_params_for_compose(
+            dataset_id, product_id, theme=theme,
+        )
 
         from ..core.composer import Composer
-        comp = Composer(font_scale=font_scale)
-        output_dir = os.path.join(
-            self.config.get_output_dir(), dataset_id, product_id, territory_id
+        comp = Composer(font_scale=font_scale, theme=resolved_theme)
+        output_dir = theme_mod.combo_dir(
+            self.config.get_output_dir(), dataset_id, base_prod, territory_id,
+            resolved_theme,
         )
         paths = comp.compose(
             output_dir,
@@ -804,11 +792,13 @@ class CLI:
             from scripts.sync.upload_to_gcs import upload_combo
             from pathlib import Path
             root_dir = Path(self.config.get_output_dir())
-            n = upload_combo(dataset_id, product_id, territory_id, root_dir)
+            n = upload_combo(dataset_id, base_prod, territory_id, root_dir,
+                             theme=resolved_theme)
             print(f"    Upload GCS: {n} arquivo(s)")
 
     def _execute_compose_batch(self, batch_path: str, font_scale: float = 1.0,
-                                use_gcs: bool = False):
+                                use_gcs: bool = False,
+                                theme: Optional[str] = None):
         try:
             with open(batch_path, encoding="utf-8") as f:
                 batch = json.load(f)
@@ -839,22 +829,30 @@ class CLI:
                 continue
             try:
                 pinfo = self.datasets.get_product(ds, prod)
+                base_prod = pinfo.get("id", prod)
                 pname = pinfo.get("name", prod)
             except KeyError:
                 print(f"\n  [SKIP] Produto '{prod}' não encontrado")
                 continue
+            item_theme = item.get("theme") or theme
+            resolved_theme = theme_mod.resolve_theme(
+                item_theme, pinfo.get("alias_theme")
+            )
             try:
                 tinfo = self.territories.get_territory(terr)
                 tname = tinfo.get("name", terr)
             except KeyError:
                 tname = terr
 
-            viz_params = self._resolve_viz_params_for_compose(ds, prod)
-            output_dir = os.path.join(
-                self.config.get_output_dir(), ds, prod, terr
+            viz_params = self._resolve_viz_params_for_compose(
+                ds, prod, theme=item_theme,
+            )
+            output_dir = theme_mod.combo_dir(
+                self.config.get_output_dir(), ds, base_prod, terr,
+                resolved_theme,
             )
             try:
-                comp = Composer(font_scale=font_scale)
+                comp = Composer(font_scale=font_scale, theme=resolved_theme)
                 paths = comp.compose(
                     output_dir,
                     product_name=pname,
@@ -863,10 +861,11 @@ class CLI:
                 )
                 if paths:
                     ok += 1
-                    print(f"  +-> {len(paths)} arquivo(s)")
+                    print(f"  +-> {len(paths)} arquivo(s)  [{resolved_theme}]")
                     if use_gcs:
                         from scripts.sync.upload_to_gcs import upload_combo
-                        n = upload_combo(ds, prod, terr, root_dir)
+                        n = upload_combo(ds, base_prod, terr, root_dir,
+                                         theme=resolved_theme)
                         print(f"    Upload GCS: {n} arquivo(s)")
             except Exception as e:
                 print(f"  [ERRO] {ds}/{prod}/{terr}: {e}")
@@ -890,7 +889,8 @@ class CLI:
 
         from ..core.area_stats import AreaStatsCalculator
         calc = AreaStatsCalculator(self.config)
-
+        # area_stats é independente de tema e sempre vive no produto base
+        product_id = product_info.get("id", product_id)
         if product_batch:
             paths = calc.compute_and_save_product(
                 dataset_id, product_id, territory_id, product_info,
@@ -905,7 +905,6 @@ class CLI:
             calc.wait_all_tasks(output_dir)
 
         print(f"\n  [OK] {len(paths)} CSV(s) salvos em {calc._get_output_dir(dataset_id, product_id, territory_id)}/area_stats/")
-
     def _execute_area_stats_batch(
         self, batch_path: str, use_gcs: bool = False, resume: bool = False,
         product_batch: bool = False,
@@ -945,21 +944,22 @@ class CLI:
 
             try:
                 pinfo = self.datasets.get_product(ds, prod)
+                base_prod = pinfo.get("id", prod)
                 pname = pinfo.get("name", prod)
             except KeyError:
                 print(f"\n[{i:02d}/{total:02d}] [SKIP] Produto '{prod}' nao encontrado")
                 errors += 1
                 continue
 
-            print(f"\n[{i:02d}/{total:02d}] {pname} — {ds}/{prod}/{terr}")
+            print(f"\n[{i:02d}/{total:02d}] {pname} — {ds}/{base_prod}/{terr}")
             try:
                 if product_batch:
                     paths = calc.compute_and_save_product(
-                        ds, prod, terr, pinfo,
+                        ds, base_prod, terr, pinfo,
                     )
                 else:
                     paths = calc.compute_and_save(
-                        ds, prod, terr, pinfo, use_gcs=use_gcs, resume=resume,
+                        ds, base_prod, terr, pinfo, use_gcs=use_gcs, resume=resume,
                     )
                 if paths:
                     ok += 1
@@ -976,7 +976,11 @@ class CLI:
                 prod = item.get("product", "")
                 terr = item.get("territory", "")
                 if all([ds, prod, terr]):
-                    output_dir = calc._get_output_dir(ds, prod, terr)
+                    try:
+                        base_prod = self.datasets.get_product(ds, prod).get("id", prod)
+                    except KeyError:
+                        continue
+                    output_dir = calc._get_output_dir(ds, base_prod, terr)
                     calc.wait_all_tasks(output_dir)
 
         print("-" * 52)

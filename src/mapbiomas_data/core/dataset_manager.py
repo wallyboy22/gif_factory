@@ -1,5 +1,6 @@
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 from ..config import ConfigLoader
+from . import theme as theme_mod
 
 
 class DatasetManager:
@@ -56,16 +57,35 @@ class DatasetManager:
             })
         return result
 
-    def get_product(self, dataset_id: str, product_id: str) -> Dict[str, Any]:
+    def resolve_alias(self, dataset_id: str,
+                      product_id: str) -> Tuple[str, Optional[str]]:
+        """Resolve alias depreciado `produto_black` -> (`produto`, "dark").
+
+        O sufixo `_black` é reservado: nunca deve existir produto novo com ele.
+        Quando o produto já existe no YAML, ele também é redirecionado para o
+        produto base (e o tema escuro), para que exista um único caminho.
+        """
         ds = self._datasets.get(dataset_id)
         if not ds:
             raise KeyError(f"Dataset '{dataset_id}' não encontrado")
         products = ds.get("products", {})
-        product = products.get(product_id)
-        if not product:
-            raise KeyError(f"Produto '{product_id}' não encontrado em '{dataset_id}'")
+        base, implied = theme_mod.theme_alias(product_id)
+        if implied and base in products:
+            return base, implied
+        if product_id in products:
+            return product_id, None
+        raise KeyError(f"Produto '{product_id}' não encontrado em '{dataset_id}'")
+
+    def get_product(self, dataset_id: str, product_id: str) -> Dict[str, Any]:
+        base_id, alias_theme = self.resolve_alias(dataset_id, product_id)
+        ds = self._datasets[dataset_id]
+        product = ds.get("products", {})[base_id]
         result = dict(product)
-        result["id"] = product_id
+        result["id"] = base_id
+        result["requested_id"] = product_id
+        if base_id != product_id:
+            result["alias_of"] = base_id
+            result["alias_theme"] = alias_theme
         result["dataset_id"] = dataset_id
         result["dataset_description"] = ds.get("description", "")
         result["collection_title"] = ds.get("title_collection", "")

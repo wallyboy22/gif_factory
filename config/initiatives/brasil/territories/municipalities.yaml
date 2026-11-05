@@ -17,8 +17,12 @@ territories:
   juazeiro_petrolina:
     name: "Juazeiro (BA) e Petrolina (PE)"
     name_en: "Juazeiro (BA) and Petrolina (PE)"
-    source: "projects/ee-ipam/assets/ORIGINAIS/IBGE/limite_municipios_IBGE_2025"
-    filter_in:
-      field: "NM_MUN"
-      values: ["Juazeiro", "Petrolina"]
+    # Composição: os dois municípios viram UMA FeatureCollection.
+    # `dissolve: true` funde as geometrias em um único polígono (sem a divisa
+    # interna entre eles). Para manter os limites municipais visíveis, use
+    # `dissolve: false` (as duas features seguem na mesma FC).
+    union_of:
+      - juazeiro_ba
+      - petrolina_pe
+    dissolve: true
     bbox: [-40.9590, -9.9735, -39.8608, -8.6227]

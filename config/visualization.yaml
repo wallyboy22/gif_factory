@@ -130,97 +130,97 @@ visualizations:
     min: 0
     max: 91
     palette:
-    - ffffff
-    - ffffff
-    - ffffff
+    - auto_bg
+    - auto_bg
+    - auto_bg
     - 1f8d49
     - 7dc975
     - 04381d
     - 007785
     - 228c70
-    - ffffff
+    - auto_bg
     - 7a5900
-    - ffffff
+    - auto_bg
     - '519799'
     - d6bc74
-    - ffffff
-    - ffffff
+    - auto_bg
+    - auto_bg
     - edde8e
-    - ffffff
-    - ffffff
-    - ffffff
-    - ffffff
+    - auto_bg
+    - auto_bg
+    - auto_bg
+    - auto_bg
     - db7093
     - ffefc3
-    - ffffff
+    - auto_bg
     - ffa07a
     - d4271e
     - db4d4f
-    - ffffff
-    - ffffff
-    - ffffff
+    - auto_bg
+    - auto_bg
+    - auto_bg
     - ad5100
     - 9c0027
     - 091077
     - fc8114
     - 2532e4
-    - ffffff
+    - auto_bg
     - 9065d0
-    - ffffff
-    - ffffff
-    - ffffff
+    - auto_bg
+    - auto_bg
+    - auto_bg
     - f5b3c8
     - c71585
     - f54ca9
-    - ffffff
-    - ffffff
-    - ffffff
-    - ffffff
+    - auto_bg
+    - auto_bg
+    - auto_bg
+    - auto_bg
     - d68fe2
     - 9932cc
     - e6ccff
     - 02d659
     - ffaa5f
-    - ffffff
-    - ffffff
-    - ffffff
-    - ffffff
-    - ffffff
-    - ffffff
-    - ffffff
-    - ffffff
-    - ffffff
-    - ffffff
-    - ffffff
+    - auto_bg
+    - auto_bg
+    - auto_bg
+    - auto_bg
+    - auto_bg
+    - auto_bg
+    - auto_bg
+    - auto_bg
+    - auto_bg
+    - auto_bg
+    - auto_bg
     - ff69b4
-    - ffffff
-    - ffffff
-    - ffffff
-    - ffffff
-    - ffffff
-    - ffffff
-    - ffffff
-    - ffffff
-    - ffffff
-    - ffffff
-    - ffffff
-    - ffffff
+    - auto_bg
+    - auto_bg
+    - auto_bg
+    - auto_bg
+    - auto_bg
+    - auto_bg
+    - auto_bg
+    - auto_bg
+    - auto_bg
+    - auto_bg
+    - auto_bg
+    - auto_bg
     - '757272'
-    - ffffff
+    - auto_bg
     - 86b074
-    - ffffff
-    - ffffff
-    - ffffff
-    - ffffff
-    - ffffff
-    - ffffff
+    - auto_bg
+    - auto_bg
+    - auto_bg
+    - auto_bg
+    - auto_bg
+    - auto_bg
     - 81dbbf
-    - ffffff
-    - ffffff
-    - ffffff
-    - ffffff
-    - ffffff
-    - ffffff
+    - auto_bg
+    - auto_bg
+    - auto_bg
+    - auto_bg
+    - auto_bg
+    - auto_bg
     - 403d3e
     label: Classe de uso
     cmap_type: categorical
@@ -323,7 +323,7 @@ visualizations:
     min: 0
     max: 4
     palette:
-    - ffffff
+    - auto_bg
     - 1f8d49
     - ffefc3
     - 2532e4
@@ -341,7 +341,7 @@ visualizations:
     min: 0
     max: 8
     palette:
-    - ffffff
+    - auto_bg
     - 1f8d49
     - d6bc74
     - ad5100
@@ -367,32 +367,32 @@ visualizations:
     min: 0
     max: 27
     palette:
-    - ffffff
-    - ffffff
-    - ffffff
+    - auto_bg
+    - auto_bg
+    - auto_bg
     - 1f8d49
     - 7dc975
-    - ffffff
-    - ffffff
-    - ffffff
-    - ffffff
+    - auto_bg
+    - auto_bg
+    - auto_bg
+    - auto_bg
     - 7a5900
-    - ffffff
+    - auto_bg
     - '519799'
     - d6bc74
-    - ffffff
-    - ffffff
+    - auto_bg
+    - auto_bg
     - edde8e
-    - ffffff
-    - ffffff
+    - auto_bg
+    - auto_bg
     - e974ed
-    - ffffff
-    - ffffff
+    - auto_bg
+    - auto_bg
     - ffefc3
     - db4d4f
-    - ffffff
+    - auto_bg
     - d4271e
-    - ffffff
+    - auto_bg
     - 2532e4
     - '808080'
     label: Classe
@@ -431,42 +431,42 @@ visualizations:
     min: 0
     max: 36
     palette:
-    - ffffff
-    - ffffff
-    - ffffff
+    - auto_bg
+    - auto_bg
+    - auto_bg
     - 1f8d49
-    - ffffff
-    - ffffff
-    - ffffff
-    - ffffff
-    - ffffff
+    - auto_bg
+    - auto_bg
+    - auto_bg
+    - auto_bg
+    - auto_bg
     - 7a5900
-    - ffffff
+    - auto_bg
     - '519799'
     - d6bc74
-    - ffffff
-    - ffffff
+    - auto_bg
+    - auto_bg
     - edde8e
-    - ffffff
-    - ffffff
-    - ffffff
+    - auto_bg
+    - auto_bg
+    - auto_bg
     - f54ca9
-    - ffffff
+    - auto_bg
     - ffefc3
-    - ffffff
+    - auto_bg
     - ffa07a
     - d4271e
     - db4d4f
     - 2532e4
-    - ffffff
-    - ffffff
+    - auto_bg
+    - auto_bg
     - ad5100
     - 9c0027
     - 091077
-    - ffffff
-    - ffffff
-    - ffffff
-    - ffffff
+    - auto_bg
+    - auto_bg
+    - auto_bg
+    - auto_bg
     - e974ed
     label: Classe
     cmap_type: categorical
@@ -2132,7 +2132,7 @@ visualizations:
     min: 0
     max: 7000
     nodata_value: 0
-    nodata_color: ffffff
+    nodata_color: auto_bg
     palette:
     - d73027
     - fc8d59
@@ -2149,7 +2149,7 @@ visualizations:
     min: 0
     max: 8
     palette:
-    - ffffff
+    - auto_bg
     - bc4749
     - d68c8d
     - fff59d
@@ -2158,45 +2158,8 @@ visualizations:
     - '6a994e'
     - '386641'
     - '0d2207'
-    label: Distância até a borda (m)
-    unit: m
-    cmap_type: categorical
-    prefix_labels: false
-    discrete_labels:
-    - ''
-    - ≤ 30 m
-    - ≤ 60 m
-    - ≤ 90 m
-    - ≤ 120 m
-    - ≤ 150 m
-    - ≤ 300 m
-    - ≤ 600 m
-    - ≤ 1000 m
-  edge_area_black:
-    name: Distância até a Borda
-    min: 0
-    max: 7000
-    theme: dark
-    nodata_value: 0
-    nodata_color: '000000'
-    palette:
-    - d73027
-    - fc8d59
-    - fee08b
-    - ffffbf
-    - d9ef8b
-    - '91cf60'
-    - 1a9850
-    label: Distância até a borda (m)
-    unit: m
-    cmap_type: sequential
-  edge_area_1000m_black:
-    name: Distância até a Borda (até 1000 m)
-    min: 0
-    max: 8
-    theme: dark
-    palette:
-    - '000000'
+    palette_dark:
+    - auto_bg
     - bc4749
     - d68c8d
     - fff59d
@@ -3951,392 +3914,3 @@ visualizations:
     - 33
     - 34
     - 0
-
-  lulc_nivel0_black:
-    name: Uso e Cobertura - Nível 0
-    min: 0
-    max: 4
-    theme: dark
-    palette:
-    - '000000'
-    - 1f8d49
-    - ffefc3
-    - 2532e4
-    - '808080'
-    label: Classe
-    cmap_type: categorical
-    discrete_labels:
-    - ''
-    - Vegetação Natural
-    - Antrópico
-    - Corpos d'água
-    - Não observado
-  lulc_nivel1_black:
-    name: Uso e Cobertura - Nível 1
-    min: 0
-    max: 8
-    theme: dark
-    palette:
-    - '000000'
-    - 1f8d49
-    - d6bc74
-    - ad5100
-    - 7a5900
-    - ffefc3
-    - db4d4f
-    - 2532e4
-    - '808080'
-    label: Classe
-    cmap_type: categorical
-    discrete_labels:
-    - ''
-    - Formação Florestal
-    - Formação Campestre e Herbácea
-    - Afloramento Rochoso
-    - Silvicultura
-    - Agropecuária
-    - Área não Vegetada
-    - Corpos d'água
-    - Não observado
-  lulc_nivel1_1_black:
-    name: Uso e Cobertura - Nível 1.1
-    min: 0
-    max: 27
-    theme: dark
-    palette:
-    - '000000'
-    - '000000'
-    - '000000'
-    - 1f8d49
-    - 7dc975
-    - '000000'
-    - '000000'
-    - '000000'
-    - '000000'
-    - 7a5900
-    - '000000'
-    - '519799'
-    - d6bc74
-    - '000000'
-    - '000000'
-    - edde8e
-    - '000000'
-    - '000000'
-    - e974ed
-    - '000000'
-    - '000000'
-    - ffefc3
-    - db4d4f
-    - '000000'
-    - d4271e
-    - '000000'
-    - 2532e4
-    - '808080'
-    label: Classe
-    cmap_type: categorical
-    discrete_labels:
-    - ''
-    - ''
-    - ''
-    - Formação Florestal
-    - Formação Savânica
-    - ''
-    - ''
-    - ''
-    - ''
-    - Silvicultura
-    - ''
-    - Campo Alagado e Área Pantanosa
-    - Formação Campestre
-    - ''
-    - ''
-    - Pastagem
-    - ''
-    - ''
-    - Lavoura
-    - ''
-    - ''
-    - Mosaico de Usos
-    - Área não Vegetada
-    - ''
-    - Área Urbanizada
-    - ''
-    - Corpos d'água
-    - Não observado
-  lulc_nivel2_black:
-    name: Uso e Cobertura - Nível 2
-    min: 0
-    max: 36
-    theme: dark
-    palette:
-    - '000000'
-    - '000000'
-    - '000000'
-    - 1f8d49
-    - '000000'
-    - '000000'
-    - '000000'
-    - '000000'
-    - '000000'
-    - 7a5900
-    - '000000'
-    - '519799'
-    - d6bc74
-    - '000000'
-    - '000000'
-    - edde8e
-    - '000000'
-    - '000000'
-    - '000000'
-    - f54ca9
-    - '000000'
-    - ffefc3
-    - '000000'
-    - ffa07a
-    - d4271e
-    - db4d4f
-    - 2532e4
-    - '000000'
-    - '000000'
-    - ad5100
-    - 9c0027
-    - 091077
-    - '000000'
-    - '000000'
-    - '000000'
-    - '000000'
-    - e974ed
-    label: Classe
-    cmap_type: categorical
-    discrete_labels:
-    - ''
-    - ''
-    - ''
-    - Formação Florestal
-    - ''
-    - ''
-    - ''
-    - ''
-    - ''
-    - Silvicultura
-    - ''
-    - Campo Alagado e Área Pantanosa
-    - Formação Campestre
-    - ''
-    - ''
-    - Pastagem
-    - ''
-    - ''
-    - ''
-    - Lavoura Temporária
-    - ''
-    - Mosaico de Usos
-    - ''
-    - Praia, Duna e Areal
-    - Área Urbanizada
-    - Outras Áreas não Vegetadas
-    - Corpos d'água
-    - ''
-    - ''
-    - Afloramento Rochoso
-    - Mineração
-    - Aquicultura
-    - ''
-    - ''
-    - ''
-    - ''
-    - Lavoura Perene
-  lulc_black:
-    name: Uso e Cobertura (Coleção 11)
-    min: 0
-    max: 91
-    theme: dark
-    palette:
-    - '000000'
-    - '000000'
-    - '000000'
-    - 1f8d49
-    - 7dc975
-    - 04381d
-    - 007785
-    - 228c70
-    - '000000'
-    - 7a5900
-    - '000000'
-    - '519799'
-    - d6bc74
-    - '000000'
-    - '000000'
-    - edde8e
-    - '000000'
-    - '000000'
-    - '000000'
-    - '000000'
-    - db7093
-    - ffefc3
-    - '000000'
-    - ffa07a
-    - d4271e
-    - db4d4f
-    - '000000'
-    - '000000'
-    - '000000'
-    - ad5100
-    - 9c0027
-    - 091077
-    - fc8114
-    - 2532e4
-    - '000000'
-    - 9065d0
-    - '000000'
-    - '000000'
-    - '000000'
-    - f5b3c8
-    - c71585
-    - f54ca9
-    - '000000'
-    - '000000'
-    - '000000'
-    - '000000'
-    - d68fe2
-    - 9932cc
-    - e6ccff
-    - 02d659
-    - ffaa5f
-    - '000000'
-    - '000000'
-    - '000000'
-    - '000000'
-    - '000000'
-    - '000000'
-    - '000000'
-    - '000000'
-    - '000000'
-    - '000000'
-    - '000000'
-    - ff69b4
-    - '000000'
-    - '000000'
-    - '000000'
-    - '000000'
-    - '000000'
-    - '000000'
-    - '000000'
-    - '000000'
-    - '000000'
-    - '000000'
-    - '000000'
-    - '000000'
-    - '757272'
-    - '000000'
-    - 86b074
-    - '000000'
-    - '000000'
-    - '000000'
-    - '000000'
-    - '000000'
-    - '000000'
-    - 81dbbf
-    - '000000'
-    - '000000'
-    - '000000'
-    - '000000'
-    - '000000'
-    - '000000'
-    - 403d3e
-    label: Classe de uso
-    cmap_type: categorical
-    discrete_labels:
-    - ''
-    - ''
-    - ''
-    - Formação Florestal
-    - Formação Savânica
-    - Mangue
-    - Floresta Alagável
-    - Savana Alagada (beta)
-    - ''
-    - Silvicultura
-    - ''
-    - Campo Alagado e Área Pantanosa
-    - Formação Campestre
-    - ''
-    - ''
-    - Pastagem
-    - ''
-    - ''
-    - ''
-    - ''
-    - Cana
-    - Mosaico de Usos
-    - ''
-    - Praia, Duna e Areal
-    - Área Urbanizada
-    - Outras Áreas não Vegetadas
-    - ''
-    - ''
-    - ''
-    - Afloramento Rochoso
-    - Mineração
-    - Aquicultura
-    - Apicum
-    - Rio, Lago e Oceano
-    - ''
-    - Dendê
-    - ''
-    - ''
-    - ''
-    - Soja
-    - Arroz
-    - Outras Lavouras Temporárias
-    - ''
-    - ''
-    - ''
-    - ''
-    - Café
-    - Citrus
-    - Outras Lavouras Perenes
-    - Restinga Arbórea
-    - Restinga Herbácea ou Arbustiva
-    - ''
-    - ''
-    - ''
-    - ''
-    - ''
-    - ''
-    - ''
-    - ''
-    - ''
-    - ''
-    - ''
-    - Algodão (beta)
-    - ''
-    - ''
-    - ''
-    - ''
-    - ''
-    - ''
-    - ''
-    - ''
-    - ''
-    - ''
-    - ''
-    - ''
-    - Usina Fotovoltaica
-    - ''
-    - Formação Herbáceo Arbustiva
-    - ''
-    - ''
-    - ''
-    - ''
-    - ''
-    - ''
-    - Marismas (beta)
-    - ''
-    - ''
-    - ''
-    - ''
-    - ''
-    - ''
-    - ''
-    - Parque Eólico (beta)

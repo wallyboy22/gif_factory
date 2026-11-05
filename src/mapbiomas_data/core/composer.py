@@ -1,6 +1,7 @@
 import os
 from typing import Any, Dict, List, Optional, Tuple
 from PIL import Image as PILImage, ImageDraw, ImageFont
+from . import theme as theme_mod
 
 
 def _parse_hex(hex_color: str) -> Tuple[int, int, int]:
@@ -12,22 +13,24 @@ class Composer:
     """Compose map frames + chart PNGs into composed frames + GIF.
 
     Layout:
-      ┌─────────────────────────────────────┐
-      │ TITLE BAR (product — territory)     │
-      ├──────────────────────┬──────────────┤
-      │                      │              │
-      │  MAP (frame_clean)   │  DONUT       │
-      │  ~65% width          │  ~35% width  │
-      │                      │              │
-      ├──────────────────────┴──────────────┤
-      │  TIMESERIES (full width)            │
-      ├─────────────────────────────────────┤
-      │ LEGEND BAR (class colors + labels)  │
-      └─────────────────────────────────────┘
+      â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+      â”‚ TITLE BAR (product â€” territory)     â”‚
+      â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤
+      â”‚                      â”‚              â”‚
+      â”‚  MAP (frame_clean)   â”‚  DONUT       â”‚
+      â”‚  ~65% width          â”‚  ~35% width  â”‚
+      â”‚                      â”‚              â”‚
+      â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”´â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤
+      â”‚  TIMESERIES (full width)            â”‚
+      â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤
+      â”‚ LEGEND BAR (class colors + labels)  â”‚
+      â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
     """
 
-    def __init__(self, font_scale: float = 1.0):
+    def __init__(self, font_scale: float = 1.0, theme: Optional[str] = None):
         self.font_scale = font_scale
+        self.theme = theme_mod.resolve_theme(theme)
+        self.style = theme_mod.get_style(self.theme)
 
     @staticmethod
     def _make_font(size: int) -> ImageFont.FreeTypeFont:
@@ -234,7 +237,7 @@ class Composer:
 
         canvas_h = title_h + mh + ts_h + legend_h + gap_ts
 
-        canvas = PILImage.new("RGBA", (canvas_w, canvas_h), (255, 255, 255, 255))
+        canvas = PILImage.new("RGBA", (canvas_w, canvas_h), (*self.style["bg"], 255))
         draw = ImageDraw.Draw(canvas)
 
         # --- Title bar ---
@@ -262,7 +265,7 @@ class Composer:
                           is_sequential=self._is_sequential)
 
         # --- Separator lines ---
-        sep_color = (180, 180, 180)
+        sep_color = self.style["sep"]
         draw.line([(0, title_h), (canvas_w, title_h)], fill=sep_color, width=1)
         if donut_panel_w > 0:
             draw.line([(map_w + margin, title_h), (map_w + margin, ts_y)], fill=sep_color, width=1)
@@ -275,12 +278,12 @@ class Composer:
         w: int, h: int, product_name: str, territory_name: str,
     ):
         """Fill title bar with centered text."""
-        draw.rectangle([(0, 0), (w, h)], fill=(245, 245, 245))
+        draw.rectangle([(0, 0), (w, h)], fill=self.style["panel"])
         title_font = self._make_font(int(80 * self.font_scale))
         text = f"{product_name} — {territory_name}" if product_name else territory_name
         tw = draw.textbbox((0, 0), text, font=title_font)
         draw.text(((w - tw[2]) // 2, (h - (tw[3] - tw[1])) // 2),
-                  text, font=title_font, fill=(51, 51, 51))
+                  text, font=title_font, fill=self.style["text"])
 
     def _draw_legend(
         self, draw: ImageDraw.Draw,
@@ -294,8 +297,8 @@ class Composer:
         map scale bar text (which is ~69pt on the compose canvas at M3.0).
         For sequential cmap_type, draws a gradient color bar instead.
         """
-        draw.rectangle([(0, y), (w, y + h)], fill=(248, 248, 248))
-        draw.line([(0, y), (w, y)], fill=(200, 200, 200), width=1)
+        draw.rectangle([(0, y), (w, y + h)], fill=self.style["legend_bg"])
+        draw.line([(0, y), (w, y)], fill=self.style["sep"], width=1)
 
         if is_sequential:
             palette = self._viz_params.get("palette", [])
@@ -327,24 +330,24 @@ class Composer:
                 else:
                     draw.rectangle([sx, bar_y, sx + seg_w, bar_y + bar_h], fill=color)
             draw.rectangle([bar_x, bar_y, bar_x + bar_w, bar_y + bar_h],
-                           outline=(100, 100, 100), width=2)
+                           outline=self.style["box"], width=2)
 
             viz_min = self._viz_params.get("min", 0)
             viz_max = self._viz_params.get("max", len(palette) - 1)
             label_y = bar_y + bar_h + 4
 
             draw.text((bar_x + 4, label_y), str(viz_min),
-                      font=lbl_font, fill=(51, 51, 51))
+                      font=lbl_font, fill=self.style["text"])
             tw_max = draw.textbbox((0, 0), str(viz_max), font=lbl_font)
             draw.text((bar_x + bar_w - tw_max[2], label_y), str(viz_max),
-                      font=lbl_font, fill=(51, 51, 51))
+                      font=lbl_font, fill=self.style["text"])
 
             if label_text:
                 lbl_font_big = self._make_font(font_sz)
                 lw = draw.textbbox((0, 0), label_text, font=lbl_font_big)
                 label_text_y = label_y + lbl_h + 4
                 draw.text(((w - lw[2]) // 2, label_text_y),
-                          label_text, font=lbl_font_big, fill=(51, 51, 51))
+                          label_text, font=lbl_font_big, fill=self.style["text"])
             return
 
         if not entries:
@@ -368,8 +371,8 @@ class Composer:
             by = y + (h - n_rows * row_h) // 2 + row * row_h
             draw.rectangle([bx, by, bx + box_size, by + box_size], fill=color)
             draw.rectangle([bx, by, bx + box_size, by + box_size],
-                           outline=(100, 100, 100), width=1)
+                           outline=self.style["box"], width=1)
             lbl_bbox = draw.textbbox((0, 0), label, font=leg_font)
             lbl_h = lbl_bbox[3] - lbl_bbox[1]
             draw.text((bx + box_size + 8, by + (box_size - lbl_h) // 2),
-                      label, font=leg_font, fill=(51, 51, 51))
+                      label, font=leg_font, fill=self.style["text"])

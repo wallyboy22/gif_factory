@@ -77,3 +77,70 @@ class TestTerritoryManager:
         bbox = manager.get_bbox("uf_df")
         assert bbox is not None
         assert len(bbox) == 4
+
+
+class _FakeFC:
+    """FeatureCollection falsa: registra as operações sem tocar no GEE."""
+
+    def __init__(self, source=None):
+        self.source = source
+        self.ops = []
+
+    def filter(self, filt):
+        self.ops.append(("filter", filt))
+        return self
+
+    def merge(self, other):
+        self.ops.append(("merge", other))
+        return self
+
+    def union(self, max_error):
+        self.ops.append(("union", max_error))
+        return self
+
+
+def _fake_ee():
+    import types
+    mod = types.ModuleType("ee")
+    mod.FeatureCollection = _FakeFC
+    mod.Filter = types.SimpleNamespace(
+        equals=lambda field, value: ("equals", field, value),
+        inList=lambda field, values: ("inList", field, values),
+    )
+    return mod
+
+
+class TestTerritoryUnion:
+    def test_union_declared_in_yaml(self, manager):
+        info = manager.get_territory("juazeiro_petrolina")
+        assert info["union_of"] == ["juazeiro_ba", "petrolina_pe"]
+        assert info["dissolve"] is True
+        valid, _ = manager.validate_territory("juazeiro_petrolina")
+        assert valid is True
+
+    def test_union_builds_one_feature_collection(self, manager, monkeypatch):
+        monkeypatch.setitem(sys.modules, "ee", _fake_ee())
+        fc = manager.get_feature_collection("juazeiro_petrolina")
+        assert isinstance(fc, _FakeFC)
+        ops = [op for op, _ in fc.ops]
+        assert ops.count("merge") == 1
+        assert "union" in ops
+
+    def test_union_accepts_inline_members(self, manager, monkeypatch):
+        manager._territories["municipalities"]["inline_pair"] = {
+            "name": "Inline",
+            "union_of": [
+                {"source": "src", "filter": "NM_MUN == 'A'"},
+                {"source": "src", "filter_in": {"field": "NM_MUN", "values": ["B"]}},
+            ],
+        }
+        monkeypatch.setitem(sys.modules, "ee", _fake_ee())
+        fc = manager.get_feature_collection("inline_pair")
+        assert "merge" in [op for op, _ in fc.ops]
+
+    def test_union_cycle_raises(self, manager, monkeypatch):
+        manager._territories["municipalities"]["loop_a"] = {"union_of": ["loop_b"]}
+        manager._territories["municipalities"]["loop_b"] = {"union_of": ["loop_a"]}
+        monkeypatch.setitem(sys.modules, "ee", _fake_ee())
+        with pytest.raises(ValueError, match="Ciclo"):
+            manager.get_feature_collection("loop_a")

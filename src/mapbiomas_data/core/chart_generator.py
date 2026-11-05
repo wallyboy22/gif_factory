@@ -6,19 +6,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
 from PIL import Image as PILImage, ImageDraw, ImageFont
-
-plt.rcParams.update({
-    "figure.facecolor": "white",
-    "axes.facecolor": "white",
-    "font.family": "sans-serif",
-    "axes.edgecolor": "#333333",
-    "axes.labelcolor": "#333333",
-    "text.color": "#333333",
-    "xtick.color": "#555555",
-    "ytick.color": "#555555",
-    "axes.spines.top": False,
-    "axes.spines.right": False,
-})
+from . import theme as theme_mod
 
 
 def _parse_hex(hex_color: str) -> Tuple[int, int, int]:
@@ -43,7 +31,8 @@ class ChartGenerator:
                  timeseries_font_scale: Optional[float] = None,
                  donut_figsize: Optional[Tuple[float, float]] = None,
                  donut_binary_figsize: Optional[Tuple[float, float]] = None,
-                 timeseries_figsize: Optional[Tuple[float, float]] = None):
+                 timeseries_figsize: Optional[Tuple[float, float]] = None,
+                 theme: Optional[str] = None):
         self.class_labels = class_labels or {}
         self.class_colors = class_colors or {}
         self.viz_params = viz_params or {}
@@ -54,6 +43,12 @@ class ChartGenerator:
         self.donut_figsize = donut_figsize or (6, 6)
         self.donut_binary_figsize = donut_binary_figsize or (5, 5)
         self.timeseries_figsize = timeseries_figsize or (8, 3)
+        self.theme = theme_mod.resolve_theme(theme)
+        self.style = theme_mod.get_style(self.theme)
+
+    def _use_theme(self, theme: Optional[str]) -> None:
+        self.theme = theme_mod.resolve_theme(theme, self.theme)
+        self.style = theme_mod.get_style(self.theme)
 
     @staticmethod
     def _make_font(size: int) -> ImageFont.FreeTypeFont:
@@ -64,6 +59,23 @@ class ChartGenerator:
                 return ImageFont.truetype("DejaVuSans.ttf", size)
             except (IOError, OSError):
                 return ImageFont.load_default()
+
+    def _subplots(self, figsize: Tuple[float, float]):
+        """Figure com o fundo do tema (sem depender de rcParams globais)."""
+        fig, ax = plt.subplots(figsize=figsize, facecolor=self.style["bg"])
+        ax.set_facecolor(self.style["bg"])
+        return fig, ax
+
+    def _apply_axes_style(self, ax) -> None:
+        st = self.style
+        for side in ("top", "right"):
+            ax.spines[side].set_visible(False)
+        for side in ("left", "bottom"):
+            ax.spines[side].set_color(st["muted"])
+        ax.tick_params(axis="both", colors=st["muted"])
+        ax.xaxis.label.set_color(st["text"])
+        ax.yaxis.label.set_color(st["text"])
+        ax.title.set_color(st["text"])
 
     # ------------------------------------------------------------------
     # Data loading
@@ -229,7 +241,7 @@ class ChartGenerator:
         is_binary: bool = False,
     ):
         figsize = self.donut_figsize if not is_binary else self.donut_binary_figsize
-        fig, ax = plt.subplots(figsize=figsize)
+        fig, ax = self._subplots(figsize)
 
         if is_binary:
             self._plot_binary_gauge(records, class_colors, ax)
@@ -237,7 +249,7 @@ class ChartGenerator:
             self._plot_multiclass_donut(records, all_classes, class_colors, ax)
 
         fig.tight_layout()
-        fig.savefig(path, dpi=150, bbox_inches="tight")
+        fig.savefig(path, dpi=150, bbox_inches="tight", facecolor=self.style["bg"])
         plt.close(fig)
 
     def _plot_binary_gauge(self, records: List[Dict],
@@ -254,13 +266,13 @@ class ChartGenerator:
 
         if burned_area == 0 and unburned_area == 0:
             ax.text(0.5, 0.5, "Sem dados", ha="center", va="center",
-                    fontsize=fs(10), color="#999")
+                    fontsize=fs(10), color=self.style["faint"])
             ax.set_xlim(-1, 1)
             ax.set_ylim(-1, 1)
             return
 
         burned_color = class_colors.get(1, "#800000")
-        unburned_color = class_colors.get(0, "#e0e0e0")
+        unburned_color = class_colors.get(0, theme_mod.to_hex(self.style["unburned"]))
 
         if unburned_area > 0:
             wedges, texts = ax.pie(
@@ -268,7 +280,7 @@ class ChartGenerator:
                 colors=[unburned_color, burned_color],
                 startangle=90,
                 counterclock=False,
-                wedgeprops=dict(width=0.35, edgecolor="#555555", linewidth=1.5),
+                wedgeprops=dict(width=0.35, edgecolor=self.style["muted"], linewidth=1.5),
             )
         else:
             wedges, texts = ax.pie(
@@ -276,15 +288,15 @@ class ChartGenerator:
                 colors=[burned_color],
                 startangle=90,
                 counterclock=False,
-                wedgeprops=dict(width=0.35, edgecolor="#555555", linewidth=1.5),
+                wedgeprops=dict(width=0.35, edgecolor=self.style["muted"], linewidth=1.5),
             )
 
         total_area = burned_area + unburned_area
         pct = (burned_area / total_area * 100) if total_area > 0 else 0
         ax.text(0, 0.06, f"{burned_area:,.0f} ha", ha="center", va="center",
-                fontsize=fs(13), fontweight="bold", color="#333")
+                fontsize=fs(13), fontweight="bold", color=self.style["text"])
         ax.text(0, -0.08, f"{pct:.1f}%", ha="center", va="center",
-                fontsize=fs(11), color="#555")
+                fontsize=fs(11), color=self.style["muted"])
 
 
 
@@ -301,23 +313,23 @@ class ChartGenerator:
         slices = [(c, class_areas[c]) for c in all_classes if class_areas[c] > 0]
         if not slices:
             ax.text(0.5, 0.5, "Sem dados", ha="center", va="center",
-                    fontsize=fs(10), color="#999")
+                    fontsize=fs(10), color=self.style["faint"])
             ax.set_xlim(-1, 1)
             ax.set_ylim(-1, 1)
             return
 
         classes, areas = zip(*slices)
-        colors = [class_colors.get(c, "#cccccc") for c in classes]
+        colors = [class_colors.get(c, theme_mod.to_hex(self.style["unknown"])) for c in classes]
         total = sum(areas)
 
         wedges, texts = ax.pie(
             areas, colors=colors,
             startangle=90,
-            wedgeprops=dict(width=0.35, edgecolor="#555555", linewidth=1.5),
+            wedgeprops=dict(width=0.35, edgecolor=self.style["muted"], linewidth=1.5),
         )
 
         ax.text(0, 0, f"{total:,.0f}\nha", ha="center", va="center",
-                fontsize=fs(10), fontweight="bold", color="#333")
+                fontsize=fs(10), fontweight="bold", color=self.style["text"])
 
     # ------------------------------------------------------------------
     # Timeseries: fixed stacked area with current-year highlight
@@ -356,7 +368,8 @@ class ChartGenerator:
         product_id: str = "", territory_id: str = "",
     ):
         fs_l = lambda n: int(n * self.timeseries_font_scale)
-        fig, ax = plt.subplots(figsize=self.timeseries_figsize)
+        fig, ax = self._subplots(self.timeseries_figsize)
+        self._apply_axes_style(ax)
 
         x = list(range(len(all_years)))
         x_labels = [str(y) for y in all_years]
@@ -370,17 +383,17 @@ class ChartGenerator:
             if sum(vals) == 0:
                 continue
             y_layers.append(vals)
-            layer_colors.append(class_colors.get(cls_val, "#cccccc"))
+            layer_colors.append(class_colors.get(cls_val, theme_mod.to_hex(self.style["unknown"])))
 
         if y_layers:
             ax.stackplot(x, y_layers, colors=layer_colors, alpha=0.75)
         max_y = max(sum(vals) for vals in zip(*y_layers)) if y_layers else 1
         ax.set_ylim(0, max_y * 1.15)
 
-        ax.axvline(x=current_idx, color="#e74c3c", linewidth=2,
+        ax.axvline(x=current_idx, color=self.style["up"], linewidth=2,
                    linestyle="--", alpha=0.7, zorder=5)
         ax.axvspan(current_idx - 0.35, current_idx + 0.35,
-                   alpha=0.08, color="#e74c3c", zorder=4)
+                   alpha=0.08, color=self.style["up"], zorder=4)
 
         # Value label for current year — exclude background class (0)
         current_vals = [
@@ -389,7 +402,7 @@ class ChartGenerator:
         ] if y_layers else [0]
         total_at_current = sum(current_vals) if current_vals else 0
         arrow_text = ""
-        arrow_color = "#333"
+        arrow_color = self.style["text"]
         if current_idx > 0:
             prev_vals = [
                 layer[current_idx - 1] for layer, cls_val in zip(y_layers, reversed(all_classes))
@@ -401,17 +414,17 @@ class ChartGenerator:
                 pct = (diff / total_prev) * 100
                 if diff > 0:
                     arrow_text = f"▲ +{pct:.1f}%"
-                    arrow_color = "#e74c3c"
+                    arrow_color = self.style["up"]
                 else:
                     arrow_text = f"▼ {pct:.1f}%"
-                    arrow_color = "#3498db"
+                    arrow_color = self.style["down"]
         if total_at_current > 0:
             ax.text(0.95, 0.95, f"{total_at_current:,.0f} ha",
                     ha="right", va="top", fontsize=fs_l(12),
-                    color="#333",
+                    color=self.style["text"],
                     transform=ax.transAxes,
                     bbox=dict(boxstyle="round,pad=0.3",
-                              facecolor="white", edgecolor="#ccc", alpha=0.85))
+                              facecolor=self.style["bg"], edgecolor=self.style["sep"], alpha=0.85))
             if arrow_text:
                 ax.text(0.95, 0.85, arrow_text,
                         ha="right", va="top", fontsize=fs_l(6),
@@ -432,8 +445,9 @@ class ChartGenerator:
         ax.yaxis.set_major_formatter(mticker.StrMethodFormatter("{x:,.0f}"))
         ax.tick_params(axis="y", labelsize=fs_l(12))
         ax.set_ylabel("ha", fontsize=fs_l(8), labelpad=2)
+        ax.yaxis.label.set_color(self.style["text"])
         fig.tight_layout()
-        fig.savefig(path, dpi=150, bbox_inches="tight")
+        fig.savefig(path, dpi=150, bbox_inches="tight", facecolor=self.style["bg"])
         plt.close(fig)
 
     # ------------------------------------------------------------------
@@ -462,7 +476,7 @@ class ChartGenerator:
                     label = "Não queimado"
                 else:
                     label = self.class_labels.get(cls_val, str(cls_val))
-                color_hex = self.class_colors.get(cls_val, "#cccccc").lstrip("#")
+                color_hex = self.class_colors.get(cls_val, theme_mod.to_hex(self.style["unknown"])).lstrip("#")
                 entries.append((_parse_hex(f"#{color_hex}"), label))
 
         for src_path, year in zip(chart_paths, years):
@@ -501,17 +515,17 @@ class ChartGenerator:
             legend_h = n_rows * row_h + margin * 2
 
         canvas_h = title_h + ch + legend_h
-        canvas = PILImage.new("RGBA", (cw, canvas_h), (255, 255, 255, 255))
+        canvas = PILImage.new("RGBA", (cw, canvas_h), (*self.style["bg"], 255))
         draw = ImageDraw.Draw(canvas)
 
         # --- Title bar ---
         title_font = self._make_font(fs(20))
         title_text = f"{year} — {product_id} — {territory_id}"
-        draw.rectangle([(0, 0), (cw, title_h)], fill=(245, 245, 245))
-        draw.line([(0, title_h), (cw, title_h)], fill=(200, 200, 200), width=1)
+        draw.rectangle([(0, 0), (cw, title_h)], fill=self.style["panel"])
+        draw.line([(0, title_h), (cw, title_h)], fill=self.style["sep"], width=1)
         tw = draw.textbbox((0, 0), title_text, font=title_font)
         draw.text(((cw - tw[2]) // 2, (title_h - (tw[3] - tw[1])) // 2),
-                  title_text, font=title_font, fill=(51, 51, 51))
+                  title_text, font=title_font, fill=self.style["text"])
 
         # --- Chart ---
         canvas.paste(chart, (0, title_h), chart)
@@ -535,7 +549,7 @@ class ChartGenerator:
                     else:
                         draw.rectangle([sx, bar_y, sx + seg_w, bar_y + bar_h_val], fill=color)
                 draw.rectangle([bar_x, bar_y, bar_x + bar_w, bar_y + bar_h_val],
-                               outline=(100, 100, 100), width=1)
+                               outline=self.style["box"], width=1)
 
                 viz_min = self.viz_params.get("min", 0)
                 viz_max = self.viz_params.get("max", len(palette) - 1)
@@ -545,14 +559,14 @@ class ChartGenerator:
                 lbl_font_big = self._make_font(fs(18))
                 label_text = self.viz_params.get("label", "")
                 draw.text((bar_x, bar_y + bar_h_val + 2), min_text,
-                          font=lbl_font, fill=(51, 51, 51))
+                          font=lbl_font, fill=self.style["text"])
                 tw_max = draw.textbbox((0, 0), max_text, font=lbl_font)
                 draw.text((bar_x + bar_w - tw_max[2], bar_y + bar_h_val + 2), max_text,
-                          font=lbl_font, fill=(51, 51, 51))
+                          font=lbl_font, fill=self.style["text"])
                 if label_text:
                     lw = draw.textbbox((0, 0), label_text, font=lbl_font_big)
                     draw.text(((cw - lw[2]) // 2, bar_y + bar_h_val + 2),
-                              label_text, font=lbl_font_big, fill=(51, 51, 51))
+                              label_text, font=lbl_font_big, fill=self.style["text"])
         else:
             col_w = (cw - 2 * margin) // n_cols
             leg_font = self._make_font(fs(20))
@@ -563,11 +577,11 @@ class ChartGenerator:
                 by = leg_y + row * row_h
                 draw.rectangle([bx, by, bx + box_size, by + box_size], fill=color)
                 draw.rectangle([bx, by, bx + box_size, by + box_size],
-                               outline=(100, 100, 100), width=1)
+                               outline=self.style["box"], width=1)
                 lbl_bbox = draw.textbbox((0, 0), label, font=leg_font)
                 lbl_h = lbl_bbox[3] - lbl_bbox[1]
                 draw.text((bx + box_size + 6, by + (box_size - lbl_h) // 2),
-                          label, font=leg_font, fill=(51, 51, 51))
+                          label, font=leg_font, fill=self.style["text"])
 
         chart.close()
         canvas.save(dst_path)
@@ -633,15 +647,23 @@ class ChartGenerator:
         product_id: str,
         territory_id: str,
         product_info: Dict[str, Any],
+        theme: Optional[str] = None,
     ) -> Tuple[List[str], List[str]]:
         """Compute chart PNGs for a (dataset, product, territory).
 
-        Returns (annual_paths, timeseries_paths).
+        `product_info` pode vir de um alias (`produto_black`); nesse caso o
+        produto base é usado para localizar `area_stats/` e o tema escuro é
+        aplicado. Retorna (annual_paths, timeseries_paths).
         """
         from ..core.area_stats import AreaStatsCalculator
         calc = AreaStatsCalculator(config)
 
-        self.product_name = product_info.get("name", product_id)
+        base_product = product_info.get("id", product_id)
+        alias_theme = product_info.get("alias_theme")
+        ref_viz = calc.get_viz_reference(product_info.get("visualization", "")) or {}
+        self._use_theme(theme_mod.resolve_theme(theme, alias_theme or ref_viz.get("theme")))
+
+        self.product_name = product_info.get("name", base_product)
 
         viz_key = product_info.get("visualization", "")
         if viz_key:
@@ -649,7 +671,9 @@ class ChartGenerator:
             ref_viz = calc.get_viz_reference(viz_key)
             self.viz_params = {
                 "cmap_type": ref_viz.get("cmap_type", "categorical"),
-                "palette": ref_viz.get("palette", []),
+                "palette": theme_mod.resolve_palette(
+                    ref_viz.get("palette", []), self.theme
+                ),
                 "label": ref_viz.get("label", ""),
                 "min": ref_viz.get("min", 0),
                 "max": ref_viz.get("max", 0),
@@ -665,13 +689,17 @@ class ChartGenerator:
                 for i, p in enumerate(self.viz_params.get("palette", [])):
                     self.class_colors[i] = f"#{p}"
 
-        output_dir = calc._get_output_dir(dataset_id, product_id, territory_id)
-        area_stats_dir = calc._get_area_stats_dir(output_dir)
+        base_output_dir = calc._get_output_dir(dataset_id, base_product, territory_id)
+        area_stats_dir = calc._get_area_stats_dir(base_output_dir)
 
+        output_dir = theme_mod.combo_dir(
+            config.get_output_dir(), dataset_id, base_product, territory_id,
+            self.theme,
+        )
         charts_annual_dir = os.path.join(output_dir, "charts_annual")
         charts_timeseries_dir = os.path.join(output_dir, "charts_timeseries")
 
         return self.generate(
             area_stats_dir, charts_annual_dir, charts_timeseries_dir,
-            product_id, territory_id,
+            base_product, territory_id,
         )
