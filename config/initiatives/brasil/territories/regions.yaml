@@ -43,3 +43,9 @@ territories:
     source: "projects/ee-arcplan/assets/bap_pantanal_planalto"
     filter: "name_pt_br == 'Planalto'"
     bbox: [-58.0, -22.0, -55.0, -17.0]
+  oeste_baiano:
+    name: "Oeste Baiano"
+    name_en: "Western Bahia"
+    geometry:
+      bbox: [-44.22593743286713, -11.10766924156219, -44.051885214950076, -10.934961838348839]
+    bbox: [-44.22593743286713, -11.10766924156219, -44.051885214950076, -10.934961838348839]

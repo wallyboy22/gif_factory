@@ -99,7 +99,8 @@ class ChartGenerator:
                         "label": row.get("class_name",
                                         self.class_labels.get(cls_val, str(cls_val))),
                     })
-            return data
+            if data:
+                return data
 
         for fname in sorted(os.listdir(area_stats_dir)):
             if not fname.endswith(".csv") or fname == "_tasks.json":
@@ -267,7 +268,7 @@ class ChartGenerator:
                 colors=[unburned_color, burned_color],
                 startangle=90,
                 counterclock=False,
-                wedgeprops=dict(width=0.35, edgecolor="white", linewidth=2),
+                wedgeprops=dict(width=0.35, edgecolor="#555555", linewidth=1.5),
             )
         else:
             wedges, texts = ax.pie(
@@ -275,11 +276,17 @@ class ChartGenerator:
                 colors=[burned_color],
                 startangle=90,
                 counterclock=False,
-                wedgeprops=dict(width=0.35, edgecolor="white", linewidth=2),
+                wedgeprops=dict(width=0.35, edgecolor="#555555", linewidth=1.5),
             )
 
-        ax.text(0, 0, f"{burned_area:,.0f} ha", ha="center", va="center",
+        total_area = burned_area + unburned_area
+        pct = (burned_area / total_area * 100) if total_area > 0 else 0
+        ax.text(0, 0.06, f"{burned_area:,.0f} ha", ha="center", va="center",
                 fontsize=fs(13), fontweight="bold", color="#333")
+        ax.text(0, -0.08, f"{pct:.1f}%", ha="center", va="center",
+                fontsize=fs(11), color="#555")
+
+
 
     def _plot_multiclass_donut(self, records: List[Dict],
                                 all_classes: List[int],
@@ -306,7 +313,7 @@ class ChartGenerator:
         wedges, texts = ax.pie(
             areas, colors=colors,
             startangle=90,
-            wedgeprops=dict(width=0.35, edgecolor="white", linewidth=1),
+            wedgeprops=dict(width=0.35, edgecolor="#555555", linewidth=1.5),
         )
 
         ax.text(0, 0, f"{total:,.0f}\nha", ha="center", va="center",
@@ -357,6 +364,8 @@ class ChartGenerator:
         y_layers = []
         layer_colors = []
         for cls_val in reversed(all_classes):
+            if cls_val == 0:
+                continue
             vals = plot_data.get(cls_val, [0] * len(all_years))
             if sum(vals) == 0:
                 continue
@@ -365,38 +374,63 @@ class ChartGenerator:
 
         if y_layers:
             ax.stackplot(x, y_layers, colors=layer_colors, alpha=0.75)
+        max_y = max(sum(vals) for vals in zip(*y_layers)) if y_layers else 1
+        ax.set_ylim(0, max_y * 1.15)
 
         ax.axvline(x=current_idx, color="#e74c3c", linewidth=2,
                    linestyle="--", alpha=0.7, zorder=5)
         ax.axvspan(current_idx - 0.35, current_idx + 0.35,
                    alpha=0.08, color="#e74c3c", zorder=4)
 
-        # Value label for current year at fixed position (top of chart)
-        current_vals = [layer[current_idx] for layer in y_layers] if y_layers else [0]
-        total_at_current = sum(current_vals)
+        # Value label for current year — exclude background class (0)
+        current_vals = [
+            layer[current_idx] for layer, cls_val in zip(y_layers, reversed(all_classes))
+            if cls_val > 0
+        ] if y_layers else [0]
+        total_at_current = sum(current_vals) if current_vals else 0
+        arrow_text = ""
+        arrow_color = "#333"
+        if current_idx > 0:
+            prev_vals = [
+                layer[current_idx - 1] for layer, cls_val in zip(y_layers, reversed(all_classes))
+                if cls_val > 0
+            ] if y_layers else [0]
+            total_prev = sum(prev_vals) if prev_vals else 0
+            if total_prev > 0:
+                diff = total_at_current - total_prev
+                pct = (diff / total_prev) * 100
+                if diff > 0:
+                    arrow_text = f"▲ +{pct:.1f}%"
+                    arrow_color = "#e74c3c"
+                else:
+                    arrow_text = f"▼ {pct:.1f}%"
+                    arrow_color = "#3498db"
         if total_at_current > 0:
-            ax.text(current_idx, 0.92, f"{total_at_current:,.0f} ha",
-                    ha="center", va="top", fontsize=fs_l(7),
-                    color="#333", fontweight="bold",
-                    transform=ax.get_xaxis_transform(),
-                    bbox=dict(boxstyle="round,pad=0.2",
-                              facecolor="white", edgecolor="none", alpha=0.7))
+            ax.text(0.95, 0.95, f"{total_at_current:,.0f} ha",
+                    ha="right", va="top", fontsize=fs_l(12),
+                    color="#333",
+                    transform=ax.transAxes,
+                    bbox=dict(boxstyle="round,pad=0.3",
+                              facecolor="white", edgecolor="#ccc", alpha=0.85))
+            if arrow_text:
+                ax.text(0.95, 0.85, arrow_text,
+                        ha="right", va="top", fontsize=fs_l(6),
+                        color=arrow_color,
+                        transform=ax.transAxes)
 
+        ax.set_xlim(-0.3, len(all_years) - 1 + 0.6)
         ax.set_xticks(x)
-        ax.set_xticklabels(x_labels, rotation=45, fontsize=fs_l(6))
+        ax.set_xticklabels(x_labels, rotation=45, fontsize=fs_l(12))
         n_ticks = min(len(x_labels), 15)
         step = max(1, len(x_labels) // n_ticks)
         visible = set(range(0, len(x_labels), step))
-        visible.add(current_idx)
         tick_labels = ax.get_xticklabels()
         for idx in range(len(x_labels)):
             if idx < len(tick_labels):
                 tick_labels[idx].set_visible(idx in visible)
-                if idx == current_idx:
-                    tick_labels[idx].set_ha("right")
 
         ax.yaxis.set_major_formatter(mticker.StrMethodFormatter("{x:,.0f}"))
-        ax.tick_params(axis="y", labelsize=fs_l(6))
+        ax.tick_params(axis="y", labelsize=fs_l(12))
         ax.set_ylabel("ha", fontsize=fs_l(8), labelpad=2)
         fig.tight_layout()
         fig.savefig(path, dpi=150, bbox_inches="tight")
@@ -416,15 +450,20 @@ class ChartGenerator:
             return
         os.makedirs(clean_dir, exist_ok=True)
 
-        # Build legend entries from class_colors + class_labels
-        entries = []
-        for cls_val in sorted(self.class_colors.keys()):
-            if is_binary and cls_val == 0:
-                label = "Não queimado"
-            else:
-                label = self.class_labels.get(cls_val, str(cls_val))
-            color_hex = self.class_colors.get(cls_val, "#cccccc").lstrip("#")
-            entries.append((_parse_hex(f"#{color_hex}"), label))
+        cmap_type = self.viz_params.get("cmap_type", "categorical")
+        is_sequential = (cmap_type == "sequential")
+
+        if is_sequential:
+            entries = []
+        else:
+            entries = []
+            for cls_val in sorted(self.class_colors.keys()):
+                if is_binary and cls_val == 0:
+                    label = "Não queimado"
+                else:
+                    label = self.class_labels.get(cls_val, str(cls_val))
+                color_hex = self.class_colors.get(cls_val, "#cccccc").lstrip("#")
+                entries.append((_parse_hex(f"#{color_hex}"), label))
 
         for src_path, year in zip(chart_paths, years):
             fname = os.path.basename(src_path)
@@ -432,12 +471,14 @@ class ChartGenerator:
             self._add_chart_overlay(
                 src_path, dst_path, year,
                 product_id, territory_id, entries,
+                is_sequential=is_sequential,
             )
 
     def _add_chart_overlay(
         self, src_path: str, dst_path: str,
         year: str, product_id: str, territory_id: str,
         legend_entries: List[Tuple[Tuple[int, int, int], str]],
+        is_sequential: bool = False,
     ):
         """Add title bar at top and legend at bottom to a chart PNG."""
         fs = lambda n: int(n * self.font_scale)
@@ -446,11 +487,18 @@ class ChartGenerator:
 
         title_h = 46
         margin = 10
-        box_size = fs(16)
-        row_h = fs(26)
-        n_cols = min(3, max(1, len(legend_entries)))
-        n_rows = (len(legend_entries) + n_cols - 1) // n_cols
-        legend_h = n_rows * row_h + margin * 2
+
+        if is_sequential:
+            palette = self.viz_params.get("palette", [])
+            bar_h = fs(20)
+            label_h = fs(22)
+            legend_h = bar_h + label_h + margin * 2
+        else:
+            box_size = fs(16)
+            row_h = fs(26)
+            n_cols = min(3, max(1, len(legend_entries)))
+            n_rows = (len(legend_entries) + n_cols - 1) // n_cols
+            legend_h = n_rows * row_h + margin * 2
 
         canvas_h = title_h + ch + legend_h
         canvas = PILImage.new("RGBA", (cw, canvas_h), (255, 255, 255, 255))
@@ -470,21 +518,56 @@ class ChartGenerator:
 
         # --- Legend ---
         leg_y = title_h + ch + margin
-        col_w = (cw - 2 * margin) // n_cols
-        leg_font = self._make_font(fs(12))
 
-        for idx, (color, label) in enumerate(legend_entries):
-            col = idx // n_rows if n_cols > 1 else 0
-            row = idx % n_rows if n_cols > 1 else idx
-            bx = margin + col * col_w
-            by = leg_y + row * row_h
-            draw.rectangle([bx, by, bx + box_size, by + box_size], fill=color)
-            draw.rectangle([bx, by, bx + box_size, by + box_size],
-                           outline=(100, 100, 100), width=1)
-            lbl_bbox = draw.textbbox((0, 0), label, font=leg_font)
-            lbl_h = lbl_bbox[3] - lbl_bbox[1]
-            draw.text((bx + box_size + 6, by + (box_size - lbl_h) // 2),
-                      label, font=leg_font, fill=(51, 51, 51))
+        if is_sequential:
+            palette = self.viz_params.get("palette", [])
+            if palette:
+                bar_x = margin
+                bar_w = cw - 2 * margin
+                bar_y = leg_y
+                bar_h_val = fs(20)
+                seg_w = max(1, bar_w // len(palette))
+                for i, p in enumerate(palette):
+                    color = _parse_hex(f"#{p}")
+                    sx = bar_x + i * seg_w
+                    if i == len(palette) - 1:
+                        draw.rectangle([sx, bar_y, bar_x + bar_w, bar_y + bar_h_val], fill=color)
+                    else:
+                        draw.rectangle([sx, bar_y, sx + seg_w, bar_y + bar_h_val], fill=color)
+                draw.rectangle([bar_x, bar_y, bar_x + bar_w, bar_y + bar_h_val],
+                               outline=(100, 100, 100), width=1)
+
+                viz_min = self.viz_params.get("min", 0)
+                viz_max = self.viz_params.get("max", len(palette) - 1)
+                lbl_font = self._make_font(fs(14))
+                min_text = str(viz_min)
+                max_text = str(viz_max)
+                lbl_font_big = self._make_font(fs(18))
+                label_text = self.viz_params.get("label", "")
+                draw.text((bar_x, bar_y + bar_h_val + 2), min_text,
+                          font=lbl_font, fill=(51, 51, 51))
+                tw_max = draw.textbbox((0, 0), max_text, font=lbl_font)
+                draw.text((bar_x + bar_w - tw_max[2], bar_y + bar_h_val + 2), max_text,
+                          font=lbl_font, fill=(51, 51, 51))
+                if label_text:
+                    lw = draw.textbbox((0, 0), label_text, font=lbl_font_big)
+                    draw.text(((cw - lw[2]) // 2, bar_y + bar_h_val + 2),
+                              label_text, font=lbl_font_big, fill=(51, 51, 51))
+        else:
+            col_w = (cw - 2 * margin) // n_cols
+            leg_font = self._make_font(fs(20))
+            for idx, (color, label) in enumerate(legend_entries):
+                col = idx // n_rows if n_cols > 1 else 0
+                row = idx % n_rows if n_cols > 1 else idx
+                bx = margin + col * col_w
+                by = leg_y + row * row_h
+                draw.rectangle([bx, by, bx + box_size, by + box_size], fill=color)
+                draw.rectangle([bx, by, bx + box_size, by + box_size],
+                               outline=(100, 100, 100), width=1)
+                lbl_bbox = draw.textbbox((0, 0), label, font=leg_font)
+                lbl_h = lbl_bbox[3] - lbl_bbox[1]
+                draw.text((bx + box_size + 6, by + (box_size - lbl_h) // 2),
+                          label, font=leg_font, fill=(51, 51, 51))
 
         chart.close()
         canvas.save(dst_path)
@@ -568,6 +651,8 @@ class ChartGenerator:
                 "cmap_type": ref_viz.get("cmap_type", "categorical"),
                 "palette": ref_viz.get("palette", []),
                 "label": ref_viz.get("label", ""),
+                "min": ref_viz.get("min", 0),
+                "max": ref_viz.get("max", 0),
             }
             classes_list = ref_viz.get("classes", [])
             self.class_colors = {}

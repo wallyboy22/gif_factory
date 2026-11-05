@@ -131,6 +131,11 @@ class Pipeline:
                 print(f"Modo: resume (pulando etapas ja concluidas)")
             print(f"{'='*60}")
 
+            theme = viz_params.get("theme", "light")
+            FrameProcessor.set_theme(theme)
+            if theme and theme != "light":
+                print(f"Tema: {theme}")
+
             image = self._load_product_image(product_info)
 
             bands_slice = product_info.get("bands_slice")
@@ -166,7 +171,11 @@ class Pipeline:
                         if year not in groups:
                             groups[year] = []
                         groups[year].append(b)
-                CHANNEL_ORDER = {'swir1': 0, 'nir': 1, 'red': 2}
+                CHANNEL_ORDER = product_info.get("channel_order") or {
+                    'swir1': 0, 'nir': 1, 'red': 2,
+                    'swir1_median': 0, 'nir_median': 1, 'red_median': 2,
+                    'green_median': 3, 'blue_median': 4,
+                }
                 rgb_band_groups = [
                     (y, sorted(grp, key=lambda b: CHANNEL_ORDER.get(b.split('_')[0], 99)))
                     for y, grp in sorted(groups.items())
@@ -266,7 +275,8 @@ class Pipeline:
                     FrameProcessor.render_legend_overlay(
                         width=frame_w, palette=viz_params.get("palette", ["fdfdfd", "800000"]),
                         vmin=viz_params.get("min", 0), vmax=viz_params.get("max", 1),
-                        font_size=fs(50), discrete_labels=viz_params.get("discrete_labels"),
+                        font_size=fs(54) if viz_params.get("rgb_legend") else fs(80),
+                        discrete_labels=viz_params.get("discrete_labels"),
                         cmap_type=viz_params.get("cmap_type", "sequential"),
                         label="", rgb_legend=viz_params.get("rgb_legend"),
                         legend_order=viz_params.get("legend_order"),
@@ -281,16 +291,25 @@ class Pipeline:
 
             product_label = product_info.get("name", product_id)
             territory_name = territory_info["name"]
-            dataset_desc = product_info.get("dataset_description", dataset_id)
-            title_line1 = product_label
-            title_line2 = f"{dataset_desc} \u00b7 {territory_name}"
+            collection_title = product_info.get("collection_title", "")
+            if collection_title:
+                title_line1 = territory_name
+                title_line2 = f"{collection_title} - {product_label}"
+                title_line3 = None
+            else:
+                title_line1 = product_label
+                title_line2 = territory_name
+                title_line3 = None
 
+            year_offset = int(product_info.get("year_offset", 0) or 0)
             label_map = {}
             for fp in frame_paths:
                 band_name = os.path.splitext(os.path.basename(fp))[0]
                 if band_name.startswith(prefix):
                     band_name = band_name[len(prefix):]
                 year_part = re.sub(r"^[a-z_]+", "", band_name).replace("_", "\u2192")
+                if year_offset and re.fullmatch(r"\d{4}", year_part):
+                    year_part = str(int(year_part) + year_offset)
                 label_map[os.path.basename(fp)] = year_part
 
             need_clean = create_collage or add_labels
@@ -305,16 +324,16 @@ class Pipeline:
                             continue
                         clean_fp = os.path.join(frames_clean_dir, os.path.basename(fp))
                         shutil.copy2(fp, clean_fp)
-                        FrameProcessor.add_year_only(clean_fp, year_text, font_size=fs(80))
+                        FrameProcessor.add_year_only(clean_fp, year_text, font_size=fs(160), draw_north=bool(collection_title))
                         clean_paths.append(clean_fp)
                     FrameProcessor.batch_add_bottom_bars(
                         clean_paths, bounds['lon_min'], bounds['lon_max'],
                         bounds['lat_min'], bounds['lat_max'],
                         palette=viz_params.get("palette", ["fdfdfd", "800000"]),
                         vmin=viz_params.get("min", 0), vmax=viz_params.get("max", 1),
-                        font_size=fs(50), discrete_labels=viz_params.get("discrete_labels"),
+                        font_size=fs(80), discrete_labels=viz_params.get("discrete_labels"),
                         cmap_type=viz_params.get("cmap_type", "sequential"),
-                        show_legend=False, show_scale=True,
+                        show_legend=False, show_scale=True, show_north=not bool(collection_title),
                         prefix_labels=viz_params.get("prefix_labels", True),
                     )
                     timings["frames_clean"] = round(time.perf_counter() - t3a, 1)
@@ -397,8 +416,8 @@ class Pipeline:
                             cw = cimg.width
                             cimg.close()
                             cscale = max(1, cw // 2000)
-                            title_font = fs(int(36 * cscale))
-                            sub_font = fs(int(28 * cscale))
+                            title_font = fs(int(28 * cscale))
+                            sub_font = fs(int(20 * cscale))
                             legend_at_width = os.path.join(overlays_dir, f"legend_{os.path.basename(cp)}")
                             FrameProcessor.render_legend_overlay(
                                 width=cw, palette=viz_params.get("palette", ["fdfdfd", "800000"]),
@@ -416,11 +435,13 @@ class Pipeline:
                                 cp, title_line1,
                                 position="top_left",
                                 font_size=title_font,
-                                padding_top=max(130, title_font + sub_font + 60),
-                                bar_color=(255, 255, 255),
-                                text_color=(0, 0, 0),
+                                padding_top=max(130, title_font + 2 * sub_font + 60),
+                                bar_color=FrameProcessor.get_theme()["bg"],
+                                text_color=FrameProcessor.get_theme()["fg"],
                                 subtitle=title_line2,
                                 subtitle_size=sub_font,
+                                line2=title_line3,
+                                line2_size=sub_font,
                             )
                             FrameProcessor.paste_overlay_below(cp, legend_at_width)
                             FrameProcessor.add_margin(cp, 30)
@@ -444,11 +465,13 @@ class Pipeline:
                         shutil.copy2(fp, map_fp)
                         map_paths.append(map_fp)
                     FrameProcessor.batch_add_margins(map_paths, 30)
+                    line2_map = {fp: (title_line3 or "") for fp in map_paths}
+                    header_padding = 200 if collection_title else 140
                     FrameProcessor.batch_add_frame_headers(
-                        map_paths, title_line1, {},
-                        line1_size=fs(36), line2_size=fs(80),
-                        padding_top=120, gap=10,
-                        subtitle=title_line2, subtitle_size=fs(28),
+                        map_paths, title_line1, line2_map,
+                        line1_size=fs(54), line2_size=fs(42),
+                        padding_top=header_padding, gap=10,
+                        subtitle=title_line2, subtitle_size=fs(42),
                     )
                     if legend_overlay and os.path.exists(legend_overlay):
                         FrameProcessor.batch_paste_overlay_below(map_paths, legend_overlay)

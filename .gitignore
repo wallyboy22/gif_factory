@@ -77,3 +77,10 @@ tests/test_outputs/
 
 # OpenDocument / binary references
 references/*.odt
+
+# Local copies / large artifacts (not versioned)
+copia_oeste_baiano/
+mapbiomas_gif_factory/
+docs/*.xlsx
+docs/archive/
+logs_mosaics*.txt

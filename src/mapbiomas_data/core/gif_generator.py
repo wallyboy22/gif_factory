@@ -3,6 +3,7 @@ import os
 from typing import Any, Dict, List, Optional, Tuple
 from PIL import Image as PILImage, ImageDraw, ImageFont
 from ..utils.file_utils import ensure_dir, clean_filename
+from .frame_processor import get_theme
 
 
 class GIFGenerator:
@@ -38,7 +39,7 @@ class GIFGenerator:
         for path in image_paths:
             img = PILImage.open(path)
             if img.mode == "RGBA":
-                bg = PILImage.new("RGB", img.size, (255, 255, 255))
+                bg = PILImage.new("RGB", img.size, get_theme()["bg"])
                 bg.paste(img, mask=img.split()[3])
                 img = bg
             elif img.mode != "RGB":
@@ -51,81 +52,100 @@ class GIFGenerator:
         common_size = self._get_common_size(images)
         resized = [img.resize(common_size, PILImage.Resampling.LANCZOS) for img in images]
 
-        # --- Build palette from known viz colors + sampled data ---
-        known_colors = set()
-        known_colors.add((255, 255, 255))  # fundo
-        known_colors.add((0, 0, 0))        # texto
+        # --- Palette strategy ---
+        # Com paleta viz definida (produtos categóricos/contínuos): paleta
+        # compartilhada, preserva as cores exatas das classes.
+        # Sem paleta viz (produtos RGB com cores fotográficas): paleta adaptativa
+        # POR FRAME com dithering - o GIF grava paleta local em cada frame e as
+        # cores ficam tão fiéis quanto possível ao PNG original.
+        use_shared_palette = bool(viz_palette)
+        optimize_palette = True
 
-        if viz_palette:
+        if not use_shared_palette:
+            resized_rgb = [
+                img.quantize(
+                    colors=256,
+                    method=PILImage.Quantize.MEDIANCUT,
+                    dither=PILImage.Dither.FLOYDSTEINBERG,
+                )
+                for img in resized
+            ]
+            optimize_palette = False
+        else:
+            # --- Build palette from known viz colors + sampled data ---
+            known_colors = set()
+            known_colors.add(get_theme()["bg"])   # fundo
+            known_colors.add(get_theme()["fg"])   # texto
+
             for hex_color in viz_palette:
                 hex_color = hex_color.lstrip("#")
                 rgb = tuple(int(hex_color[i:i+2], 16) for i in (0, 2, 4))
                 known_colors.add(rgb)
 
-        # Sample frames to capture remaining colors
-        sample_count = min(12, len(resized))
-        palette_collage = PILImage.new("RGB", (sample_count * 64, 64))
-        for i, img in enumerate(resized[:sample_count]):
-            strip = img.resize((64, 64), PILImage.Resampling.LANCZOS)
-            palette_collage.paste(strip, (i * 64, 0))
+            # Sample frames to capture remaining colors
+            sample_count = min(12, len(resized))
+            palette_collage = PILImage.new("RGB", (sample_count * 64, 64))
+            for i, img in enumerate(resized[:sample_count]):
+                strip = img.resize((64, 64), PILImage.Resampling.LANCZOS)
+                palette_collage.paste(strip, (i * 64, 0))
 
-        # Build palette: known colors first, then MEDIANCUT for remaining slots
-        known_list = list(known_colors)
-        remaining_slots = 256 - len(known_list)
+            # Build palette: known colors first, then MEDIANCUT for remaining slots
+            known_list = list(known_colors)
+            remaining_slots = 256 - len(known_list)
 
-        if remaining_slots >= 0:
-            # Enough room: place known colors at start of palette
-            palette_pixels = []
-            for r, g, b in known_list:
-                palette_pixels.extend([r, g, b])
-            palette_pixels += [0] * (768 - len(palette_pixels))
-            known_palette_img = PILImage.new("P", (1, 1))
-            known_palette_img.putpalette(palette_pixels)
+            if remaining_slots >= 0:
+                # Enough room: place known colors at start of palette
+                palette_pixels = []
+                for r, g, b in known_list:
+                    palette_pixels.extend([r, g, b])
+                palette_pixels += [0] * (768 - len(palette_pixels))
+                known_palette_img = PILImage.new("P", (1, 1))
+                known_palette_img.putpalette(palette_pixels)
 
-            # Quantize sampled collage to fill remaining slots
-            if remaining_slots > 0:
-                sampled = palette_collage.quantize(
-                    colors=remaining_slots,
+                # Quantize sampled collage to fill remaining slots
+                if remaining_slots > 0:
+                    sampled = palette_collage.quantize(
+                        colors=remaining_slots,
+                        method=PILImage.Quantize.MEDIANCUT,
+                        dither=PILImage.Dither.NONE,
+                    )
+                    # Merge palettes: known + sampled
+                    final_palette = known_list[:]
+                    sampled_pal = sampled.getpalette()
+                    for y in range(sampled.height):
+                        for x in range(sampled.width):
+                            if len(final_palette) >= 256:
+                                break
+                            idx = sampled.getpixel((x, y))
+                            offset = idx * 3
+                            if offset + 2 < len(sampled_pal):
+                                color = (sampled_pal[offset], sampled_pal[offset + 1], sampled_pal[offset + 2])
+                                if color not in known_colors:
+                                    final_palette.append(color)
+                        if len(final_palette) >= 256:
+                            break
+
+                    final_pixels = []
+                    for r, g, b in final_palette[:256]:
+                        final_pixels.extend([r, g, b])
+                    final_pixels += [0] * (768 - len(final_pixels))
+                    final_img = PILImage.new("P", (1, 1))
+                    final_img.putpalette(final_pixels)
+                    shared_palette = final_img
+                else:
+                    shared_palette = known_palette_img
+            else:
+                # More than 256 known colors: use MEDIANCUT on full collage
+                shared_palette = palette_collage.quantize(
+                    colors=256,
                     method=PILImage.Quantize.MEDIANCUT,
                     dither=PILImage.Dither.NONE,
                 )
-                # Merge palettes: known + sampled
-                final_palette = known_list[:]
-                sampled_pal = sampled.getpalette()
-                for y in range(sampled.height):
-                    for x in range(sampled.width):
-                        if len(final_palette) >= 256:
-                            break
-                        idx = sampled.getpixel((x, y))
-                        offset = idx * 3
-                        if offset + 2 < len(sampled_pal):
-                            color = (sampled_pal[offset], sampled_pal[offset + 1], sampled_pal[offset + 2])
-                            if color not in known_colors:
-                                final_palette.append(color)
-                    if len(final_palette) >= 256:
-                        break
 
-                final_pixels = []
-                for r, g, b in final_palette[:256]:
-                    final_pixels.extend([r, g, b])
-                final_pixels += [0] * (768 - len(final_pixels))
-                final_img = PILImage.new("P", (1, 1))
-                final_img.putpalette(final_pixels)
-                shared_palette = final_img
-            else:
-                shared_palette = known_palette_img
-        else:
-            # More than 256 known colors: use MEDIANCUT on full collage
-            shared_palette = palette_collage.quantize(
-                colors=256,
-                method=PILImage.Quantize.MEDIANCUT,
-                dither=PILImage.Dither.NONE,
-            )
-
-        resized_rgb = [
-            img.quantize(palette=shared_palette, dither=PILImage.Dither.NONE)
-            for img in resized
-        ]
+            resized_rgb = [
+                img.quantize(palette=shared_palette, dither=PILImage.Dither.NONE)
+                for img in resized
+            ]
 
         ensure_dir(output_dir)
         output_path = os.path.join(output_dir, clean_filename(filename))
@@ -139,7 +159,7 @@ class GIFGenerator:
             append_images=resized_rgb[1:],
             duration=self.frame_duration,
             loop=self.loop_count,
-            optimize=True,
+            optimize=optimize_palette,
         )
         return output_path
 
@@ -174,7 +194,7 @@ class GIFGenerator:
         for p in image_paths:
             img = PILImage.open(p)
             if img.mode == "RGBA":
-                bg = PILImage.new("RGB", img.size, (255, 255, 255))
+                bg = PILImage.new("RGB", img.size, get_theme()["bg"])
                 bg.paste(img, mask=img.split()[3])
                 img = bg
             elif img.mode != "RGB":
@@ -206,7 +226,7 @@ class GIFGenerator:
             new_w = int(target_h * aspect)
             small = img.resize((new_w, target_h), PILImage.Resampling.LANCZOS)
             if cell_labels:
-                padded = PILImage.new("RGB", (new_w, target_h + cell_pad), color="white")
+                padded = PILImage.new("RGB", (new_w, target_h + cell_pad), color=get_theme()["bg"])
                 padded.paste(small, (0, cell_pad))
                 resized.append(padded)
             else:
@@ -218,7 +238,7 @@ class GIFGenerator:
         grid_w = n_cols * frame_w
         grid_h = n_rows * frame_h
 
-        collage = PILImage.new("RGB", (grid_w, grid_h), color="white")
+        collage = PILImage.new("RGB", (grid_w, grid_h), color=get_theme()["bg"])
 
         for idx, img in enumerate(resized):
             row = idx // n_cols
@@ -244,7 +264,7 @@ class GIFGenerator:
                 col = idx % n_cols
                 cx = col * frame_w
                 cy = row * frame_h
-                draw.text((cx + 10, cy + 10), label, font=label_font, fill=(0, 0, 0))
+                draw.text((cx + 10, cy + 10), label, font=label_font, fill=get_theme()["fg"])
 
         ensure_dir(output_dir)
         output_path = os.path.join(output_dir, clean_filename(filename))

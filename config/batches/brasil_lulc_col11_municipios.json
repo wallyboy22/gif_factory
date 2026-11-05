@@ -1,0 +1,38 @@
+{
+  "items": [
+    {"dataset": "brasil_lulc_col11", "product": "lulc_nivel0", "territory": "juazeiro_ba"},
+    {"dataset": "brasil_lulc_col11", "product": "lulc_nivel0", "territory": "petrolina_pe"},
+    {"dataset": "brasil_lulc_col11", "product": "lulc_nivel0", "territory": "juazeiro_petrolina"},
+    {"dataset": "brasil_lulc_col11", "product": "lulc_nivel0_black", "territory": "juazeiro_ba"},
+    {"dataset": "brasil_lulc_col11", "product": "lulc_nivel0_black", "territory": "petrolina_pe"},
+    {"dataset": "brasil_lulc_col11", "product": "lulc_nivel0_black", "territory": "juazeiro_petrolina"},
+
+    {"dataset": "brasil_lulc_col11", "product": "lulc_nivel1", "territory": "juazeiro_ba"},
+    {"dataset": "brasil_lulc_col11", "product": "lulc_nivel1", "territory": "petrolina_pe"},
+    {"dataset": "brasil_lulc_col11", "product": "lulc_nivel1", "territory": "juazeiro_petrolina"},
+    {"dataset": "brasil_lulc_col11", "product": "lulc_nivel1_black", "territory": "juazeiro_ba"},
+    {"dataset": "brasil_lulc_col11", "product": "lulc_nivel1_black", "territory": "petrolina_pe"},
+    {"dataset": "brasil_lulc_col11", "product": "lulc_nivel1_black", "territory": "juazeiro_petrolina"},
+
+    {"dataset": "brasil_lulc_col11", "product": "lulc_nivel2", "territory": "juazeiro_ba"},
+    {"dataset": "brasil_lulc_col11", "product": "lulc_nivel2", "territory": "petrolina_pe"},
+    {"dataset": "brasil_lulc_col11", "product": "lulc_nivel2", "territory": "juazeiro_petrolina"},
+    {"dataset": "brasil_lulc_col11", "product": "lulc_nivel2_black", "territory": "juazeiro_ba"},
+    {"dataset": "brasil_lulc_col11", "product": "lulc_nivel2_black", "territory": "petrolina_pe"},
+    {"dataset": "brasil_lulc_col11", "product": "lulc_nivel2_black", "territory": "juazeiro_petrolina"},
+
+    {"dataset": "brasil_lulc_col11", "product": "lulc_nivel3", "territory": "juazeiro_ba"},
+    {"dataset": "brasil_lulc_col11", "product": "lulc_nivel3", "territory": "petrolina_pe"},
+    {"dataset": "brasil_lulc_col11", "product": "lulc_nivel3", "territory": "juazeiro_petrolina"},
+    {"dataset": "brasil_lulc_col11", "product": "lulc_nivel3_black", "territory": "juazeiro_ba"},
+    {"dataset": "brasil_lulc_col11", "product": "lulc_nivel3_black", "territory": "petrolina_pe"},
+    {"dataset": "brasil_lulc_col11", "product": "lulc_nivel3_black", "territory": "juazeiro_petrolina"},
+
+    {"dataset": "brasil_lulc_col11", "product": "lulc_nivel4", "territory": "juazeiro_ba"},
+    {"dataset": "brasil_lulc_col11", "product": "lulc_nivel4", "territory": "petrolina_pe"},
+    {"dataset": "brasil_lulc_col11", "product": "lulc_nivel4", "territory": "juazeiro_petrolina"},
+    {"dataset": "brasil_lulc_col11", "product": "lulc_nivel4_black", "territory": "juazeiro_ba"},
+    {"dataset": "brasil_lulc_col11", "product": "lulc_nivel4_black", "territory": "petrolina_pe"},
+    {"dataset": "brasil_lulc_col11", "product": "lulc_nivel4_black", "territory": "juazeiro_petrolina"}
+  ]
+}

@@ -130,6 +130,7 @@ COL101_FIRE_FREQ = "projects/mapbiomas-public/assets/brazil/lulc/collection10_1/
 COL101_FIRE_AGE = "projects/mapbiomas-public/assets/brazil/lulc/collection10_1/mapbiomas_brazil_collection10_1_degradation_fire_age_v1"
 COL101_VEG_SEC = "projects/mapbiomas-public/assets/brazil/lulc/collection10_1/mapbiomas_brazil_collection10_1_degradation_secondary_vegetation_age_v1"
 COL101_EDGE_AREA = "projects/mapbiomas-public/assets/brazil/lulc/collection10_1/mapbiomas_brazil_collection10_1_degradation_edge_area_v1"
+COL11_EDGE_AREA = "projects/mapbiomas-brazil/assets/DEGRADATION/COLLECTION-11/public/degradation_edge_area_col11_v1"
 COL101_EDGE_AGE = "projects/mapbiomas-public/assets/brazil/lulc/collection10_1/mapbiomas_brazil_collection10_1_degradation_edge_age_v1"
 COL101_MORPHOLOGY = "projects/mapbiomas-public/assets/brazil/lulc/collection10_1/mapbiomas_brazil_collection10_1_degradation_landscape_morphology_v1"
 COL101_PATCH_ID = "projects/mapbiomas-public/assets/brazil/lulc/collection10_1/mapbiomas_brazil_collection10_1_degradation_patch_id_v1"
@@ -248,6 +249,28 @@ def decode_edge_area_col101() -> ee.Image:
         .int8()
     )
     return classified
+
+
+def decode_edge_area_1000m_col11() -> ee.Image:
+    """Versao categorica (0-8) da distancia ate a borda da Colecao 11.
+
+    1 = <=30m, 2 = <=60m, ... 8 = <=1000m. Valores acima de 1000 m e pixels
+    sem dado viram 0, que a visualizacao pinta de branco e omite da legenda.
+    """
+    img = ee.Image(COL11_EDGE_AREA).round()
+    return (
+        img.multiply(0)
+        .where(img.gt(0).And(img.lte(30)), 1)
+        .where(img.gt(30).And(img.lte(60)), 2)
+        .where(img.gt(60).And(img.lte(90)), 3)
+        .where(img.gt(90).And(img.lte(120)), 4)
+        .where(img.gt(120).And(img.lte(150)), 5)
+        .where(img.gt(150).And(img.lte(300)), 6)
+        .where(img.gt(300).And(img.lte(600)), 7)
+        .where(img.gt(600).And(img.lte(1000)), 8)
+        .unmask(0)
+        .int8()
+    )
 
 
 def decode_edge_age_col101() -> ee.Image:
@@ -410,6 +433,176 @@ def build_nbr_min_mosaic() -> ee.Image:
     return ee.ImageCollection(images).toBands().rename(clean_names)
 
 
+MAPBIOMAS_LANDSAT_MOSAICS2 = "projects/nexgenmap/MapBiomas2/LANDSAT/BRAZIL/mosaics-2"
+
+
+def _landsat_mosaics2_year(y: int):
+    col = ee.ImageCollection(MAPBIOMAS_LANDSAT_MOSAICS2)
+    img = col.filter(ee.Filter.eq("year", y)).mosaic()
+    return img
+
+
+def build_landsat_false_color_swir() -> ee.Image:
+    images = []
+    clean_names = []
+    for y in range(1985, 2026):
+        img = _landsat_mosaics2_year(y)
+        names = [f'swir1_{y}', f'nir_{y}', f'red_{y}']
+        img = img.select(["swir1_median", "nir_median", "red_median"], names)
+        images.append(img)
+        clean_names.extend(names)
+    return ee.ImageCollection(images).toBands().rename(clean_names)
+
+
+def build_landsat_natural_rgb() -> ee.Image:
+    images = []
+    clean_names = []
+    for y in range(1985, 2026):
+        img = _landsat_mosaics2_year(y)
+        names = [f'red_{y}', f'green_{y}', f'blue_{y}']
+        img = img.select(["red_median", "green_median", "blue_median"], names)
+        images.append(img)
+        clean_names.extend(names)
+    return ee.ImageCollection(images).toBands().rename(clean_names)
+
+
+MAPBIOMAS_LULC11_COVERAGE = (
+    "projects/mapbiomas-public/assets/brazil/lulc/collection11/"
+    "mapbiomas_brazil_collection11_coverage_v3"
+)
+MAPBIOMAS_LULC11_DEFSEC = (
+    "projects/mapbiomas-public/assets/brazil/lulc/collection11/"
+    "mapbiomas_brazil_collection11_deforestation_secondary_vegetation_v5"
+)
+
+_LULC11_NATURAL_FOR = [3, 4, 5, 6, 7, 49]
+_LULC11_NATURAL_HERB = [11, 12, 32, 50, 77, 84]
+_LULC11_NATURAL_ROCK = [29]
+_LULC11_WATER = [33]
+_LULC11_SILV = [9]
+_LULC11_PAST = [15]
+_LULC11_AGR_TEMP = [20, 39, 40, 41, 62]
+_LULC11_AGR_PER = [35, 46, 47, 48]
+_LULC11_MOSAIC = [21]
+_LULC11_URBAN = [24]
+_LULC11_NONVEG = [23, 25]
+_LULC11_MINING = [30]
+_LULC11_AQUA = [31]
+_LULC11_ENERGY = [75, 91]
+_LULC11_ANTROPICO = (
+    _LULC11_SILV + _LULC11_PAST + _LULC11_AGR_TEMP + _LULC11_AGR_PER
+    + _LULC11_MOSAIC + _LULC11_URBAN + _LULC11_NONVEG + _LULC11_MINING
+    + _LULC11_AQUA + _LULC11_ENERGY
+)
+_LULC11_NATURAL = _LULC11_NATURAL_FOR + _LULC11_NATURAL_HERB + _LULC11_NATURAL_ROCK
+
+
+def build_lulc_col11() -> ee.Image:
+    return ee.Image(MAPBIOMAS_LULC11_COVERAGE).unmask(0).int8()
+
+
+def _recode_lulc_col11(mapping):
+    img = ee.Image(MAPBIOMAS_LULC11_COVERAGE).unmask(0).int8()
+    result = img.multiply(0)
+    for codes, target in mapping:
+        result = result.where(_make_eq_chain(img, codes), target)
+    return result.unmask(0).int8()
+
+
+def build_lulc_col11_nivel0() -> ee.Image:
+    return _recode_lulc_col11([
+        (_LULC11_NATURAL, 1),
+        (_LULC11_ANTROPICO, 2),
+        (_LULC11_WATER, 3),
+    ])
+
+
+def build_lulc_col11_nivel1() -> ee.Image:
+    return _recode_lulc_col11([
+        (_LULC11_NATURAL_FOR, 1),
+        (_LULC11_NATURAL_HERB, 2),
+        (_LULC11_NATURAL_ROCK, 3),
+        (_LULC11_SILV, 4),
+        (_LULC11_PAST + _LULC11_AGR_TEMP + _LULC11_AGR_PER + _LULC11_MOSAIC, 5),
+        (_LULC11_URBAN + _LULC11_NONVEG + _LULC11_MINING + _LULC11_AQUA + _LULC11_ENERGY, 6),
+        (_LULC11_WATER, 7),
+    ])
+
+
+def build_lulc_col11_nivel1_1() -> ee.Image:
+    return _recode_lulc_col11([
+        ([3, 5, 6, 49], 3),
+        ([4, 7], 4),
+        ([11], 11),
+        (_LULC11_NATURAL_HERB, 12),
+        ([29], 29),
+        (_LULC11_SILV, 9),
+        (_LULC11_PAST, 15),
+        (_LULC11_AGR_TEMP + _LULC11_AGR_PER, 18),
+        (_LULC11_MOSAIC, 21),
+        (_LULC11_URBAN, 24),
+        (_LULC11_NONVEG + _LULC11_MINING + _LULC11_AQUA + _LULC11_ENERGY, 22),
+        (_LULC11_WATER, 26),
+    ])
+
+
+def build_lulc_col11_nivel2() -> ee.Image:
+    return _recode_lulc_col11([
+        (_LULC11_NATURAL_FOR, 3),
+        ([11], 11),
+        ([12, 32, 50, 77, 84], 12),
+        ([29], 29),
+        (_LULC11_SILV, 9),
+        (_LULC11_PAST, 15),
+        (_LULC11_AGR_TEMP, 19),
+        (_LULC11_AGR_PER, 36),
+        (_LULC11_MOSAIC, 21),
+        (_LULC11_URBAN, 24),
+        ([23], 23),
+        ([25, 75, 91], 25),
+        (_LULC11_MINING, 30),
+        (_LULC11_AQUA, 31),
+        (_LULC11_WATER, 26),
+    ])
+
+
+def build_lulc_col11_nivel3() -> ee.Image:
+    return _recode_lulc_col11([
+        ([3], 3),
+        ([4], 4),
+        ([5], 5),
+        ([6], 6),
+        ([7], 7),
+        ([9], 9),
+        ([11], 11),
+        ([12, 50, 77, 84], 12),
+        ([15], 15),
+        ([20], 20),
+        ([21], 21),
+        ([23], 23),
+        ([24], 24),
+        ([25, 75, 91], 25),
+        ([29], 29),
+        ([30], 30),
+        ([31], 31),
+        ([32], 32),
+        ([33], 33),
+        ([41, 62], 41),
+        ([46], 46),
+        ([47], 47),
+        ([35, 48], 48),
+        ([49], 49),
+    ])
+
+
+def build_lulc_col11_nivel4() -> ee.Image:
+    return build_lulc_col11()
+
+
+def build_def_seco_col11() -> ee.Image:
+    return ee.Image(MAPBIOMAS_LULC11_DEFSEC).unmask(0).int8()
+
+
 def only_coverage(class_list: List[int], image: ee.Image, landcover: ee.Image) -> ee.Image:
     container = image.multiply(0)
     for cls in class_list:
@@ -543,6 +736,144 @@ def decode_accumulated_burned_coverage_nivel3():
     return _decode_coverage_nivel3(ACCUM_BURNED_COVERAGE)
 
 
+DRC_LULC = "projects/mapbiomas-public/assets/drc/lulc/collection1/mapbiomas_drc_collection1_coverage_v1"
+
+
+def _decode_drc_lulc_nivel0(asset):
+    img = ee.Image(asset).unmask(0).int8()
+    naturel = _make_eq_chain(img, [3, 4, 5, 66, 33])
+    anthropique = _make_eq_chain(img, [9, 21, 24])
+    non_defini = _make_eq_chain(img, [25, 27])
+    result = img.multiply(0)
+    result = result.where(naturel, 1)
+    result = result.where(anthropique, 14)
+    result = result.where(non_defini, 27)
+    return result.unmask(27).int8()
+
+
+def _decode_drc_lulc_nivel1(asset):
+    img = ee.Image(asset).unmask(0).int8()
+    foret = _make_eq_chain(img, [3, 4, 5])
+    veg_herb = _make_eq_chain(img, [66])
+    agropec = _make_eq_chain(img, [9, 21])
+    nao_veg = _make_eq_chain(img, [24, 25])
+    eau = _make_eq_chain(img, [33])
+    nao_obs = _make_eq_chain(img, [27])
+    result = img.multiply(0)
+    result = result.where(foret, 1)
+    result = result.where(veg_herb, 10)
+    result = result.where(agropec, 14)
+    result = result.where(nao_veg, 22)
+    result = result.where(eau, 26)
+    result = result.where(nao_obs, 27)
+    return result.unmask(27).int8()
+
+
+def decode_drc_lulc_nivel0():
+    return _decode_drc_lulc_nivel0(DRC_LULC)
+
+
+def decode_drc_lulc_nivel1():
+    return _decode_drc_lulc_nivel1(DRC_LULC)
+
+
+def decode_drc_lulc_nivel2():
+    return ee.Image(DRC_LULC).unmask(0).int8()
+
+
+# ---------------------------------------------------------------------------
+# Peru — Cobertura queimada e cobertura/uso (Collection 2 / Collection 4)
+# ---------------------------------------------------------------------------
+PERU_BURNED_COVERAGE = "projects/mapbiomas-public/assets/peru/fire/collection2/mapbiomas_peru_fire_collection2_annual_burned_coverage_v1"
+PERU_LULC = "projects/mapbiomas-public/assets/peru/collection4/mapbiomas_peru_collection4_coverage_v1"
+
+# nivel 0 — Natural / Antrópico
+PERU_N0_NATURAL = [1, 3, 4, 5, 6, 10, 11, 12, 13, 51, 66, 70, 82,
+                   23, 52, 61, 68, 92, 26, 33, 34, 29, 32]
+PERU_N0_ANTROPICO = [14, 9, 15, 21, 35, 40, 22, 24, 25, 30, 31, 18, 72]
+
+# nivel 1 — 5 grupos
+PERU_N1_BOSQUE = [1, 3, 4, 5, 6]
+PERU_N1_NAT_NAO_BOSQUE = [10, 11, 12, 13, 51, 66, 70, 82]
+PERU_N1_AGRO = [14, 9, 15, 21, 35, 40, 18, 72]
+PERU_N1_SEM_VEG = [22, 23, 24, 25, 30, 52, 61, 68, 92, 29, 32]
+PERU_N1_AGUA = [26, 31, 33, 34]
+
+PERU_NO_OBSERVADO = [0, 27]
+
+
+def _decode_peru_nivel0(asset):
+    img = ee.Image(asset).unmask(0).int8()
+    result = img.multiply(0)
+    result = result.where(_make_eq_chain(img, PERU_N0_NATURAL), 1)
+    result = result.where(_make_eq_chain(img, PERU_N0_ANTROPICO), 14)
+    return result.unmask(0).int8()
+
+
+def _decode_peru_nivel1(asset):
+    img = ee.Image(asset).unmask(0).int8()
+    result = img.multiply(0)
+    result = result.where(_make_eq_chain(img, PERU_N1_BOSQUE), 3)
+    result = result.where(_make_eq_chain(img, PERU_N1_NAT_NAO_BOSQUE), 10)
+    result = result.where(_make_eq_chain(img, PERU_N1_AGRO), 14)
+    result = result.where(_make_eq_chain(img, PERU_N1_SEM_VEG), 22)
+    result = result.where(_make_eq_chain(img, PERU_N1_AGUA), 33)
+    result = result.where(_make_eq_chain(img, PERU_NO_OBSERVADO), 0)
+    return result.unmask(0).int8()
+
+
+def _decode_peru_nivel2(asset):
+    img = ee.Image(asset).unmask(0).int8()
+    result = img
+    result = result.where(_make_eq_chain(img, [51, 82]), 11)
+    result = result.where(_make_eq_chain(img, [18, 35, 40, 72]), 18)
+    result = result.where(_make_eq_chain(img, [29]), 92)
+    result = result.where(_make_eq_chain(img, [32]), 52)
+    result = result.where(_make_eq_chain(img, PERU_NO_OBSERVADO), 0)
+    return result.unmask(0).int8()
+
+
+def _decode_peru_nivel3(asset):
+    img = ee.Image(asset).unmask(0).int8()
+    result = img
+    result = result.where(_make_eq_chain(img, [29]), 92)
+    result = result.where(_make_eq_chain(img, [32]), 52)
+    result = result.where(_make_eq_chain(img, PERU_NO_OBSERVADO), 0)
+    return result.unmask(0).int8()
+
+
+def decode_peru_burned_nivel0():
+    return _decode_peru_nivel0(PERU_BURNED_COVERAGE)
+
+
+def decode_peru_burned_nivel1():
+    return _decode_peru_nivel1(PERU_BURNED_COVERAGE)
+
+
+def decode_peru_burned_nivel2():
+    return _decode_peru_nivel2(PERU_BURNED_COVERAGE)
+
+
+def decode_peru_burned_nivel3():
+    return _decode_peru_nivel3(PERU_BURNED_COVERAGE)
+
+
+def decode_peru_lulc_nivel0():
+    return _decode_peru_nivel0(PERU_LULC)
+
+
+def decode_peru_lulc_nivel1():
+    return _decode_peru_nivel1(PERU_LULC)
+
+
+def decode_peru_lulc_nivel2():
+    return _decode_peru_nivel2(PERU_LULC)
+
+
+def decode_peru_lulc_nivel3():
+    return _decode_peru_nivel3(PERU_LULC)
+
+
 PROCESSOR_REGISTRY = {
     "build_edge_area": build_edge_area,
     "build_fragment_size": build_fragment_size,
@@ -589,6 +920,28 @@ PROCESSOR_REGISTRY = {
     "decode_return_interval_discrete": decode_return_interval_discrete,
     "decode_mean_return_interval_discrete": decode_mean_return_interval_discrete,
     "build_nbr_min_mosaic": build_nbr_min_mosaic,
+    "build_landsat_false_color_swir": build_landsat_false_color_swir,
+    "build_landsat_natural_rgb": build_landsat_natural_rgb,
+    "build_lulc_col11": build_lulc_col11,
+    "decode_edge_area_1000m_col11": decode_edge_area_1000m_col11,
+    "build_lulc_col11_nivel0": build_lulc_col11_nivel0,
+    "build_lulc_col11_nivel1": build_lulc_col11_nivel1,
+    "build_lulc_col11_nivel1_1": build_lulc_col11_nivel1_1,
+    "build_lulc_col11_nivel2": build_lulc_col11_nivel2,
+    "build_lulc_col11_nivel3": build_lulc_col11_nivel3,
+    "build_lulc_col11_nivel4": build_lulc_col11_nivel4,
+    "build_def_seco_col11": build_def_seco_col11,
+    "decode_drc_lulc_nivel0": decode_drc_lulc_nivel0,
+    "decode_drc_lulc_nivel1": decode_drc_lulc_nivel1,
+    "decode_drc_lulc_nivel2": decode_drc_lulc_nivel2,
+    "decode_peru_burned_nivel0": decode_peru_burned_nivel0,
+    "decode_peru_burned_nivel1": decode_peru_burned_nivel1,
+    "decode_peru_burned_nivel2": decode_peru_burned_nivel2,
+    "decode_peru_burned_nivel3": decode_peru_burned_nivel3,
+    "decode_peru_lulc_nivel0": decode_peru_lulc_nivel0,
+    "decode_peru_lulc_nivel1": decode_peru_lulc_nivel1,
+    "decode_peru_lulc_nivel2": decode_peru_lulc_nivel2,
+    "decode_peru_lulc_nivel3": decode_peru_lulc_nivel3,
 }
 
 

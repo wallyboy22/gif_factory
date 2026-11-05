@@ -30,7 +30,7 @@ BULLET = "*"
 
 CONFIG_DIR = "config"
 
-KNOWN_TERRITORY_TYPES = {"countries", "regions", "states", "biomes", "departments"}
+KNOWN_TERRITORY_TYPES = {"countries", "regions", "states", "biomes", "departments", "municipalities"}
 
 
 def _find_yaml_files(root: str) -> List[str]:

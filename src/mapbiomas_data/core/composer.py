@@ -64,6 +64,10 @@ class Composer:
         os.makedirs(charts_composed_dir, exist_ok=True)
         os.makedirs(charts_gifs_dir, exist_ok=True)
 
+        # Store viz params
+        self._viz_params = viz_params or {}
+        self._is_sequential = self._viz_params.get("cmap_type") == "sequential"
+
         # Load frames
         map_frames = self._load_sorted_pngs(frames_clean_dir)
         if not map_frames:
@@ -194,20 +198,37 @@ class Composer:
 
         margin = 6
         gap_ts = 64
-        title_h = int(52 * self.font_scale)
-        leg_font_sz = int(35 * self.font_scale)
-        legend_h = int(leg_font_sz * 2)
+        title_h = int(80 * self.font_scale)
+        leg_font_sz = int(64 * self.font_scale)
+        legend_h = int(leg_font_sz * 3)
 
-        # Donut panel: use donut_img natural width (no cap)
+        # Donut: resize to 3x but cap height to map height
+        if donut_img:
+            donut_img = donut_img.resize(
+                (donut_img.width * 3, donut_img.height * 3), PILImage.LANCZOS
+            )
+            if donut_img.height > mh:
+                ratio = mh / donut_img.height
+                donut_img = donut_img.resize(
+                    (int(donut_img.width * ratio), mh), PILImage.LANCZOS
+                )
+
+        # Donut panel: use resized donut width
         donut_w = donut_img.width if donut_img else 0
         donut_panel_w = max(donut_w, 0)
 
-        # Timeseries: use natural height, or default
+        # Timeseries: resize to match donut+mapa width
         ts_h = ts_img.height if ts_img else max(180, int(mw * 0.22))
         ts_w = ts_img.width if ts_img else (mw + donut_panel_w + margin)
 
         map_w = mw
         canvas_w = map_w + donut_panel_w + margin
+        if ts_img and ts_w < canvas_w - margin:
+            scale = (canvas_w - margin) / ts_w
+            ts_img = ts_img.resize(
+                (int(ts_w * scale), int(ts_h * scale)), PILImage.LANCZOS
+            )
+            ts_w, ts_h = ts_img.width, ts_img.height
         if ts_w > canvas_w:
             canvas_w = ts_w
 
@@ -237,7 +258,8 @@ class Composer:
 
         # --- Legend bar ---
         leg_y = ts_y + ts_h
-        self._draw_legend(draw, canvas_w, leg_y, legend_h, legend_entries)
+        self._draw_legend(draw, canvas_w, leg_y, legend_h, legend_entries,
+                          is_sequential=self._is_sequential)
 
         # --- Separator lines ---
         sep_color = (180, 180, 180)
@@ -254,7 +276,7 @@ class Composer:
     ):
         """Fill title bar with centered text."""
         draw.rectangle([(0, 0), (w, h)], fill=(245, 245, 245))
-        title_font = self._make_font(int(24 * self.font_scale))
+        title_font = self._make_font(int(80 * self.font_scale))
         text = f"{product_name} — {territory_name}" if product_name else territory_name
         tw = draw.textbbox((0, 0), text, font=title_font)
         draw.text(((w - tw[2]) // 2, (h - (tw[3] - tw[1])) // 2),
@@ -264,20 +286,72 @@ class Composer:
         self, draw: ImageDraw.Draw,
         w: int, y: int, h: int,
         entries: List[Tuple[Tuple[int, int, int], str]],
+        is_sequential: bool = False,
     ):
         """Draw legend boxes + labels centered in the bar.
 
         Font size scales with self.font_scale to visually match the
         map scale bar text (which is ~69pt on the compose canvas at M3.0).
+        For sequential cmap_type, draws a gradient color bar instead.
         """
         draw.rectangle([(0, y), (w, y + h)], fill=(248, 248, 248))
         draw.line([(0, y), (w, y)], fill=(200, 200, 200), width=1)
+
+        if is_sequential:
+            palette = self._viz_params.get("palette", [])
+            if not palette:
+                return
+            font_sz = int(64 * self.font_scale)
+            margin = 12
+            lbl_font_sz = int(font_sz * 0.6)
+            lbl_font = self._make_font(lbl_font_sz)
+            label_text = self._viz_params.get("label", "")
+            extra_rows = 1 + (1 if label_text else 0)
+
+            bar_h = font_sz
+            # Measure label height
+            _, lbl_top, _, lbl_bot = draw.textbbox((0, 0), "0", font=lbl_font)
+            lbl_h = lbl_bot - lbl_top
+            total_below = lbl_h * extra_rows + 4 * extra_rows + 4
+            needed_h = bar_h + total_below
+            bar_y = y + max(2, (h - needed_h) // 2)
+
+            bar_x = margin
+            bar_w = w - 2 * margin
+            seg_w = max(1, bar_w // len(palette))
+            for i, p in enumerate(palette):
+                color = _parse_hex(f"#{p}")
+                sx = bar_x + i * seg_w
+                if i == len(palette) - 1:
+                    draw.rectangle([sx, bar_y, bar_x + bar_w, bar_y + bar_h], fill=color)
+                else:
+                    draw.rectangle([sx, bar_y, sx + seg_w, bar_y + bar_h], fill=color)
+            draw.rectangle([bar_x, bar_y, bar_x + bar_w, bar_y + bar_h],
+                           outline=(100, 100, 100), width=2)
+
+            viz_min = self._viz_params.get("min", 0)
+            viz_max = self._viz_params.get("max", len(palette) - 1)
+            label_y = bar_y + bar_h + 4
+
+            draw.text((bar_x + 4, label_y), str(viz_min),
+                      font=lbl_font, fill=(51, 51, 51))
+            tw_max = draw.textbbox((0, 0), str(viz_max), font=lbl_font)
+            draw.text((bar_x + bar_w - tw_max[2], label_y), str(viz_max),
+                      font=lbl_font, fill=(51, 51, 51))
+
+            if label_text:
+                lbl_font_big = self._make_font(font_sz)
+                lw = draw.textbbox((0, 0), label_text, font=lbl_font_big)
+                label_text_y = label_y + lbl_h + 4
+                draw.text(((w - lw[2]) // 2, label_text_y),
+                          label_text, font=lbl_font_big, fill=(51, 51, 51))
+            return
 
         if not entries:
             return
 
         margin = 12
-        font_sz = int(35 * self.font_scale)
+        font_sz = int(64 * self.font_scale)
         leg_font = self._make_font(font_sz)
         box_size = max(16, int(font_sz * 0.55))
         row_h = box_size + 10

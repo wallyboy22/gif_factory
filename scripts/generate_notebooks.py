@@ -93,7 +93,7 @@ def make_notebook(initiative: dict, collection: dict) -> list:
     # --- Title ---
     cells.append(md_cell(
         f"# {init_name} — {coll_name}\n\n"
-        f"Pipeline completo: mapas → área stats → gráficos → composição.\n"
+        f"Pipeline: mapas → GIFs por grupo, depois área stats → gráficos → composição global.\n"
         f"Dados **{coll_name}** do [MapBiomas](https://mapbiomas.org/) via "
         f"[Google Earth Engine](https://earthengine.google.com/).\n"
     ))
@@ -151,7 +151,15 @@ def make_notebook(initiative: dict, collection: dict) -> list:
     )
     cells.append(code_cell(setup_code))
 
-    # --- Per-group batch cells ---
+    # =====================================================================
+    # PIPELINE POR GRUPO DE TERRITORIO
+    # =====================================================================
+    cells.append(md_cell(
+        "## Pipeline GIFs por grupo\n\n"
+        "Cada grupo abaixo executa: download EE → frames → collages → GIFs.\n"
+        "Resultados enviados ao GCS via `--gcs`.\n"
+    ))
+
     for group in groups:
         gid = group["id"]
         gname = group["name"]
@@ -161,18 +169,13 @@ def make_notebook(initiative: dict, collection: dict) -> list:
         md_comment = (
             f"### Grupo: {gname} ({gid})\n\n"
             f"**{len(tids)} territórios × {n_prods} produtos**\n\n"
-            "Sequência completa:\n"
-            "1. **Pipeline** — download EE → frames → collages → GIFs\n"
-            "2. **Area Stats** — (assíncrono) consulta EE, exporta área por classe para GCS\n"
-            "3. **Charts** — gera PNGs: distribuição anual + série temporal\n"
-            "4. **Compose** — funde mapas + gráficos lado a lado em GIF\n\n"
-            "Cada comando usa `--gcs` para salvar no storage permanente.\n"
-            "Use `--resume` para retomar se o ambiente cair.\n"
+            "1. Gerar batch\n"
+            "2. Pipeline → GIFs (com `--gcs` para upload automático)\n"
         )
         cells.append(md_cell(md_comment))
 
         batch_python = (
-            "# (1) Gerar batch JSON para este grupo\n"
+            "# Gerar batch JSON para este grupo\n"
             "import json, tempfile, os\n"
             f'collection_ds = "{ds_id}"\n'
             f'group_id = "{gid}"\n\n'
@@ -201,7 +204,7 @@ def make_notebook(initiative: dict, collection: dict) -> list:
 
         # Pipeline
         cells.append(code_cell(
-            "# (2) Pipeline: download EE → frames → collages → GIFs\n"
+            "# Pipeline: download EE → frames → collages → GIFs\n"
             "# Pre-requisito: batch gerado, autenticacao EE OK\n"
             "import os\n"
             '!python -m src.mapbiomas_data.interfaces.cli '
@@ -209,100 +212,87 @@ def make_notebook(initiative: dict, collection: dict) -> list:
             "--workers 6 --resume-from-gcs --font-scale 1.0 --gcs\n"
         ))
 
-        # Area stats
-        cells.append(code_cell(
-            "# (3) Area stats: computa area por classe (assincrono, EE task)\n"
-            "# Pre-requisito: pipeline executado (para config/territorios validos)\n"
-            "# Exporta CSV para GCS. Monitora tasks ate completar.\n"
-            "import os\n"
-            '!python -m src.mapbiomas_data.interfaces.cli '
-            "--area-stats --batch $OPTBATCH --resume --gcs\n"
-        ))
+    # =====================================================================
+    # AREA STATS GLOBAL — 1 TASK EE POR PRODUTO (TODOS OS ANOS)
+    # =====================================================================
+    cells.append(md_cell(
+        "## Area Stats — 1 task EE por produto\n\n"
+        "Gera batch com **todos os territórios × todos os produtos**.\n"
+        "Cada combinação vira **1 task EE** que exporta todos os anos de uma vez.\n"
+        "(em vez de 1 task por ano).\n\n"
+        "O CSV único é baixado do GCS e salvo localmente ao final.\n"
+    ))
 
-        # Charts
-        cells.append(code_cell(
-            "# (4) Charts: gera graficos anual + serie temporal\n"
-            "# Pre-requisito: area_stats CSVs disponiveis em area_stats/\n"
-            "# Gera PNGs em charts_annual/ e charts_timeseries/\n"
-            "import os\n"
-            '!python -m src.mapbiomas_data.interfaces.cli '
-            "--charts --batch $OPTBATCH\n"
-        ))
+    # Batch global
+    all_batch_python = (
+        "# Gerar batch para TODOS os grupos (area-stats + charts + compose)\n"
+        "import json, tempfile, os\n"
+        f'collection_ds = "{ds_id}"\n\n'
+        "from src.mapbiomas_data.config import ConfigLoader\n"
+        "cfg = ConfigLoader()\n"
+        "cfg.load_all()\n"
+        "ds = cfg.datasets.get(collection_ds, {})\n"
+        "product_ids = sorted(ds.get(\"products\", {}).keys())\n\n"
+        f"all_territories = {json.dumps(all_territory_ids)}\n\n"
+        "items = []\n"
+        "for tid in all_territories:\n"
+        "    for pid in product_ids:\n"
+        '        items.append({"dataset": collection_ds, '
+        '"product": pid, "territory": tid})\n\n'
+        "n_terr = len(all_territories)\n"
+        "n_prod = len(product_ids)\n"
+        f'print(f"Batch total: {{len(items)}} combos'
+        f' ({{n_terr}} territorios x {{n_prod}} produtos)")\n\n'
+        'tmp = tempfile.NamedTemporaryFile(mode="w", suffix=".json", '
+        'delete=False)\n'
+        "json.dump({\"items\": items}, tmp)\n"
+        "tmp.close()\n"
+        "os.environ[\"OPTBATCH\"] = tmp.name\n"
+    )
+    cells.append(code_cell(all_batch_python))
 
-        # Compose
-        cells.append(code_cell(
-            "# (5) Compose: funde GIF do mapa + graficos lado a lado\n"
-            "# Pre-requisito: charts PNGs + GIFs gerados\n"
-            "# Gera GIF final em composed/\n"
-            "import os\n"
-            '!python -m src.mapbiomas_data.interfaces.cli '
-            "--compose --batch $OPTBATCH\n"
-        ))
+    # Area stats global (product-batch = 1 task/produto)
+    cells.append(code_cell(
+        "# Area Stats: 1 task EE por produto (todos os anos em 1 CSV)\n"
+        "# Pre-requisito: batch global gerado.\n"
+        "# Cada (produto, territorio) cria 1 task que exporta todos os anos.\n"
+        "# Aguarda a conclusao e monta o CSV unificado automaticamente.\n"
+        "import os\n"
+        '!python -m src.mapbiomas_data.interfaces.cli '
+        "--area-stats --batch $OPTBATCH --gcs --product-batch\n"
+    ))
 
-    # --- "Tudo" cell (all groups at once) ---
-    if len(groups) > 1:
-        all_batch_python = (
-            "# Gerar batch para TODOS os grupos\n"
-            "import json, tempfile, os\n"
-            f'collection_ds = "{ds_id}"\n\n'
-            "from src.mapbiomas_data.config import ConfigLoader\n"
-            "cfg = ConfigLoader()\n"
-            "cfg.load_all()\n"
-            "ds = cfg.datasets.get(collection_ds, {})\n"
-            "product_ids = sorted(ds.get(\"products\", {}).keys())\n\n"
-            f"all_territories = {json.dumps(all_territory_ids)}\n\n"
-            "items = []\n"
-            "for tid in all_territories:\n"
-            "    for pid in product_ids:\n"
-            '        items.append({"dataset": collection_ds, '
-            '"product": pid, "territory": tid})\n\n'
-            "n_terr = len(all_territories)\n"
-            "n_prod = len(product_ids)\n"
-            f'print(f"Batch total: {{len(items)}} combos'
-            f' ({{n_terr}} territorios x {{n_prod}} produtos)")\n\n'
-            'tmp = tempfile.NamedTemporaryFile(mode="w", suffix=".json", '
-            'delete=False)\n'
-            "json.dump({\"items\": items}, tmp)\n"
-            "tmp.close()\n"
-            "os.environ[\"OPTBATCH\"] = tmp.name\n"
-        )
-        cells.append(code_cell(all_batch_python))
+    # =====================================================================
+    # CHARTS + COMPOSE GLOBAL (cada um com --gcs)
+    # =====================================================================
+    cells.append(md_cell(
+        "## Charts + Compose + Sync\n\n"
+        "Gera gráficos anuais e série temporal a partir dos CSVs de área.\n"
+        "Depois compõe mapas + gráficos lado a lado.\n"
+        "Cada etapa faz upload ao GCS via `--gcs`.\n"
+    ))
 
-        cells.append(md_cell(
-            "### Executar tudo (todos os grupos)\n\n"
-            "Sequência completa: pipeline → area stats → charts → compose.\n"
-        ))
+    cells.append(code_cell(
+        "# Charts: gera graficos anual + serie temporal\n"
+        "# Pre-requisito: area_stats CSVs disponiveis (product-batch).\n"
+        "# Faz upload dos PNGs ao GCS.\n"
+        "import os\n"
+        '!python -m src.mapbiomas_data.interfaces.cli '
+        "--charts --batch $OPTBATCH --gcs\n"
+    ))
 
-        cells.append(code_cell(
-            "# Pipeline: todos os grupos\n"
-            "import os\n"
-            '!python -m src.mapbiomas_data.interfaces.cli '
-            "--generate --batch $OPTBATCH "
-            "--workers 6 --resume-from-gcs --font-scale 1.0 --gcs\n"
-        ))
+    cells.append(code_cell(
+        "# Compose: funde GIF do mapa + graficos lado a lado\n"
+        "# Pre-requisito: charts PNGs + GIFs gerados.\n"
+        "# Faz upload dos GIFs compostos ao GCS.\n"
+        "import os\n"
+        '!python -m src.mapbiomas_data.interfaces.cli '
+        "--compose --batch $OPTBATCH --gcs\n"
+    ))
 
-        cells.append(code_cell(
-            "# Area stats: todos os grupos\n"
-            "import os\n"
-            '!python -m src.mapbiomas_data.interfaces.cli '
-            "--area-stats --batch $OPTBATCH --resume --gcs\n"
-        ))
-
-        cells.append(code_cell(
-            "# Charts: todos os grupos\n"
-            "import os\n"
-            '!python -m src.mapbiomas_data.interfaces.cli '
-            "--charts --batch $OPTBATCH\n"
-        ))
-
-        cells.append(code_cell(
-            "# Compose: todos os grupos\n"
-            "import os\n"
-            '!python -m src.mapbiomas_data.interfaces.cli '
-            "--compose --batch $OPTBATCH\n"
-        ))
-
-    # --- Sync cell ---
+    # =====================================================================
+    # SYNC FINAL
+    # =====================================================================
     cells.append(code_cell(
         "# Sync final: index + Looker CSVs\n"
         "# Os dados ja foram para o GCS via --gcs em cada etapa.\n"

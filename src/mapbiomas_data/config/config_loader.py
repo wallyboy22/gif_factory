@@ -94,6 +94,7 @@ class ConfigLoader:
                         continue
                     entry = {
                         "description": coll.get("description", ""),
+                        "title_collection": coll.get("title_collection", ""),
                         "project": coll.get("project", ""),
                         "category": coll.get("category", ""),
                         "collection": coll.get("collection"),
@@ -193,7 +194,36 @@ class ConfigLoader:
             viz_data = _try_load_yaml(os.path.join(self.config_dir, "visualization.yaml"))
             if viz_data:
                 self._visualizations = viz_data.get("visualizations", viz_data)
+                self._normalize_palettes()
         return self._visualizations
+
+    def _normalize_palettes(self) -> None:
+        """Garante que toda cor de paleta seja string.
+
+        O YAML interpreta cores so com digitos (ex.: 922108) como inteiro, e o
+        Earth Engine exige strings em `Image.visualize`. Tambem valida o formato.
+        """
+        for viz_key, viz in self._visualizations.items():
+            if not isinstance(viz, dict):
+                continue
+            palette = viz.get("palette")
+            if not isinstance(palette, list):
+                continue
+            normalized = []
+            for idx, color in enumerate(palette):
+                if not isinstance(color, str):
+                    color = str(color)
+                color = color.strip()
+                if color.startswith("#"):
+                    color = color[1:]
+                if len(color) not in (3, 6) or any(
+                    ch not in "0123456789abcdefABCDEF" for ch in color
+                ):
+                    raise ValueError(
+                        f"Visualizacao '{viz_key}': cor invalida no indice {idx}: {color!r}"
+                    )
+                normalized.append(color)
+            viz["palette"] = normalized
 
     @property
     def paths(self) -> Dict[str, Any]:

@@ -68,6 +68,7 @@ class DatasetManager:
         result["id"] = product_id
         result["dataset_id"] = dataset_id
         result["dataset_description"] = ds.get("description", "")
+        result["collection_title"] = ds.get("title_collection", "")
         result["dataset_source"] = ds.get("source", "")
         result["asset"] = product.get("asset", "")
         result["asset_type"] = product.get("asset_type", "image")

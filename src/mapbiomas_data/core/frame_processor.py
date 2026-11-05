@@ -3,8 +3,37 @@ import os
 import subprocess
 import sys
 import tempfile
+import threading
 from typing import Any, Dict, List, Optional, Tuple
 from PIL import Image as PILImage, ImageDraw, ImageFont
+
+
+# --- Tema (claro/escuro) ---------------------------------------------------
+# Guardado em thread-local: o modo batch roda varios produtos em threads no
+# mesmo processo, entao um global vazaria a configuracao entre produtos.
+LIGHT_THEME = {
+    "bg": (255, 255, 255),
+    "fg": (0, 0, 0),
+    "sep": (200, 200, 200),
+    "box": (100, 100, 100),
+}
+DARK_THEME = {
+    "bg": (0, 0, 0),
+    "fg": (240, 240, 240),
+    "sep": (70, 70, 70),
+    "box": (150, 150, 150),
+}
+THEMES = {"light": LIGHT_THEME, "dark": DARK_THEME}
+
+_THEME = threading.local()
+
+
+def set_theme(name: Optional[str]) -> None:
+    _THEME.value = THEMES.get(name or "light", LIGHT_THEME)
+
+
+def get_theme() -> Dict[str, Tuple[int, int, int]]:
+    return getattr(_THEME, "value", None) or LIGHT_THEME
 
 
 def _parse_color(hex_color: str) -> Tuple[int, int, int]:
@@ -47,7 +76,7 @@ def _find_font() -> Optional[str]:
 
 def _ensure_rgb(image: PILImage.Image) -> PILImage.Image:
     if image.mode == "RGBA":
-        bg = PILImage.new("RGB", image.size, (255, 255, 255))
+        bg = PILImage.new("RGB", image.size, get_theme()["bg"])
         bg.paste(image, mask=image.split()[3])
         return bg
     if image.mode != "RGB":
@@ -60,29 +89,29 @@ def _render_rgb_legend(draw: ImageDraw.Draw, width: int, y: int, margin: int,
                        font_size: int = 42):
     box_size = 28
     font_title = FrameProcessor._make_font(font_size)
-    font_detail = FrameProcessor._make_font(font_size - 6)
+    font_detail = FrameProcessor._make_font(font_size - 8)
 
-    line1_h = draw.textbbox((0, 0), "Ag", font=font_title)[3] + 6
-    line2_h = draw.textbbox((0, 0), "Ag", font=font_detail)[3] + 6
+    line1_h = draw.textbbox((0, 0), "Ag", font=font_title)[3] + 8
+    line2_h = draw.textbbox((0, 0), "Ag", font=font_detail)[3] + 8
 
-    draw.text((margin, y), "Composição RGB:", font=font_title, fill=(0, 0, 0))
+    draw.text((margin, y), "Composição RGB:", font=font_title, fill=get_theme()["fg"])
 
     y2 = y + line1_h
     detail_prefix = f"  min: {int(vmin)}, max: {int(vmax)}, bandas:"
     prefix_w = draw.textbbox((0, 0), detail_prefix, font=font_detail)[2]
 
-    draw.text((margin, y2), "  " + detail_prefix.lstrip(), font=font_detail, fill=(0, 0, 0))
+    draw.text((margin, y2), "  " + detail_prefix.lstrip(), font=font_detail, fill=get_theme()["fg"])
 
-    bx = margin + prefix_w + 8 + 20
+    bx = margin + prefix_w + 16 + 20
     for entry in entries:
         color = _parse_color(entry["color"])
         lbl = entry["label"]
         lbl_w = draw.textbbox((0, 0), lbl, font=font_detail)[2]
 
         draw.rectangle([bx, y2, bx + box_size, y2 + box_size], fill=color)
-        draw.rectangle([bx, y2, bx + box_size, y2 + box_size], outline=(100, 100, 100), width=2)
+        draw.rectangle([bx, y2, bx + box_size, y2 + box_size], outline=get_theme()["box"], width=2)
         bx += box_size + 6
-        draw.text((bx, y2), lbl, font=font_detail, fill=(0, 0, 0))
+        draw.text((bx, y2), lbl, font=font_detail, fill=get_theme()["fg"])
         bx += lbl_w + 30
 
 
@@ -91,27 +120,48 @@ class FrameProcessor:
 
     FONT_PATH = _find_font()
 
+    # Atalhos para o tema (mantidos na classe para uso pelo pipeline)
+    set_theme = staticmethod(set_theme)
+    get_theme = staticmethod(get_theme)
+
+    @staticmethod
+    def _rgb_legend_height(draw: ImageDraw.Draw, font_size: int) -> int:
+        font_title = FrameProcessor._make_font(font_size)
+        font_detail = FrameProcessor._make_font(font_size - 8)
+        line1_h = draw.textbbox((0, 0), "Ag", font=font_title)[3] + 8
+        line2_h = draw.textbbox((0, 0), "Ag", font=font_detail)[3] + 8
+        return line1_h + line2_h + 12
+
     @staticmethod
     def add_year_label(
         image_path: str,
         text: str,
         position: str = "top_left",
-        font_size: int = 48,
-        text_color: Tuple[int, int, int] = (255, 255, 255),
-        outline_color: Tuple[int, int, int] = (0, 0, 0),
+        font_size: int = 120,
+        text_color: Optional[Tuple[int, int, int]] = None,
+        outline_color: Optional[Tuple[int, int, int]] = None,
         padding_top: int = 0,
         bar_color: Optional[Tuple[int, int, int]] = None,
         max_width: Optional[int] = None,
         subtitle: Optional[str] = None,
         subtitle_size: Optional[int] = None,
+        line2: Optional[str] = None,
+        line2_size: Optional[int] = None,
+        draw_north: bool = False,
     ) -> None:
         image = _ensure_rgb(PILImage.open(image_path))
 
+        if text_color is None:
+            text_color = get_theme()["fg"]
+        if outline_color is None:
+            outline_color = get_theme()["bg"]
+
         font1 = FrameProcessor._make_font(font_size)
         font2 = FrameProcessor._make_font(subtitle_size or font_size - 10) if subtitle else None
+        font3 = FrameProcessor._make_font(line2_size or subtitle_size or font_size - 10) if line2 else None
 
         if padding_top > 0:
-            bg = bar_color if bar_color else (0, 0, 0)
+            bg = bar_color if bar_color else get_theme()["bg"]
             padded = PILImage.new("RGB", (image.width, image.height + padding_top), bg)
             padded.paste(image, (0, padding_top))
             image = padded
@@ -133,14 +183,19 @@ class FrameProcessor:
         l1_h = draw.textbbox((0, 0), "Ay", font=font1)[3] + 4
         l2_lines = FrameProcessor._wrap_text(draw, subtitle, font2, max_width) if subtitle and font2 else []
         l2_h = draw.textbbox((0, 0), "Ay", font=font2)[3] + 4 if l2_lines else 0
+        l3_lines = FrameProcessor._wrap_text(draw, line2, font3, max_width) if line2 and font3 else []
+        l3_h = draw.textbbox((0, 0), "Ay", font=font3)[3] + 4 if l3_lines else 0
 
         gap_between = 8
-        total_lines = l1_lines + l2_lines
-        line_heights = [l1_h] * len(l1_lines) + [l2_h] * len(l2_lines)
+        total_lines = l1_lines + l2_lines + l3_lines
+        line_heights = [l1_h] * len(l1_lines) + [l2_h] * len(l2_lines) + [l3_h] * len(l3_lines)
         total_w = max(draw.textbbox((0, 0), l, font=font1)[2] for l in l1_lines + [""]) if l1_lines else 0
         if l2_lines:
             total_w = max(total_w, max(draw.textbbox((0, 0), l, font=font2)[2] for l in l2_lines))
+        if l3_lines:
+            total_w = max(total_w, max(draw.textbbox((0, 0), l, font=font3)[2] for l in l3_lines))
         total_h = len(l1_lines) * l1_h + (gap_between if l2_lines else 0) + len(l2_lines) * l2_h
+        total_h += (gap_between if l3_lines else 0) + len(l3_lines) * l3_h
 
         if bar_color is None:
             bar_padding = 12
@@ -159,6 +214,10 @@ class FrameProcessor:
                 for l in l2_lines:
                     draw.text((pos[0] + dx, cy + dy), l, font=font2, fill=outline_color)
                     cy += l2_h
+                cy += gap_between
+                for l in l3_lines:
+                    draw.text((pos[0] + dx, cy + dy), l, font=font3, fill=outline_color)
+                    cy += l3_h
 
         cy = pos[1]
         for l in l1_lines:
@@ -168,19 +227,39 @@ class FrameProcessor:
         for l in l2_lines:
             draw.text((pos[0], cy), l, font=font2, fill=text_color)
             cy += l2_h
+        cy += gap_between
+        for l in l3_lines:
+            draw.text((pos[0], cy), l, font=font3, fill=text_color)
+            cy += l3_h
+
+        if draw_north:
+            north_font = FrameProcessor._make_font(max(14, int(font_size * 0.4)))
+            nb = draw.textbbox((0, 0), "N", font=north_font)
+            nw = nb[2] - nb[0]
+            arrow_size = max(12, int(font_size * 0.12))
+            nc = image.width - 20 - max(nw, arrow_size) // 2
+            ny = pos[1] + l1_h // 2
+            draw.polygon(
+                [(nc, ny - arrow_size), (nc - 7, ny - 2), (nc + 7, ny - 2)],
+                fill=text_color,
+            )
+            draw.line([(nc, ny - 2), (nc, ny + 4)], fill=text_color, width=2)
+            draw.line([(nc - 6, ny + 4), (nc + 6, ny + 4)], fill=text_color, width=2)
+            draw.text((nc - nw // 2, ny + 8), "N", font=north_font, fill=text_color)
 
         image.save(image_path)
 
     @staticmethod
-    def add_year_only(image_path: str, year_text: str, font_size: int = 80) -> None:
+    def add_year_only(image_path: str, year_text: str, font_size: int = 160, draw_north: bool = False) -> None:
         padding = max(130, font_size + 20)
         FrameProcessor.add_year_label(
             image_path, year_text,
             position="top_left",
             font_size=font_size,
             padding_top=padding,
-            bar_color=(255, 255, 255),
-            text_color=(0, 0, 0),
+            bar_color=get_theme()["bg"],
+            text_color=get_theme()["fg"],
+            draw_north=draw_north,
         )
 
     @staticmethod
@@ -218,7 +297,7 @@ class FrameProcessor:
         subtitle_size: Optional[int] = None,
     ) -> None:
         image = _ensure_rgb(PILImage.open(image_path))
-        padded = PILImage.new("RGB", (image.width, image.height + padding_top + gap), (255, 255, 255))
+        padded = PILImage.new("RGB", (image.width, image.height + padding_top + gap), get_theme()["bg"])
         padded.paste(image, (0, padding_top + gap))
         draw = ImageDraw.Draw(padded)
 
@@ -231,23 +310,24 @@ class FrameProcessor:
         l1_h = draw.textbbox((0, 0), "Ay", font=font1)[3] + 6
         sub_lines = FrameProcessor._wrap_text(draw, subtitle, font_sub, max_w) if subtitle and font_sub else []
         sub_h = draw.textbbox((0, 0), "Ay", font=font_sub)[3] + 4 if sub_lines else 0
+        l2_lines = FrameProcessor._wrap_text(draw, line2, font2, max_w)
+        l2_h = draw.textbbox((0, 0), "Ay", font=font2)[3] + 4 if l2_lines else 0
 
         y = 20
         for l in l1_lines:
-            draw.text((20, y), l, font=font1, fill=(0, 0, 0))
+            draw.text((20, y), l, font=font1, fill=get_theme()["fg"])
             y += l1_h
         if sub_lines:
             y += 4
             for l in sub_lines:
-                draw.text((20, y), l, font=font_sub, fill=(0, 0, 0))
+                draw.text((20, y), l, font=font_sub, fill=get_theme()["fg"])
                 y += sub_h
         l2_y = y + 8
-        draw.text((20, l2_y), line2, font=font2, fill=(0, 0, 0))
-
-        draw.line([(0, padding_top - 1), (padded.width, padding_top - 1)], fill=(0, 0, 0), width=1)
+        for l in l2_lines:
+            draw.text((20, l2_y), l, font=font2, fill=get_theme()["fg"])
+            l2_y += l2_h
 
         image.close()
-        padded.save(image_path)
         padded.save(image_path)
 
     @staticmethod
@@ -270,7 +350,7 @@ class FrameProcessor:
                 print(f"Erro ao adicionar header em {path}: {e}")
 
     @staticmethod
-    def _truncate_label(lbl: str, max_chars: int = 35) -> str:
+    def _truncate_label(lbl: str, max_chars: int = 80) -> str:
         if len(lbl) > max_chars:
             print(f"  [AVISO] Label truncada ({len(lbl)} chars, max {max_chars}): '{lbl}'")
             return lbl[:max_chars-3].rstrip() + "..."
@@ -278,6 +358,7 @@ class FrameProcessor:
 
     @staticmethod
     def _make_font(size: int) -> ImageFont.FreeTypeFont:
+        size = max(6, int(size))
         try:
             if FrameProcessor.FONT_PATH:
                 return ImageFont.truetype(FrameProcessor.FONT_PATH, size)
@@ -334,7 +415,7 @@ class FrameProcessor:
         vmin: float = 0,
         vmax: float = 1,
         label: str = "",
-        font_size: int = 50,
+        font_size: int = 80,
         discrete_labels: Optional[List[str]] = None,
         cmap_type: str = "sequential",
         legend_order: Optional[List[int]] = None,
@@ -374,12 +455,12 @@ class FrameProcessor:
 
         legend_h = label_h + content_h + margin * 2
 
-        padded = PILImage.new("RGB", (width, image.height + legend_h), (255, 255, 255))
+        padded = PILImage.new("RGB", (width, image.height + legend_h), get_theme()["bg"])
         padded.paste(image, (0, 0))
         draw = ImageDraw.Draw(padded)
 
         sep_y = image.height
-        draw.line([(0, sep_y), (width, sep_y)], fill=(200, 200, 200), width=1)
+        draw.line([(0, sep_y), (width, sep_y)], fill=get_theme()["sep"], width=1)
 
         try:
             lfont = ImageFont.truetype(FrameProcessor.FONT_PATH, font_size) if FrameProcessor.FONT_PATH else ImageFont.load_default()
@@ -389,7 +470,7 @@ class FrameProcessor:
         y = image.height + margin
 
         if label:
-            draw.text((20, y), label, font=lfont, fill=(0, 0, 0))
+            draw.text((20, y), label, font=lfont, fill=get_theme()["fg"])
         y += label_h
 
         if is_discrete:
@@ -400,8 +481,8 @@ class FrameProcessor:
                 bx = margin + col * col_w
                 by = y + row * row_h
                 draw.rectangle([bx, by, bx + box_size, by + box_size], fill=color)
-                draw.rectangle([bx, by, bx + box_size, by + box_size], outline=(100, 100, 100), width=2)
-                draw.text((bx + box_size + 10, by + 2), lbl, font=tfont, fill=(0, 0, 0))
+                draw.rectangle([bx, by, bx + box_size, by + box_size], outline=get_theme()["box"], width=2)
+                draw.text((bx + box_size + 10, by + 2), lbl, font=tfont, fill=get_theme()["fg"])
         else:
             bar_x, bar_y = margin, y
             bar_w = width - 2 * margin
@@ -418,8 +499,8 @@ class FrameProcessor:
                 lbl = str(int(val))
                 bbox = draw.textbbox((0, 0), lbl, font=tfont)
                 lw = bbox[2] - bbox[0]
-                draw.text((xi - lw // 2, bar_y + box_size + 5), lbl, font=tfont, fill=(0, 0, 0))
-                draw.line([(xi, bar_y + box_size), (xi, bar_y + box_size + 5)], fill=(0, 0, 0))
+                draw.text((xi - lw // 2, bar_y + box_size + 5), lbl, font=tfont, fill=get_theme()["fg"])
+                draw.line([(xi, bar_y + box_size), (xi, bar_y + box_size + 5)], fill=get_theme()["fg"])
 
         image.close()
         padded.save(image_path)
@@ -431,7 +512,7 @@ class FrameProcessor:
         vmin: float = 0,
         vmax: float = 1,
         label: str = "",
-        font_size: int = 50,
+        font_size: int = 80,
         cmap_type: str = "sequential",
     ) -> None:
         for path in image_paths:
@@ -450,11 +531,12 @@ class FrameProcessor:
         palette: List[str],
         vmin: float = 0,
         vmax: float = 1,
-        font_size: int = 50,
+        font_size: int = 80,
         discrete_labels: Optional[List[str]] = None,
         cmap_type: str = "sequential",
         show_legend: bool = True,
         show_scale: bool = True,
+        show_north: bool = True,
         rgb_legend: Optional[Dict[str, Any]] = None,
         legend_order: Optional[List[int]] = None,
         prefix_labels: bool = True,
@@ -470,8 +552,8 @@ class FrameProcessor:
         gap = 45
 
         north_w = 100
-        north_gap = int(60 * font_size / 50)
-        north_zone = north_w + margin + north_gap
+        north_gap = int(60 * font_size / 80)
+        north_zone = (north_w + margin + north_gap) if show_north else 0
 
         row1_h = max(60, int(font_size * 1.3))
         tfont = FrameProcessor._make_font(font_size - 14)
@@ -480,7 +562,9 @@ class FrameProcessor:
             entries = []
         elif rgb_legend and rgb_legend.get("entries"):
             box_size = 28
-            legend_content_h = 80
+            probe = PILImage.new("RGB", (1, 1))
+            pdraw = ImageDraw.Draw(probe)
+            legend_content_h = FrameProcessor._rgb_legend_height(pdraw, font_size)
             entries = []
         elif n == 0:
             box_size = 28
@@ -503,6 +587,10 @@ class FrameProcessor:
             tfont = FrameProcessor._make_font(font_size - 14)
             cols, rows, tfont, tfs = FrameProcessor._layout_discrete(
                 width, entries, tfont, box_size, 14, margin, max_cols=3)
+            # Ajusta a altura da linha e o tamanho da caixa ao tamanho real da fonte
+            # (labels curtos nao encolhem a fonte e passariam a se sobrepor).
+            row_h = max(row_h, int(tfs * 1.5))
+            box_size = max(box_size, int(tfs * 0.5))
             legend_content_h = rows * row_h
         else:
             box_size = 50
@@ -513,13 +601,13 @@ class FrameProcessor:
         s2 = gap + row2_h + margin if show_legend else 0
         section_h = s1 + s2
 
-        padded = PILImage.new("RGB", (width, image.height + section_h), (255, 255, 255))
+        padded = PILImage.new("RGB", (width, image.height + section_h), get_theme()["bg"])
         padded.paste(image, (0, 0))
         draw = ImageDraw.Draw(padded)
 
         sep_y = image.height
         if show_scale:
-            draw.line([(0, sep_y), (width, sep_y)], fill=(200, 200, 200), width=1)
+            draw.line([(0, sep_y), (width, sep_y)], fill=get_theme()["sep"], width=1)
 
         sfont = FrameProcessor._make_font(font_size - 12)
 
@@ -533,7 +621,7 @@ class FrameProcessor:
 
             scale_max_w = width - margin - north_zone
             nice = [1, 2, 5, 10, 15, 20, 25, 50, 100, 150, 200, 500]
-            target_km = km_per_px * scale_max_w
+            target_km = km_per_px * scale_max_w * 0.5
             scale_km = min(nice, key=lambda x: abs(x - target_km))
             bar_px = int(scale_km / km_per_px) if km_per_px > 0 else scale_max_w
             bar_px = min(bar_px, scale_max_w)
@@ -549,24 +637,25 @@ class FrameProcessor:
             b0w = b0[2] - b0[0]
             b1w = b1[2] - b1[0]
 
-            draw.line([(sbx, bar_cy), (sbx + bar_px, bar_cy)], fill=(0, 0, 0), width=3)
-            draw.line([(sbx, bar_cy - 5), (sbx, bar_cy + 5)], fill=(0, 0, 0), width=3)
-            draw.line([(sbx + bar_px, bar_cy - 5), (sbx + bar_px, bar_cy + 5)], fill=(0, 0, 0), width=3)
+            draw.line([(sbx, bar_cy), (sbx + bar_px, bar_cy)], fill=get_theme()["fg"], width=3)
+            draw.line([(sbx, bar_cy - 5), (sbx, bar_cy + 5)], fill=get_theme()["fg"], width=3)
+            draw.line([(sbx + bar_px, bar_cy - 5), (sbx + bar_px, bar_cy + 5)], fill=get_theme()["fg"], width=3)
 
-            draw.text((sbx - b0w // 2, bar_cy + 8), lbl0, font=sfont, fill=(0, 0, 0))
-            draw.text((sbx + bar_px - b1w // 2, bar_cy + 8), lbl1, font=sfont, fill=(0, 0, 0))
+            draw.text((sbx - b0w // 2, bar_cy + 8), lbl0, font=sfont, fill=get_theme()["fg"])
+            draw.text((sbx + bar_px - b1w // 2, bar_cy + 8), lbl1, font=sfont, fill=get_theme()["fg"])
 
-            right_cx = width - margin - north_w // 2
-            nac = bar_cy - 8
-            arrow_size = 14
-            draw.polygon([(right_cx, nac - arrow_size), (right_cx - 7, nac - 2), (right_cx + 7, nac - 2)], fill=(0, 0, 0))
-            draw.line([(right_cx, nac - 2), (right_cx, nac + 4)], fill=(0, 0, 0), width=2)
-            draw.line([(right_cx - 6, nac + 4), (right_cx + 6, nac + 4)], fill=(0, 0, 0), width=2)
-            nlabel = "N"
-            nb = draw.textbbox((0, 0), nlabel, font=tfont)
-            nw = nb[2] - nb[0]
-            nh = nb[3] - nb[1]
-            draw.text((right_cx - nw // 2, bar_cy + 8), nlabel, font=tfont, fill=(0, 0, 0))
+            if show_north:
+                right_cx = width - margin - north_w // 2
+                nac = bar_cy - 8
+                arrow_size = 14
+                draw.polygon([(right_cx, nac - arrow_size), (right_cx - 7, nac - 2), (right_cx + 7, nac - 2)], fill=get_theme()["fg"])
+                draw.line([(right_cx, nac - 2), (right_cx, nac + 4)], fill=get_theme()["fg"], width=2)
+                draw.line([(right_cx - 6, nac + 4), (right_cx + 6, nac + 4)], fill=get_theme()["fg"], width=2)
+                nlabel = "N"
+                nb = draw.textbbox((0, 0), nlabel, font=tfont)
+                nw = nb[2] - nb[0]
+                nh = nb[3] - nb[1]
+                draw.text((right_cx - nw // 2, bar_cy + 8), nlabel, font=tfont, fill=get_theme()["fg"])
 
         ly = y + (row1_h + gap if show_scale else 0)
 
@@ -578,9 +667,9 @@ class FrameProcessor:
                 bx = margin
                 by = ly + 5
                 draw.rectangle([bx, by, bx + box_size, by + box_size], fill=(128, 128, 128))
-                draw.rectangle([bx, by, bx + box_size, by + box_size], outline=(100, 100, 100), width=2)
-                draw.text((bx + box_size + 10, by), "Sem vegetação", font=tfont, fill=(0, 0, 0))
-                draw.text((margin, by + box_size + 10), "Cada mancha de vegetação possui uma cor única", font=tfont, fill=(0, 0, 0))
+                draw.rectangle([bx, by, bx + box_size, by + box_size], outline=get_theme()["box"], width=2)
+                draw.text((bx + box_size + 10, by), "Sem vegetação", font=tfont, fill=get_theme()["fg"])
+                draw.text((margin, by + box_size + 10), "Cada mancha de vegetação possui uma cor única", font=tfont, fill=get_theme()["fg"])
             elif is_discrete:
                 col_w = (width - 2 * margin) // cols
                 for idx, (color, lbl) in enumerate(entries):
@@ -588,12 +677,13 @@ class FrameProcessor:
                     row = idx // cols
                     bx = margin + col * col_w
                     by = ly + row * row_h
-                    draw.rectangle([bx, by, bx + box_size, by + box_size], fill=color)
-                    draw.rectangle([bx, by, bx + box_size, by + box_size], outline=(100, 100, 100), width=2)
+                    box_y = by + (row_h - box_size) // 2
+                    draw.rectangle([bx, box_y, bx + box_size, box_y + box_size], fill=color)
+                    draw.rectangle([bx, box_y, bx + box_size, box_y + box_size], outline=get_theme()["box"], width=2)
                     txt_bbox = draw.textbbox((0, 0), lbl, font=tfont)
                     txt_h = txt_bbox[3] - txt_bbox[1]
-                    txt_y = by + (box_size - txt_h) // 2
-                    draw.text((bx + box_size + 10, txt_y), lbl, font=tfont, fill=(0, 0, 0))
+                    txt_y = by + (row_h - txt_h) // 2
+                    draw.text((bx + box_size + 10, txt_y), lbl, font=tfont, fill=get_theme()["fg"])
             else:
                 bar_x = margin
                 bar_w = width - 2 * margin
@@ -617,8 +707,8 @@ class FrameProcessor:
                         tx = width - margin - lw
                     else:
                         tx = xi - lw // 2
-                    draw.text((tx, bar_y_pos + box_size + 5), lbl, font=tfont, fill=(0, 0, 0))
-                    draw.line([(xi, bar_y_pos + box_size), (xi, bar_y_pos + box_size + 5)], fill=(0, 0, 0))
+                    draw.text((tx, bar_y_pos + box_size + 5), lbl, font=tfont, fill=get_theme()["fg"])
+                    draw.line([(xi, bar_y_pos + box_size), (xi, bar_y_pos + box_size + 5)], fill=get_theme()["fg"])
 
         image.close()
         padded.save(image_path)
@@ -638,13 +728,14 @@ class FrameProcessor:
         cmap_type: str = "sequential",
         show_legend: bool = True,
         show_scale: bool = True,
+        show_north: bool = True,
         rgb_legend: Optional[Dict[str, Any]] = None,
         legend_order: Optional[List[int]] = None,
         prefix_labels: bool = True,
     ) -> None:
         for path in image_paths:
             try:
-                FrameProcessor.add_bottom_bar(path, lon_min, lon_max, lat_min, lat_max, palette, vmin, vmax, font_size, discrete_labels=discrete_labels, cmap_type=cmap_type, show_legend=show_legend, show_scale=show_scale, rgb_legend=rgb_legend, legend_order=legend_order, prefix_labels=prefix_labels)
+                FrameProcessor.add_bottom_bar(path, lon_min, lon_max, lat_min, lat_max, palette, vmin, vmax, font_size, discrete_labels=discrete_labels, cmap_type=cmap_type, show_legend=show_legend, show_scale=show_scale, show_north=show_north, rgb_legend=rgb_legend, legend_order=legend_order, prefix_labels=prefix_labels)
             except Exception as e:
                 print(f"Erro ao adicionar barra inferior em {path}: {e}")
 
@@ -670,7 +761,7 @@ class FrameProcessor:
         bar_px = int(scale_km / km_per_px) if km_per_px > 0 else bar_width_px
 
         bar_h = 120
-        padded = PILImage.new("RGB", (width, image.height + bar_h), (255, 255, 255))
+        padded = PILImage.new("RGB", (width, image.height + bar_h), get_theme()["bg"])
         padded.paste(image, (0, 0))
         draw = ImageDraw.Draw(padded)
 
@@ -683,26 +774,26 @@ class FrameProcessor:
         bx = width - bar_px - 120
         by = image.height + 56
 
-        draw.line([(bx, by), (bx + bar_px, by)], fill=(0, 0, 0), width=3)
-        draw.line([(bx, by - 6), (bx, by + 6)], fill=(0, 0, 0), width=3)
-        draw.line([(bx + bar_px, by - 6), (bx + bar_px, by + 6)], fill=(0, 0, 0), width=3)
+        draw.line([(bx, by), (bx + bar_px, by)], fill=get_theme()["fg"], width=3)
+        draw.line([(bx, by - 6), (bx, by + 6)], fill=get_theme()["fg"], width=3)
+        draw.line([(bx + bar_px, by - 6), (bx + bar_px, by + 6)], fill=get_theme()["fg"], width=3)
 
         lbl0 = "0"
         lbl1 = f"{int(scale_km)} km"
         b0 = draw.textbbox((0, 0), lbl0, font=font)
-        draw.text((bx - (b0[2] - b0[0]) // 2, by + 12), lbl0, font=font, fill=(0, 0, 0))
+        draw.text((bx - (b0[2] - b0[0]) // 2, by + 12), lbl0, font=font, fill=get_theme()["fg"])
         b1 = draw.textbbox((0, 0), lbl1, font=font)
-        draw.text((bx + bar_px - (b1[2] - b1[0]) // 2, by + 12), lbl1, font=font, fill=(0, 0, 0))
+        draw.text((bx + bar_px - (b1[2] - b1[0]) // 2, by + 12), lbl1, font=font, fill=get_theme()["fg"])
 
         ncx = width - 45
         ncy = by
         arrow_size = 14
-        draw.polygon([(ncx, ncy - arrow_size), (ncx - 7, ncy), (ncx + 7, ncy)], fill=(0, 0, 0))
+        draw.polygon([(ncx, ncy - arrow_size), (ncx - 7, ncy), (ncx + 7, ncy)], fill=get_theme()["fg"])
         nlabel = "N"
         nb = draw.textbbox((0, 0), nlabel, font=sfont)
         nw = nb[2] - nb[0]
         nh = nb[3] - nb[1]
-        draw.text((ncx - nw // 2, ncy - arrow_size - nh - 4), nlabel, font=sfont, fill=(0, 0, 0))
+        draw.text((ncx - nw // 2, ncy - arrow_size - nh - 4), nlabel, font=sfont, fill=get_theme()["fg"])
 
         image.close()
         padded.save(image_path)
@@ -724,7 +815,7 @@ class FrameProcessor:
     @staticmethod
     def add_margin(image_path: str, margin_px: int = 30) -> None:
         image = _ensure_rgb(PILImage.open(image_path))
-        padded = PILImage.new("RGB", (image.width + margin_px * 2, image.height + margin_px * 2), (255, 255, 255))
+        padded = PILImage.new("RGB", (image.width + margin_px * 2, image.height + margin_px * 2), get_theme()["bg"])
         padded.paste(image, (margin_px, margin_px))
         image.close()
         padded.save(image_path)
@@ -764,7 +855,7 @@ class FrameProcessor:
             for path in result:
                 img = _ensure_rgb(PILImage.open(path))
                 if img.width < max_w:
-                    padded = PILImage.new("RGB", (max_w, img.height), (255, 255, 255))
+                    padded = PILImage.new("RGB", (max_w, img.height), get_theme()["bg"])
                     padded.paste(img, (0, 0))
                     img.close()
                     padded.save(path)
@@ -778,7 +869,7 @@ class FrameProcessor:
         palette: List[str],
         vmin: float = 0,
         vmax: float = 1,
-        font_size: int = 50,
+        font_size: int = 80,
         discrete_labels: Optional[List[str]] = None,
         cmap_type: str = "sequential",
         label: str = "",
@@ -794,7 +885,9 @@ class FrameProcessor:
         label_h = font_size + 20 if label else 0
 
         if rgb_legend and rgb_legend.get("entries"):
-            content_h = 90
+            probe = PILImage.new("RGB", (1, 1))
+            pdraw = ImageDraw.Draw(probe)
+            content_h = FrameProcessor._rgb_legend_height(pdraw, font_size)
             tfont = FrameProcessor._make_font(font_size - 14)
             entries_rgb = rgb_legend["entries"]
         elif is_discrete and discrete_labels:
@@ -811,8 +904,12 @@ class FrameProcessor:
                 entries.append((colors[i], lbl))
             if entries:
                 tfont = FrameProcessor._make_font(font_size - 14)
-                cols, rows, tfont, _ = FrameProcessor._layout_discrete(
+                cols, rows, tfont, tfs = FrameProcessor._layout_discrete(
                     width, entries, tfont, box_size, 14, margin, max_cols=3)
+                # A altura da linha precisa acompanhar a fonte real; labels curtos
+                # nao encolhem a fonte e as linhas se sobrepunham.
+                row_h = max(row_h, int(tfs * 1.35))
+                box_size = max(box_size, int(tfs * 0.5))
                 content_h = rows * row_h
             else:
                 box_size = max(20, int(font_size * 0.5))
@@ -824,7 +921,7 @@ class FrameProcessor:
             tfont = FrameProcessor._make_font(font_size - 14)
 
         legend_h = label_h + content_h + margin * 2
-        img = PILImage.new("RGB", (width, legend_h), (255, 255, 255))
+        img = PILImage.new("RGB", (width, legend_h), get_theme()["bg"])
         draw = ImageDraw.Draw(img)
 
         try:
@@ -834,7 +931,7 @@ class FrameProcessor:
 
         y = margin
         if label:
-            draw.text((20, y), label, font=lfont, fill=(0, 0, 0))
+            draw.text((20, y), label, font=lfont, fill=get_theme()["fg"])
         y += label_h
 
         if rgb_legend and rgb_legend.get("entries"):
@@ -846,12 +943,13 @@ class FrameProcessor:
                 row = idx % rows if cols > 1 else idx
                 bx = margin + col * col_w
                 by = y + row * row_h
-                draw.rectangle([bx, by, bx + box_size, by + box_size], fill=color)
-                draw.rectangle([bx, by, bx + box_size, by + box_size], outline=(100, 100, 100), width=2)
+                box_y = by + (row_h - box_size) // 2
+                draw.rectangle([bx, box_y, bx + box_size, box_y + box_size], fill=color)
+                draw.rectangle([bx, box_y, bx + box_size, box_y + box_size], outline=get_theme()["box"], width=2)
                 txt_bbox = draw.textbbox((0, 0), lbl, font=tfont)
                 txt_h = txt_bbox[3] - txt_bbox[1]
-                txt_y = by + (box_size - txt_h) // 2
-                draw.text((bx + box_size + 10, txt_y), lbl, font=tfont, fill=(0, 0, 0))
+                txt_y = by + (row_h - txt_h) // 2 - txt_bbox[1]
+                draw.text((bx + box_size + 10, txt_y), lbl, font=tfont, fill=get_theme()["fg"])
         else:
             bar_x, bar_y = margin, y
             bar_w = width - 2 * margin
@@ -873,8 +971,8 @@ class FrameProcessor:
                     tx = width - margin - lw
                 else:
                     tx = xi - lw // 2
-                draw.text((tx, bar_y + box_size + 8), lbl, font=tfont, fill=(0, 0, 0))
-                draw.line([(xi, bar_y + box_size), (xi, bar_y + box_size + 8)], fill=(0, 0, 0))
+                draw.text((tx, bar_y + box_size + 8), lbl, font=tfont, fill=get_theme()["fg"])
+                draw.line([(xi, bar_y + box_size), (xi, bar_y + box_size + 8)], fill=get_theme()["fg"])
 
         if output_path:
             img.save(output_path)
@@ -889,7 +987,7 @@ class FrameProcessor:
         image = _ensure_rgb(PILImage.open(image_path))
         overlay = PILImage.open(overlay_path)
         new_h = image.height + overlay.height
-        result = PILImage.new("RGB", (image.width, new_h), (255, 255, 255))
+        result = PILImage.new("RGB", (image.width, new_h), get_theme()["bg"])
         result.paste(image, (0, 0))
         result.paste(overlay, (0, image.height))
         image.close()

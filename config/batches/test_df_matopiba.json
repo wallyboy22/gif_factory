@@ -1,0 +1,12 @@
+{
+  "items": [
+    {"dataset": "brasil_fire_col5", "product": "annual_burned", "territory": "uf_df"},
+    {"dataset": "brasil_fire_col5", "product": "annual_burned", "territory": "regiao_matopiba"},
+    {"dataset": "brasil_fire_col5", "product": "fire_frequency", "territory": "uf_df"},
+    {"dataset": "brasil_fire_col5", "product": "fire_frequency", "territory": "regiao_matopiba"},
+    {"dataset": "brasil_fire_col5", "product": "monthly_burned", "territory": "uf_df"},
+    {"dataset": "brasil_fire_col5", "product": "monthly_burned", "territory": "regiao_matopiba"},
+    {"dataset": "brasil_fire_col5", "product": "severity", "territory": "uf_df"},
+    {"dataset": "brasil_fire_col5", "product": "severity", "territory": "regiao_matopiba"}
+  ]
+}

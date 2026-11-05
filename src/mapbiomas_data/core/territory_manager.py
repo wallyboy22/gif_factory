@@ -1,3 +1,4 @@
+import math
 from typing import Any, Dict, List, Optional, Tuple
 from ..config import ConfigLoader
 
@@ -5,7 +6,7 @@ from ..config import ConfigLoader
 class TerritoryManager:
     """Gerenciar territórios geográficos a partir da configuração."""
 
-    TYPES = ["countries", "biomes", "states", "regions", "departments"]
+    TYPES = ["countries", "biomes", "states", "regions", "departments", "municipalities"]
     TYPE_ALIASES = {
         "ufs": "states",
         "custom_regions": "regions",
@@ -45,6 +46,7 @@ class TerritoryManager:
             "type": ttype,
             "source": tinfo.get("source", ""),
             "filter": tinfo.get("filter", ""),
+            "geometry": tinfo.get("geometry"),
             "bbox": tinfo.get("bbox"),
         }
 
@@ -90,6 +92,8 @@ class TerritoryManager:
             import ee
         except ImportError:
             return None
+        if info.get("geometry"):
+            return self._build_geometry_fc(ee, info["geometry"])
         fc = ee.FeatureCollection(info["source"])
         if info.get("filter"):
             parsed = self._parse_filter(info["filter"])
@@ -99,6 +103,32 @@ class TerritoryManager:
         if filter_in:
             fc = fc.filter(ee.Filter.inList(filter_in["field"], filter_in["values"]))
         return fc
+
+    def _build_geometry_fc(self, ee, geometry: dict):
+        """Constroi um FeatureCollection a partir de bbox ou ponto + buffer.
+
+        geometry:
+          bbox: [lon_min, lat_min, lon_max, lat_max] (retângulo direto)
+          center: [lon, lat]
+          buffer_m: raio do buffer em metros (define a altura)
+          aspect: relacao largura/altura para o quadro (ex: 1.78 p/ paisagem 16:9)
+        O retangulo resultante (center): altura = 2*buffer_m, largura = altura*aspect.
+        """
+        if "bbox" in geometry:
+            rect = ee.Geometry.Rectangle(geometry["bbox"])
+            return ee.FeatureCollection([ee.Feature(rect)])
+        center = geometry["center"]
+        buf_m = float(geometry.get("buffer_m", 2500))
+        aspect = float(geometry.get("aspect", 1.0))
+        lat = center[1]
+        half_h = buf_m / 111320.0
+        half_w = half_h * aspect / max(math.cos(math.radians(lat)), 0.01)
+        lon_min = center[0] - half_w
+        lon_max = center[0] + half_w
+        lat_min = center[1] - half_h
+        lat_max = center[1] + half_h
+        rect = ee.Geometry.Rectangle([lon_min, lat_min, lon_max, lat_max])
+        return ee.FeatureCollection([ee.Feature(rect)])
 
     def _parse_filter(self, expression: str) -> Optional[Dict[str, str]]:
         if "==" in expression:
@@ -134,7 +164,7 @@ class TerritoryManager:
     def validate_territory(self, territory_id: str) -> Tuple[bool, str]:
         try:
             info = self.get_territory(territory_id)
-            if not info.get("source"):
+            if not info.get("source") and not info.get("geometry"):
                 return False, "Território sem fonte definida"
             return True, "OK"
         except KeyError as e:

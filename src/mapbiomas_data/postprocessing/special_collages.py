@@ -181,8 +181,8 @@ class SpecialCollageBuilder:
                 FrameProcessor.add_year_label(
                     collage_path, title,
                     position="top_left",
-                    font_size=34,
-                    padding_top=max(130, 34 + 60),
+                    font_size=120,
+                    padding_top=max(130, 120 + 60),
                     bar_color=(255, 255, 255),
                     text_color=(0, 0, 0),
                 )

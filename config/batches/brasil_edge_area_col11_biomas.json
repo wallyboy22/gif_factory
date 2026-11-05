@@ -1,0 +1,11 @@
+{
+  "items": [
+    {"dataset": "brasil_degradation_col11", "product": "edge_area", "territory": "pais_brasil"},
+    {"dataset": "brasil_degradation_col11", "product": "edge_area", "territory": "bioma_amazonia"},
+    {"dataset": "brasil_degradation_col11", "product": "edge_area", "territory": "bioma_caatinga"},
+    {"dataset": "brasil_degradation_col11", "product": "edge_area", "territory": "bioma_cerrado"},
+    {"dataset": "brasil_degradation_col11", "product": "edge_area", "territory": "bioma_mata_atlantica"},
+    {"dataset": "brasil_degradation_col11", "product": "edge_area", "territory": "bioma_pampa"},
+    {"dataset": "brasil_degradation_col11", "product": "edge_area", "territory": "bioma_pantanal"}
+  ]
+}

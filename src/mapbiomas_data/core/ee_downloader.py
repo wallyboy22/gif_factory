@@ -105,19 +105,33 @@ class EEDownloader:
                 .updateMask(ee.Image().paint(region, 0).eq(0))
             )
         else:
+            palette = list(viz_params.get("palette", ["ffffff", "000000"]))
+            vmin = viz_params.get("min", 0)
+            nodata_color = viz_params.get("nodata_color")
+            nodata_value = viz_params.get("nodata_value")
+            if nodata_color and nodata_value is None:
+                # Reserva uma cor fixa para o valor 0 (fora da faixa da legenda)
+                vmin = vmin - 1
+                palette = [nodata_color] + palette
             vis = {
-                "min": viz_params.get("min", 0),
+                "min": vmin,
                 "max": viz_params.get("max", 1),
-                "palette": viz_params.get("palette", ["ffffff", "000000"]),
+                "palette": palette,
                 "bands": [band_name],
             }
-            visualized = (
-                image.select(band_name)
-                .unmask()
-                .visualize(**vis)
-                .updateMask(ee.Image().paint(region, 0).eq(0))
-                .blend(ee.Image().paint(region, "vazio", 1))
-            )
+            visualized = image.select(band_name).unmask().visualize(**vis)
+            if nodata_color and nodata_value is not None:
+                # Pinta exatamente o valor de nodata, sem afetar a faixa da legenda
+                hexc = str(nodata_color).lstrip("#")
+                fill = ee.Image.constant(
+                    [int(hexc[0:2], 16), int(hexc[2:4], 16), int(hexc[4:6], 16)]
+                )
+                visualized = visualized.where(
+                    image.select(band_name).unmask().eq(nodata_value), fill
+                )
+            visualized = visualized.updateMask(
+                ee.Image().paint(region, 0).eq(0)
+            ).blend(ee.Image().paint(region, "vazio", 1))
 
         if overlay_fc is not None:
             boundaries = ee.Image().byte().paint(featureCollection=overlay_fc, color=1, width=1)

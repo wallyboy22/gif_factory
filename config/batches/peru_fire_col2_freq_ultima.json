@@ -1,0 +1,16 @@
+{
+  "items": [
+    {"dataset": "peru_fire_col2", "product": "frequency_burned", "territory": "peru"},
+    {"dataset": "peru_fire_col2", "product": "frequency_burned", "territory": "peru_biomas"},
+    {"dataset": "peru_fire_col2", "product": "frequency_burned", "territory": "peru_bioma_amazonia"},
+    {"dataset": "peru_fire_col2", "product": "frequency_burned", "territory": "peru_bioma_andes"},
+    {"dataset": "peru_fire_col2", "product": "frequency_burned", "territory": "peru_bioma_desierto_costero"},
+    {"dataset": "peru_fire_col2", "product": "frequency_burned", "territory": "peru_bioma_bosque_seco_ecuatorial"},
+    {"dataset": "peru_fire_col2", "product": "year_last_fire", "territory": "peru"},
+    {"dataset": "peru_fire_col2", "product": "year_last_fire", "territory": "peru_biomas"},
+    {"dataset": "peru_fire_col2", "product": "year_last_fire", "territory": "peru_bioma_amazonia"},
+    {"dataset": "peru_fire_col2", "product": "year_last_fire", "territory": "peru_bioma_andes"},
+    {"dataset": "peru_fire_col2", "product": "year_last_fire", "territory": "peru_bioma_desierto_costero"},
+    {"dataset": "peru_fire_col2", "product": "year_last_fire", "territory": "peru_bioma_bosque_seco_ecuatorial"}
+  ]
+}

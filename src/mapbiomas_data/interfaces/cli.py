@@ -61,6 +61,8 @@ class CLI:
         parser.add_argument("--charts", action="store_true", help="Gerar gráficos a partir de area_stats (anual + série temporal)")
         parser.add_argument("--compose", action="store_true", help="Compor mapas + gráficos lado a lado em GIF")
         parser.add_argument("--gcs", action="store_true", help="Exportar/upload para GCS (storage permanente)")
+        parser.add_argument("--product-batch", action="store_true",
+                            help="Modo area-stats: 1 task EE por produto (todos os anos) em vez de 1 por ano")
         parser.add_argument("--cell-height", type=int, default=300, help="Altura de cada célula na colagem (padrão: 300)")
         parser.add_argument("--resume", action="store_true", help="Retomar processamento de onde parou (checkpoint local)")
         parser.add_argument("--resume-from-gcs", action="store_true",
@@ -110,25 +112,29 @@ class CLI:
         if parsed.area_stats:
             if parsed.batch:
                 return self._execute_area_stats_batch(
-                    parsed.batch, use_gcs=parsed.gcs, resume=parsed.resume
+                    parsed.batch, use_gcs=parsed.gcs, resume=parsed.resume,
+                    product_batch=parsed.product_batch,
                 )
             return self._execute_area_stats(
                 parsed.dataset, parsed.product, parsed.territory,
-                use_gcs=parsed.gcs, resume=parsed.resume
+                use_gcs=parsed.gcs, resume=parsed.resume,
+                product_batch=parsed.product_batch,
             )
         if parsed.charts:
             if parsed.batch:
-                return self._execute_charts_batch(parsed.batch, font_scale=parsed.font_scale)
+                return self._execute_charts_batch(parsed.batch, font_scale=parsed.font_scale,
+                                                   use_gcs=parsed.gcs)
             return self._execute_charts(
                 parsed.dataset, parsed.product, parsed.territory,
-                font_scale=parsed.font_scale,
+                font_scale=parsed.font_scale, use_gcs=parsed.gcs,
             )
         if parsed.compose:
             if parsed.batch:
-                return self._execute_compose_batch(parsed.batch, font_scale=parsed.font_scale)
+                return self._execute_compose_batch(parsed.batch, font_scale=parsed.font_scale,
+                                                    use_gcs=parsed.gcs)
             return self._execute_compose(
                 parsed.dataset, parsed.product, parsed.territory,
-                font_scale=parsed.font_scale,
+                font_scale=parsed.font_scale, use_gcs=parsed.gcs,
             )
         if parsed.postprocess:
             if parsed.postprocess == "geopdfs":
@@ -643,7 +649,7 @@ class CLI:
 
     def _execute_charts(
         self, dataset_id: str, product_id: str, territory_id: str,
-        font_scale: float = 1.0,
+        font_scale: float = 1.0, use_gcs: bool = False,
     ):
         if not dataset_id or not product_id or not territory_id:
             print("Erro: --dataset, --product e --territory sao obrigatorios")
@@ -664,6 +670,12 @@ class CLI:
             self.config.get_output_dir(), dataset_id, product_id, territory_id
         )
         self._print_chart_summary(output_dir)
+        if use_gcs:
+            from scripts.sync.upload_to_gcs import upload_combo
+            from pathlib import Path
+            root_dir = Path(self.config.get_output_dir())
+            n = upload_combo(dataset_id, product_id, territory_id, root_dir)
+            print(f"    Upload GCS: {n} arquivo(s)")
 
     def _print_chart_summary(self, output_dir: str):
         """Print summary of chart output folders."""
@@ -675,7 +687,8 @@ class CLI:
                 if files:
                     print(f"  +-> {folder}/: {len(files)} arquivo(s)")
 
-    def _execute_charts_batch(self, batch_path: str, font_scale: float = 1.0):
+    def _execute_charts_batch(self, batch_path: str, font_scale: float = 1.0,
+                               use_gcs: bool = False):
         try:
             with open(batch_path, encoding="utf-8") as f:
                 batch = json.load(f)
@@ -690,6 +703,8 @@ class CLI:
             return
 
         from ..core.chart_generator import ChartGenerator
+        from pathlib import Path
+        root_dir = Path(self.config.get_output_dir())
 
         print("=" * 52)
         print(f"  Charts  —  {total} itens")
@@ -721,6 +736,10 @@ class CLI:
                         self.config.get_output_dir(), ds, prod, terr
                     )
                     self._print_chart_summary(output_dir)
+                    if use_gcs:
+                        from scripts.sync.upload_to_gcs import upload_combo
+                        n = upload_combo(ds, prod, terr, root_dir)
+                        print(f"    Upload GCS: {n} arquivo(s)")
             except Exception as e:
                 import traceback
                 print(f"  [ERRO] {e}")
@@ -748,7 +767,7 @@ class CLI:
 
     def _execute_compose(
         self, dataset_id: str, product_id: str, territory_id: str,
-        font_scale: float = 1.0,
+        font_scale: float = 1.0, use_gcs: bool = False,
     ):
         if not dataset_id or not product_id or not territory_id:
             print("Erro: --dataset, --product e --territory sao obrigatorios")
@@ -781,8 +800,15 @@ class CLI:
             viz_params=viz_params,
         )
         print(f"\n  [OK] {len(paths)} composicao(oes) gerada(s)")
+        if use_gcs:
+            from scripts.sync.upload_to_gcs import upload_combo
+            from pathlib import Path
+            root_dir = Path(self.config.get_output_dir())
+            n = upload_combo(dataset_id, product_id, territory_id, root_dir)
+            print(f"    Upload GCS: {n} arquivo(s)")
 
-    def _execute_compose_batch(self, batch_path: str, font_scale: float = 1.0):
+    def _execute_compose_batch(self, batch_path: str, font_scale: float = 1.0,
+                                use_gcs: bool = False):
         try:
             with open(batch_path, encoding="utf-8") as f:
                 batch = json.load(f)
@@ -797,6 +823,8 @@ class CLI:
             return
 
         from ..core.composer import Composer
+        from pathlib import Path
+        root_dir = Path(self.config.get_output_dir())
 
         print("=" * 52)
         print(f"  Compose  —  {total} itens")
@@ -836,6 +864,10 @@ class CLI:
                 if paths:
                     ok += 1
                     print(f"  +-> {len(paths)} arquivo(s)")
+                    if use_gcs:
+                        from scripts.sync.upload_to_gcs import upload_combo
+                        n = upload_combo(ds, prod, terr, root_dir)
+                        print(f"    Upload GCS: {n} arquivo(s)")
             except Exception as e:
                 print(f"  [ERRO] {ds}/{prod}/{terr}: {e}")
 
@@ -844,7 +876,8 @@ class CLI:
 
     def _execute_area_stats(
         self, dataset_id: str, product_id: str, territory_id: str,
-        use_gcs: bool = False, resume: bool = False
+        use_gcs: bool = False, resume: bool = False,
+        product_batch: bool = False,
     ):
         if not dataset_id or not product_id or not territory_id:
             print("Erro: --dataset, --product e --territory sao obrigatorios")
@@ -857,10 +890,16 @@ class CLI:
 
         from ..core.area_stats import AreaStatsCalculator
         calc = AreaStatsCalculator(self.config)
-        paths = calc.compute_and_save(
-            dataset_id, product_id, territory_id, product_info,
-            use_gcs=use_gcs, resume=resume,
-        )
+
+        if product_batch:
+            paths = calc.compute_and_save_product(
+                dataset_id, product_id, territory_id, product_info,
+            )
+        else:
+            paths = calc.compute_and_save(
+                dataset_id, product_id, territory_id, product_info,
+                use_gcs=use_gcs, resume=resume,
+            )
         if use_gcs:
             output_dir = calc._get_output_dir(dataset_id, product_id, territory_id)
             calc.wait_all_tasks(output_dir)
@@ -868,7 +907,8 @@ class CLI:
         print(f"\n  [OK] {len(paths)} CSV(s) salvos em {calc._get_output_dir(dataset_id, product_id, territory_id)}/area_stats/")
 
     def _execute_area_stats_batch(
-        self, batch_path: str, use_gcs: bool = False, resume: bool = False
+        self, batch_path: str, use_gcs: bool = False, resume: bool = False,
+        product_batch: bool = False,
     ):
         try:
             with open(batch_path, encoding="utf-8") as f:
@@ -889,6 +929,7 @@ class CLI:
         print("=" * 52)
         print(f"  Area Stats  —  {total} itens")
         print(f"  GCS: {'sim' if use_gcs else 'nao'}  |  Resume: {'sim' if resume else 'nao'}")
+        print(f"  Product batch (1 task/produto): {'sim' if product_batch else 'nao'}")
         print("-" * 52)
 
         ok = 0
@@ -912,9 +953,14 @@ class CLI:
 
             print(f"\n[{i:02d}/{total:02d}] {pname} — {ds}/{prod}/{terr}")
             try:
-                paths = calc.compute_and_save(
-                    ds, prod, terr, pinfo, use_gcs=use_gcs, resume=resume,
-                )
+                if product_batch:
+                    paths = calc.compute_and_save_product(
+                        ds, prod, terr, pinfo,
+                    )
+                else:
+                    paths = calc.compute_and_save(
+                        ds, prod, terr, pinfo, use_gcs=use_gcs, resume=resume,
+                    )
                 if paths:
                     ok += 1
                     print(f"  +-> {len(paths)} CSV(s)")
@@ -924,7 +970,7 @@ class CLI:
                 print(f"  [ERRO] {e}")
                 errors += 1
 
-        if use_gcs:
+        if use_gcs and not product_batch:
             for item in items:
                 ds = item.get("dataset", "")
                 prod = item.get("product", "")

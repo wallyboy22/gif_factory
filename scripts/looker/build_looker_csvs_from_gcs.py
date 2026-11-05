@@ -35,6 +35,20 @@ GCS_ROOT = "data-container"
 GCS_BASE_URL = "https://storage.googleapis.com/mapbiomas-fire/data-container"
 LOCAL_CSV_ROOT = "outputs/looker_studio"
 
+TIPO_GRUPO_MAP = {
+    "GIF do periodo": "GIF",
+    "Collage principal": "Collage",
+    "Collage decadal": "Collage",
+    "Collage quinzenal": "Collage",
+    "Collage first_last": "Collage",
+    "Collage last_six": "Collage",
+}
+TIPO_FRAME = "Frame"
+TIPO_GRAFICO_ANUAL = "Gráfico anual"
+TIPO_GRAFICO_TS = "Gráfico série temporal"
+TIPO_GIF_GRAFICOS = "GIF dos gráficos"
+TIPO_GIF_COMPOSTO = "GIF composto"
+
 warnings.filterwarnings("ignore", message="Your application has authenticated using end user credentials")
 
 
@@ -139,6 +153,7 @@ def parse_metadata_dir(dataset_id, base_dir):
 
     base_path = os.path.join(base_dir, dataset_id)
     rows = []
+    base_cache = {}
 
     if not os.path.isdir(base_path):
         return rows
@@ -203,12 +218,14 @@ def parse_metadata_dir(dataset_id, base_dir):
                 total_pixels_m=round(tpx / 1_000_000, 1) if tpx else "",
                 dimensao_frame=dim_str,
             )
+            base_cache[(prod_id, terr_id)] = base_values
 
             # GIF
             rows.append(OrderedDict([
                 *base_values.items(),
                 ("link_direto", gif_url),
                 ("tipo_arquivo", "GIF do periodo"),
+                ("tipo_grupo", TIPO_GRUPO_MAP["GIF do periodo"]),
                 ("arquivo", gif_fn),
                 ("ano", "gif"),
             ]))
@@ -218,6 +235,7 @@ def parse_metadata_dir(dataset_id, base_dir):
                 *base_values.items(),
                 ("link_direto", collage_url),
                 ("tipo_arquivo", "Collage principal"),
+                ("tipo_grupo", TIPO_GRUPO_MAP["Collage principal"]),
                 ("arquivo", collage_fn),
                 ("ano", "principal"),
             ]))
@@ -228,6 +246,7 @@ def parse_metadata_dir(dataset_id, base_dir):
                     *base_values.items(),
                     ("link_direto", curl),
                     ("tipo_arquivo", f"Collage {mode}"),
+                    ("tipo_grupo", TIPO_GRUPO_MAP[f"Collage {mode}"]),
                     ("arquivo", cfn),
                     ("ano", mode),
                 ]))
@@ -241,10 +260,61 @@ def parse_metadata_dir(dataset_id, base_dir):
                 rows.append(OrderedDict([
                     *base_values.items(),
                     ("link_direto", frame_url),
-                    ("tipo_arquivo", f"Frame do ano {year}"),
+                    ("tipo_arquivo", f"Frame {year}"),
+                    ("tipo_grupo", TIPO_FRAME),
                     ("arquivo", ffn),
                     ("ano", year),
                 ]))
+
+    # --- Varredura GCS para charts e composed (complementa linhas sem metadata JSON) ---
+    try:
+        client = get_gcs_client()
+        bucket = client.bucket(BUCKET_NAME)
+        prefix = f"{GCS_ROOT}/{dataset_id}/"
+        gcs_configs = [
+            ("charts_annual_clean", TIPO_GRAFICO_ANUAL, "Gráfico",
+             lambda fn: (m.group(1) if (m := re.search(r'_(\d{4})\.png$', fn)) else "")),
+            ("charts_timeseries_clean", TIPO_GRAFICO_TS, "Gráfico",
+             lambda fn: (m.group(1) if (m := re.search(r'_(\d{4})\.png$', fn)) else "")),
+            ("charts_gifs", TIPO_GIF_GRAFICOS, "Gráfico",
+             lambda fn: "charts"),
+            ("composed", TIPO_GIF_COMPOSTO, "GIF composto",
+             lambda fn: "composed"),
+        ]
+        for subdir, tipo_label, grupo_label, year_fn in gcs_configs:
+            sub_prefix = f"{prefix}"
+            for blob in bucket.list_blobs(prefix=sub_prefix):
+                if f"/{subdir}/" not in blob.name:
+                    continue
+                if not (blob.name.endswith(".png") or blob.name.endswith(".gif")):
+                    continue
+                rel = blob.name[len(f"{GCS_ROOT}/"):]
+                parts = rel.split("/")
+                if len(parts) < 4:
+                    continue
+                ds, pid, tid = parts[0], parts[1], parts[2]
+                fname = parts[-1]
+                if tid not in parts:
+                    continue
+                cache_key = (pid, tid)
+                bv = base_cache.get(cache_key)
+                if bv is None:
+                    continue
+                ano_val = year_fn(fname)
+                link = f"{GCS_BASE_URL}/{ds}/{pid}/{tid}/{subdir}/{fname}"
+                tipo_arquivo_val = tipo_label
+                if "{year}" in tipo_label:
+                    tipo_arquivo_val = tipo_label.format(year=ano_val)
+                rows.append(OrderedDict([
+                    *bv.items(),
+                    ("link_direto", link),
+                    ("tipo_arquivo", tipo_arquivo_val),
+                    ("tipo_grupo", grupo_label),
+                    ("arquivo", fname),
+                    ("ano", ano_val),
+                ]))
+    except Exception as e:
+        print(f"  [aviso] Varredura GCS para charts/compose falhou: {e}")
 
     return rows
 
@@ -253,7 +323,7 @@ def pivot_territorios(data):
     """Pivot onde TERRITORIOS sao as COLUNAS (linhas = produtos, todos os tipos de arquivo)."""
     prods = sorted(set(r["produto_id"] for r in data))
     terrs = sorted(set(r["territorio_id"] for r in data))
-    fn = ["dataset", "colecao", "produto_id", "nome_produto", "tipo_arquivo", "ano"] + terrs
+    fn = ["dataset", "colecao", "produto_id", "nome_produto", "tipo_arquivo", "tipo_grupo", "ano"] + terrs
     out = []
     for pid in prods:
         sub = [r for r in data if r["produto_id"] == pid]
@@ -270,6 +340,7 @@ def pivot_territorios(data):
             row["produto_id"] = pid
             row["nome_produto"] = r["nome_produto"]
             row["tipo_arquivo"] = r["tipo_arquivo"]
+            row["tipo_grupo"] = r["tipo_grupo"]
             row["ano"] = r["ano"]
             for t in terrs:
                 match = [x for x in sub if x["territorio_id"] == t and x["tipo_arquivo"] == r["tipo_arquivo"] and x["ano"] == r["ano"]]
@@ -282,7 +353,7 @@ def pivot_produtos(data):
     """Pivot onde PRODUTOS sao as COLUNAS (linhas = territorios, todos os tipos de arquivo)."""
     terrs = sorted(set(r["territorio_id"] for r in data))
     prods = sorted(set(r["produto_id"] for r in data))
-    fn = ["dataset", "colecao", "territorio_id", "nome_territorio", "tipo_territorio", "tipo_arquivo", "ano"] + prods
+    fn = ["dataset", "colecao", "territorio_id", "nome_territorio", "tipo_territorio", "tipo_arquivo", "tipo_grupo", "ano"] + prods
     out = []
     for tid in terrs:
         sub = [r for r in data if r["territorio_id"] == tid]
@@ -299,6 +370,7 @@ def pivot_produtos(data):
             row["nome_territorio"] = r["nome_territorio"]
             row["tipo_territorio"] = r["tipo_territorio"]
             row["tipo_arquivo"] = r["tipo_arquivo"]
+            row["tipo_grupo"] = r["tipo_grupo"]
             row["ano"] = r["ano"]
             for p in prods:
                 match = [x for x in sub if x["produto_id"] == p and x["tipo_arquivo"] == r["tipo_arquivo"] and x["ano"] == r["ano"]]
@@ -319,7 +391,7 @@ FIELDS = [
     "link_direto", "dataset", "colecao",
     "produto_id", "nome_produto",
     "territorio_id", "nome_territorio", "tipo_territorio",
-    "tipo_arquivo", "arquivo", "ano",
+    "tipo_arquivo", "tipo_grupo", "arquivo", "ano",
     "data_geracao", "bandas",
     "gif_tamanho_mb", "frames_total_mb", "frames_count",
     "tempo_total_s", "tempo_download_s", "tempo_resize_s",
@@ -408,10 +480,12 @@ def main():
         print("  Nenhum metadata encontrado. Abortando.")
         return
 
-    gif_count = sum(1 for r in all_rows if r["tipo_arquivo"] == "GIF do periodo")
-    frame_count = sum(1 for r in all_rows if r["tipo_arquivo"].startswith("Frame"))
-    collage_count = sum(1 for r in all_rows if r["tipo_arquivo"] == "Colagem")
-    print(f"  {len(all_rows)} linhas ({gif_count} GIFs, {collage_count} Colagens, {frame_count} Frames)")
+    tipo_counts = {}
+    for r in all_rows:
+        tg = r.get("tipo_grupo", "?")
+        tipo_counts[tg] = tipo_counts.get(tg, 0) + 1
+    parts = [f"{v} {k}" for k, v in sorted(tipo_counts.items())]
+    print(f"  {len(all_rows)} linhas ({', '.join(parts)})")
 
     # 2. Generate CSVs
     print(f"\n[2/3] Gerando CSVs...")

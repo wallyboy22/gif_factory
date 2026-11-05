@@ -482,7 +482,7 @@ class AreaStatsCalculator:
 
         def to_feature(g):
             d = ee.Dictionary(g)
-            cls_val = ee.Number(d.get("group")).toInt()
+            cls_val = ee.Number(ee.Algorithms.If(d.contains("class"), d.get("class"), d.get("group"))).toInt()
             area_sqm = ee.Number(d.get("sum"))
             area_ha = area_sqm.divide(10000)
             return ee.Feature(None, {
@@ -521,6 +521,203 @@ class AreaStatsCalculator:
         task.start()
         return task
 
+    def _export_all_years_to_gcs(
+        self, img: ee.Image, territory_fc: ee.FeatureCollection,
+        year_bands: List[Tuple[int, str]], product_id: str, territory_id: str,
+        dataset_id: str, bucket_name: str
+    ) -> ee.batch.Task:
+        """Export all years of a product as a single EE task.
+
+        Builds one FeatureCollection per year (per-class area),
+        merges them, and exports a single CSV with all years.
+        """
+        area_img = ee.Image.pixelArea()
+
+        def build_year_fc(year: int, band_name: str):
+            year_img = img.select(band_name)
+            stacked = area_img.addBands(year_img)
+            stats = stacked.reduceRegion(
+                reducer=ee.Reducer.sum().group(groupField=1, groupName="class"),
+                geometry=territory_fc,
+                scale=30, bestEffort=True, maxPixels=1e13,
+            )
+            total = area_img.reduceRegion(
+                reducer=ee.Reducer.sum(),
+                geometry=territory_fc,
+                scale=30, bestEffort=True, maxPixels=1e13,
+            )
+            groups = ee.List(stats.get("groups"))
+
+            def to_feature(g):
+                d = ee.Dictionary(g)
+                cls_val = ee.Number(ee.Algorithms.If(d.contains("class"), d.get("class"), d.get("group"))).toInt()
+                area_sqm = ee.Number(d.get("sum"))
+                area_ha = area_sqm.divide(10000)
+                return ee.Feature(None, {
+                    "class_value": cls_val,
+                    "area_ha": area_ha,
+                    "year": ee.Number(year),
+                    "dataset": dataset_id,
+                    "product": product_id,
+                    "territory_id": territory_id,
+                })
+
+            fc = ee.FeatureCollection(groups.map(to_feature))
+            total_sqm = ee.Number(total.get("area"))
+            sum_other = fc.aggregate_sum("area_ha").multiply(10000)
+            zero_sqm = total_sqm.subtract(sum_other)
+            zero_feat = ee.Feature(None, {
+                "class_value": 0,
+                "area_ha": zero_sqm.divide(10000),
+                "year": ee.Number(year),
+                "dataset": dataset_id,
+                "product": product_id,
+                "territory_id": territory_id,
+            })
+            return fc.merge(ee.FeatureCollection([zero_feat]))
+
+        year_fcs = [build_year_fc(year, band_name) for year, band_name in year_bands]
+        merged = year_fcs[0]
+        for fc in year_fcs[1:]:
+            merged = merged.merge(fc)
+
+        prefix = f"area_stats/{dataset_id}/{product_id}/{territory_id}"
+        filename = f"{prefix}/all_years"
+        task = ee.batch.Export.table.toCloudStorage(
+            collection=merged,
+            description=f"area_stats_{product_id}_{territory_id}_all",
+            bucket=bucket_name,
+            fileNamePrefix=filename,
+            fileFormat="CSV",
+        )
+        task.start()
+        return task
+
+    def compute_and_save_product(
+        self,
+        dataset_id: str,
+        product_id: str,
+        territory_id: str,
+        product_info: Dict[str, Any],
+    ) -> List[str]:
+        """Compute area stats for a (product, territory) with ONE export task per product.
+
+        Exports ALL years as a single EE task. Returns after the task
+        completes and the unified CSV is assembled locally.
+
+        Returns list of CSV paths that were saved (single unified CSV).
+        """
+        territory_info = self.territory_manager.get_territory(territory_id)
+        if territory_info is None:
+            print(f"  [SKIP] Territory '{territory_id}' not found")
+            return []
+        territory_name = territory_info.get("name", territory_id)
+        territory_fc = self.territory_manager.get_feature_collection(territory_id)
+
+        viz_key = product_info.get("visualization", "fire")
+        class_labels = self.get_class_labels(viz_key)
+
+        output_dir = self._get_output_dir(dataset_id, product_id, territory_id)
+        area_stats_dir = self._get_area_stats_dir(output_dir)
+
+        yaml_bands = product_info.get("bands", [])
+        temporal_range = product_info.get("temporal_range")
+        bands_slice = product_info.get("bands_slice")
+
+        img = self._load_image(product_info)
+        year_bands = self._map_years_to_bands(
+            img, yaml_bands, temporal_range, bands_slice
+        )
+
+        if not year_bands:
+            print(f"  [SKIP] No bands to process for '{product_id}'")
+            return []
+
+        unified_csv = os.path.join(area_stats_dir, f"{product_id}_{territory_id}_area_stats.csv")
+        bucket_name = self._get_gcs_bucket()
+
+        if bucket_name:
+            task = self._export_all_years_to_gcs(
+                img, territory_fc, year_bands, product_id, territory_id,
+                dataset_id, bucket_name
+            )
+            print(f"  Product task started: {task.id}")
+            self._save_tasks(output_dir, [{
+                "task_id": task.id,
+                "product": product_id,
+                "territory": territory_id,
+                "year": "all",
+                "state": "STARTED",
+            }])
+            # Wait for completion
+            ok = self._wait_for_product_task(product_id, territory_id)
+            if ok:
+                # Download the single all_years CSV from GCS
+                gcs_csv = f"area_stats/{dataset_id}/{product_id}/{territory_id}/all_years.csv"
+                gcs_path = f"{bucket_name}/{gcs_csv}"
+                tmp_csv = os.path.join(area_stats_dir, "_all_years.csv")
+                self._download_from_gcs(gcs_path, tmp_csv)
+
+                all_records = []
+                with open(tmp_csv, newline="") as f:
+                    reader = csv.DictReader(f)
+                    for row in reader:
+                        all_records.append({
+                            "dataset": dataset_id,
+                            "product": product_id,
+                            "territory_id": territory_id,
+                            "territory_name": territory_name,
+                            "year": row.get("year", "static"),
+                            "class_value": int(row.get("class_value", 0)),
+                            "class_name": class_labels.get(
+                                int(row.get("class_value", 0)),
+                                row.get("class_name", f"Class {row.get('class_value', 0)}"),
+                            ),
+                            "area_ha": float(row.get("area_ha", 0)),
+                        })
+                os.remove(tmp_csv)
+
+                all_records.sort(key=lambda r: (r["year"], r["class_value"]))
+                with open(unified_csv, "w", newline="", encoding="utf-8") as f:
+                    fieldnames = ["dataset", "product", "territory_id", "territory_name",
+                                   "year", "class_value", "class_name", "area_ha"]
+                    writer = csv.DictWriter(f, fieldnames=fieldnames)
+                    writer.writeheader()
+                    writer.writerows(all_records)
+                print(f"  Unified CSV: {unified_csv} ({len(all_records)} rows)")
+                return [unified_csv]
+            else:
+                print(f"  [FAIL] Product task failed for {product_id}/{territory_id}")
+                return []
+        else:
+            # Local computation: all years
+            all_records = []
+            for year, band_name in year_bands:
+                year_str = str(year) if year > 0 else "static"
+                year_img = img.select(band_name)
+                records = self._compute_local(year_img, territory_fc)
+                for r in records:
+                    r.update({
+                        "dataset": dataset_id,
+                        "product": product_id,
+                        "territory_id": territory_id,
+                        "territory_name": territory_name,
+                        "year": year_str,
+                        "class_name": class_labels.get(r["class_value"], f"Class {r['class_value']}"),
+                    })
+                all_records.extend(records)
+                print(f"  [{year_str}] Local computation done")
+
+            all_records.sort(key=lambda r: (r["year"], r["class_value"]))
+            with open(unified_csv, "w", newline="", encoding="utf-8") as f:
+                fieldnames = ["dataset", "product", "territory_id", "territory_name",
+                               "year", "class_value", "class_name", "area_ha"]
+                writer = csv.DictWriter(f, fieldnames=fieldnames)
+                writer.writeheader()
+                writer.writerows(all_records)
+            print(f"  Unified CSV: {unified_csv} ({len(all_records)} rows)")
+            return [unified_csv]
+
     def _download_from_gcs(self, gcs_path: str, local_path: str):
         from google.cloud import storage
         os.makedirs(os.path.dirname(local_path), exist_ok=True)
@@ -558,6 +755,34 @@ class AreaStatsCalculator:
             time.sleep(30)
         return False
 
+    def _check_product_task(self, product_id: str, territory_id: str) -> str:
+        prefix = f"area_stats_{product_id}_{territory_id}_all"
+        try:
+            root = ee.data.getAssetRoots()[0]["id"].replace("projects/", "")
+            tasks = ee.data.listOperations(root)
+            for t in (tasks or []):
+                meta = t.get("metadata", {})
+                if meta.get("description") == prefix:
+                    return meta.get("state", "UNKNOWN")
+        except Exception:
+            pass
+        return "NOT_FOUND"
+
+    def _wait_for_product_task(
+        self, product_id: str, territory_id: str, timeout: int = 7200
+    ) -> bool:
+        deadline = time.time() + timeout
+        while time.time() < deadline:
+            status = self._check_product_task(product_id, territory_id)
+            if status == "COMPLETED":
+                print(f"  [all] Task COMPLETED")
+                return True
+            elif status in ("FAILED", "CANCELLED"):
+                print(f"  [all] Task {status}")
+                return False
+            time.sleep(30)
+        return False
+
     def wait_all_tasks(self, output_dir: str, poll_interval: int = 30) -> Dict[str, str]:
         tasks = self._load_tasks(output_dir)
         if not tasks:
@@ -579,6 +804,33 @@ class AreaStatsCalculator:
                     results[t["year"]] = state
                     pending.remove(t)
                     print(f"    [{t['year']}] {state}")
+            if pending:
+                time.sleep(poll_interval)
+
+        self._save_tasks(output_dir, tasks)
+        return results
+
+    def wait_all_product_tasks(self, output_dir: str, poll_interval: int = 30) -> Dict[str, str]:
+        tasks = self._load_tasks(output_dir)
+        if not tasks:
+            return {}
+
+        results = {t["product"]: t.get("state", "UNKNOWN") for t in tasks}
+        pending = [t for t in tasks if t.get("state") in ("STARTED", "RUNNING")]
+        if not pending:
+            return results
+
+        print(f"  Monitoring {len(pending)} product tasks...")
+        while pending:
+            for t in list(pending):
+                state = self._check_product_task(
+                    t["product"], t["territory"]
+                )
+                if state in ("COMPLETED", "FAILED", "CANCELLED"):
+                    t["state"] = state
+                    results[t["product"]] = state
+                    pending.remove(t)
+                    print(f"    [{t['product']}] {state}")
             if pending:
                 time.sleep(poll_interval)
 
